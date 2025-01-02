@@ -1,0 +1,3 @@
+CREATE INDEX idx_categoria_gastos ON gastos_fixos(categoria_id);
+CREATE INDEX idx_orcamento_gastos_fixos ON gastos_fixos(orcamento_id);
+CREATE INDEX idx_investimento_linha_do_tempo ON linha_do_tempo_investimentos(investimento_id);
