@@ -19,7 +19,7 @@ Este projeto é uma API Rest para controle de gastos e investimentos, utilizando
 1. Clone o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/projeto-controle-gastos.git
+git clone git@gitlab.com:bruninho51/projeto-controle-gastos.git
 cd projeto-controle-gastos
 ```
 
