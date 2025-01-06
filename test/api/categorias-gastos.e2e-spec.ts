@@ -9,6 +9,9 @@ import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
+import { CategoriaGastoUpdateInputDto } from 'src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdateInput.dto';
+
+const apiGlobalPrefix = '/api/v1';
 
 describe('CategoriasGastosController (e2e)', () => {
   let app: INestApplication;
@@ -22,6 +25,9 @@ describe('CategoriasGastosController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    app.setGlobalPrefix(apiGlobalPrefix);
+
     prisma = moduleFixture.get<PrismaService>(PrismaService);
 
     globalPipes.forEach(gp => app.useGlobalPipes(gp));
@@ -35,10 +41,10 @@ describe('CategoriasGastosController (e2e)', () => {
     await app.close();
   });
 
-  describe('GET /v1/categorias-gastos', () => {
+  describe(`GET ${apiGlobalPrefix}/categorias-gastos`, () => {
     it('should return an array of categorias de gastos', async () => {
       const response = await request(app.getHttpServer())
-        .get('/v1/categorias-gastos')
+        .get(`${apiGlobalPrefix}/categorias-gastos`)
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
@@ -55,7 +61,7 @@ describe('CategoriasGastosController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .get('/v1/categorias-gastos');
+        .get(`${apiGlobalPrefix}/categorias-gastos`);
 
       const result = response.body.filter(c => c.id === categoria.id);
 
@@ -63,14 +69,14 @@ describe('CategoriasGastosController (e2e)', () => {
     });
   });
 
-  describe('POST /v1/categorias-gastos', () => {
+  describe(`POST ${apiGlobalPrefix}/categorias-gastos`, () => {
     it('should create a new categoria de gasto', async () => {
       const newCategoria: CategoriaGastoCreateInputDto = {
         nome: faker.string.alphanumeric(6).toUpperCase(),
       };
 
       const response = await request(app.getHttpServer())
-        .post('/v1/categorias-gastos')
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
         .send(newCategoria)
         .expect(201);
 
@@ -88,7 +94,7 @@ describe('CategoriasGastosController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .post('/v1/categorias-gastos')
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
         .send({ nome })
         .expect(201);
 
@@ -97,7 +103,7 @@ describe('CategoriasGastosController (e2e)', () => {
       expect(response.body.nome).toBe(nome);
     });
 
-    it('should return 409 if name exists', async () => {
+    it('should return 409 if name exists when create', async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       await prisma.categoriaGasto.create({
         data: {
@@ -110,7 +116,7 @@ describe('CategoriasGastosController (e2e)', () => {
       };
 
       await request(app.getHttpServer())
-        .post('/v1/categorias-gastos')
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
         .send(newCategoria)
         .expect(409);
     });
@@ -124,7 +130,7 @@ describe('CategoriasGastosController (e2e)', () => {
       } as CategoriaGastoCreateInputDto;
 
       await request(app.getHttpServer())
-        .post('/v1/categorias-gastos')
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
         .send(newCategoria)
         .expect(400);
     });
@@ -133,7 +139,7 @@ describe('CategoriasGastosController (e2e)', () => {
       const invalidCategoria = {}; // Missing required fields
 
       const response = await request(app.getHttpServer())
-        .post('/v1/categorias-gastos')
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
         .send(invalidCategoria)
         .expect(400);
 
@@ -141,7 +147,7 @@ describe('CategoriasGastosController (e2e)', () => {
     });
   });
 
-  describe('PATCH /v1/categorias-gastos/:id', () => {
+  describe(`PATCH ${apiGlobalPrefix}/categorias-gastos/:id`, () => {
     it('should return 404 if try to update a categoria de gasto was deleted (soft delete)', async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
@@ -156,7 +162,7 @@ describe('CategoriasGastosController (e2e)', () => {
       };
 
       await request(app.getHttpServer())
-        .patch(`/v1/categorias-gastos/${categoria.id}`)
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .send(updatedCategoria)
         .expect(404);
 
@@ -175,7 +181,7 @@ describe('CategoriasGastosController (e2e)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`/v1/categorias-gastos/${categoria.id}`)
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .send(updatedCategoria)
         .expect(200);
 
@@ -186,13 +192,31 @@ describe('CategoriasGastosController (e2e)', () => {
     it('should return 404 if categoria de gasto does not exist', async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       await request(app.getHttpServer())
-        .patch('/v1/categorias-gastos/999')
+        .patch(`${apiGlobalPrefix}/categorias-gastos/999`)
         .send({ nome })
         .expect(404);
     });
+
+    it('should return 409 if name exists when update', async () => {
+      const nome1 = faker.string.alphanumeric(6).toUpperCase();
+      const nome2 = faker.string.alphanumeric(6).toUpperCase();
+
+      const categoriaGasto1 = await prisma.categoriaGasto.create({
+        data: { nome: nome1 },
+      });
+
+      await prisma.categoriaGasto.create({
+        data: { nome: nome2 },
+      });
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoriaGasto1.id}`)
+        .send({ nome: nome2 })
+        .expect(409);
+    });
   });
 
-  describe('DELETE /v1/categorias-gastos/:id', () => {
+  describe(`DELETE ${apiGlobalPrefix}/categorias-gastos/:id`, () => {
     it('should soft delete a categoria de gasto', async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
@@ -202,7 +226,7 @@ describe('CategoriasGastosController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .delete(`/v1/categorias-gastos/${categoria.id}`)
+        .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .expect(200);
 
       expect(response.body).toHaveProperty('soft_delete');
@@ -217,18 +241,18 @@ describe('CategoriasGastosController (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .delete(`/v1/categorias-gastos/${categoria.id}`)
+        .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .expect(200);
 
       await request(app.getHttpServer())
-        .delete(`/v1/categorias-gastos/${categoria.id}`)
+        .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .expect(404);
 
     });
 
     it('should return 404 if categoria de gasto does not exist', async () => {
       await request(app.getHttpServer())
-        .delete('/v1/categorias-gastos/999')
+        .delete(`${apiGlobalPrefix}/categorias-gastos/999`)
         .expect(404);
 
     });

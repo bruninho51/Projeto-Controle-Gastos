@@ -5,7 +5,7 @@ import { OrcamentoCreateInputDto } from './dtos/OrcamentoCreateInput.dto';
 import { OrcamentoUpdateInputDto } from './dtos/OrcamentoUpdateInput.dto';
 
 @ApiTags('Orçamentos') 
-@Controller('v1/orcamentos')
+@Controller('orcamentos')
 export class OrcamentosController {
   constructor(private readonly orcamentoService: OrcamentosService) {}
 
@@ -13,6 +13,7 @@ export class OrcamentosController {
   @ApiOperation({ summary: 'Criar um novo orçamento' })
   @ApiBody({ type: OrcamentoCreateInputDto })
   @ApiResponse({ status: 201, description: 'Orçamento criado com sucesso.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   create(@Body() createOrcamentoDto: OrcamentoCreateInputDto) {
     return this.orcamentoService.create(createOrcamentoDto);
   }
@@ -20,6 +21,7 @@ export class OrcamentosController {
   @Get()
   @ApiOperation({ summary: 'Buscar todos os orçamentos' })
   @ApiResponse({ status: 200, description: 'Lista de orçamentos.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   findAll() {
     return this.orcamentoService.findAll();
   }
@@ -29,6 +31,7 @@ export class OrcamentosController {
   @ApiParam({ name: 'id', type: 'string', description: 'ID do orçamento', required: true })
   @ApiResponse({ status: 200, description: 'Orçamento encontrado.' })
   @ApiResponse({ status: 404, description: 'Orçamento não encontrado.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   async findOne(@Param('id') id: string) {
     return this.orcamentoService.findOne(+id);
   }
@@ -39,6 +42,7 @@ export class OrcamentosController {
   @ApiBody({ type: OrcamentoUpdateInputDto })
   @ApiResponse({ status: 200, description: 'Orçamento atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Orçamento não encontrado.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   update(
     @Param('id') id: string,
     @Body() updateOrcamentoDto: OrcamentoUpdateInputDto,
@@ -51,6 +55,7 @@ export class OrcamentosController {
   @ApiParam({ name: 'id', type: 'string', description: 'ID do orçamento', required: true })
   @ApiResponse({ status: 200, description: 'Orçamento removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Orçamento não encontrado.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   remove(@Param('id') id: string) {
     return this.orcamentoService.softDelete(+id);
   }

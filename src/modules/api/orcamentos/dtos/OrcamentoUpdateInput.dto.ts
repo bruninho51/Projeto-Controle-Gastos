@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsDate, IsOptional, IsString } from "class-validator";
+import { IsDate, IsDecimal, IsOptional, IsString } from "class-validator";
 
 export class OrcamentoUpdateInputDto {
     @IsString()
@@ -11,7 +11,7 @@ export class OrcamentoUpdateInputDto {
       })
     nome?: string;
 
-    @IsString()
+    @IsDecimal({ decimal_digits: '2' })
     @IsOptional()
     @ApiProperty({
         description: 'Valor inicial/salário',

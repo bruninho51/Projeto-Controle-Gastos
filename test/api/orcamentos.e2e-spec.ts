@@ -10,6 +10,8 @@ import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
 
+const apiGlobalPrefix = '/api/v1';
+
 describe('OrcamentoController (v1) (E2E)', () => {
   let app: INestApplication;
   let prismaService: PrismaService;
@@ -22,6 +24,9 @@ describe('OrcamentoController (v1) (E2E)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+
+    app.setGlobalPrefix(apiGlobalPrefix);
+
     prismaService = moduleFixture.get<PrismaService>(PrismaService);
 
     globalPipes.forEach(gp => app.useGlobalPipes(gp));
@@ -36,7 +41,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
     await app.close();
   });
 
-  describe('POST /v1/orcamentos', () => {
+  describe(`POST ${apiGlobalPrefix}/orcamentos`, () => {
     it('should create a new orcamento', async () => {
       const createOrcamentoDto = {
         nome: 'Orçamento A',
@@ -44,7 +49,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(201);
 
@@ -68,7 +73,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send({ nome, valor_inicial })
         .expect(201);
 
@@ -88,16 +93,16 @@ describe('OrcamentoController (v1) (E2E)', () => {
       } as OrcamentoCreateInputDto;
   
       await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(400);
     });
   });
 
-  describe('GET /v1/orcamentos', () => {
+  describe('GET ${apiGlobalPrefix}/orcamentos', () => {
     it('should return all orcamentos', async () => {
       const response = await request(app.getHttpServer())
-        .get('/v1/orcamentos')
+        .get(`${apiGlobalPrefix}/orcamentos`)
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
@@ -114,7 +119,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .get('/v1/orcamentos');
+        .get(`${apiGlobalPrefix}/orcamentos`);
 
       const result = response.body.filter(o => o.id === orcamento.id);
 
@@ -122,7 +127,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
     });
   });
 
-  describe('GET /v1/orcamentos/:id', () => {
+  describe(`GET ${apiGlobalPrefix}/orcamentos/:id`, () => {
     it('should return a single orcamento', async () => {
       const createOrcamentoDto = {
         nome: 'Orçamento B',
@@ -130,14 +135,14 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(201);
 
       const orcamentoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-        .get(`/v1/orcamentos/${orcamentoId}`)
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
         .expect(200);
 
       expect(response.body.id).toBe(orcamentoId);
@@ -146,7 +151,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
 
     it('should return 404 if orcamento not found', async () => {
       const response = await request(app.getHttpServer())
-        .get('/v1/orcamentos/9999')
+        .get(`${apiGlobalPrefix}/orcamentos/9999`)
         .expect(404);
 
 
@@ -154,7 +159,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
     });
   });
 
-  describe('PATCH /v1/orcamentos/:id', () => {
+  describe(`PATCH ${apiGlobalPrefix}/orcamentos/:id`, () => {
     it('should update an orcamento', async () => {
       const createOrcamentoDto = {
         nome: 'Orçamento C',
@@ -162,7 +167,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(201);
 
@@ -174,7 +179,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`/v1/orcamentos/${orcamentoId}`)
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
         .send(updateOrcamentoDto)
         .expect(200);
 
@@ -192,14 +197,14 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(201);
 
       const orcamentoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(`/v1/orcamentos/${orcamentoId}`);
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`);
 
       const updateOrcamentoDto = {
         nome: 'Orçamento C Atualizado',
@@ -207,14 +212,14 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       await request(app.getHttpServer())
-        .patch(`/v1/orcamentos/${orcamentoId}`)
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
         .send(updateOrcamentoDto)
         .expect(404);
 
     });
   });
 
-  describe('DELETE /v1/orcamentos/:id', () => {
+  describe(`DELETE ${apiGlobalPrefix}/orcamentos/:id`, () => {
     it('should delete an orcamento (soft delete)', async () => {
       const createOrcamentoDto = {
         nome: 'Orçamento D',
@@ -222,14 +227,14 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(201);
 
       const orcamentoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-        .delete(`/v1/orcamentos/${orcamentoId}`)
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
         .expect(200);
 
       expect(response.body.soft_delete).toBeTruthy();
@@ -242,18 +247,18 @@ describe('OrcamentoController (v1) (E2E)', () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post('/v1/orcamentos')
+        .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(201);
 
       const orcamentoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-          .delete(`/v1/orcamentos/${orcamentoId}`);
+          .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`);
 
 
         await request(app.getHttpServer())
-          .delete(`/v1/orcamentos/${orcamentoId}`)
+          .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
           .expect(404);
 
     });

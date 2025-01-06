@@ -6,7 +6,11 @@ import { globalPipes } from './pipes/globalPipes';
 import { globalInterceptors } from './interceptors/globalInterceptors';
 
 async function bootstrap() {
+  const apiGlobalPrefix = '/api/v1';
+
   const app = await NestFactory.create(AppModule);
+
+  app.setGlobalPrefix(apiGlobalPrefix);
 
   globalPipes.forEach(gp => app.useGlobalPipes(gp));
   globalFilters.forEach(gf => app.useGlobalFilters(gf));
@@ -19,7 +23,7 @@ async function bootstrap() {
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup(`${apiGlobalPrefix}/docs`, app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsDecimal, IsString } from "class-validator";
 
 export class OrcamentoCreateInputDto {
     @IsString()
@@ -9,7 +9,7 @@ export class OrcamentoCreateInputDto {
       })
     nome: string;
 
-    @IsString()
+    @IsDecimal({ decimal_digits: '2' })
     @ApiProperty({
         description: 'Valor inicial/salário',
         example: '2000.00',

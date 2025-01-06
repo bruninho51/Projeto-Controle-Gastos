@@ -5,13 +5,14 @@ import { CategoriaGastoUpdateInputDto } from './dtos/CategoriaGastoUpdateInput.d
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Categorias de Gastos')
-@Controller('v1/categorias-gastos')
+@Controller('categorias-gastos')
 export class CategoriasGastosController {
   constructor(private readonly categoriasGastosService: CategoriasGastosService) {}
 
   @Get()
   @ApiOperation({ summary: 'Listar todas as categorias de gastos' })
   @ApiResponse({ status: 200, description: 'Lista de categorias de gastos' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   async findAll() {
     return this.categoriasGastosService.findAll();
   }
@@ -19,6 +20,8 @@ export class CategoriasGastosController {
   @Post()
   @ApiOperation({ summary: 'Criar uma nova categoria de gasto' })
   @ApiResponse({ status: 201, description: 'Categoria de gasto criada com sucesso.' })
+  @ApiResponse({ status: 409, description: 'Categoria de gasto já existe.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   async create(@Body() createCategoriaDto: CategoriaGastoCreateInputDto) {
     return this.categoriasGastosService.create(createCategoriaDto);
   }
@@ -26,6 +29,9 @@ export class CategoriasGastosController {
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar uma categoria de gasto' })
   @ApiResponse({ status: 200, description: 'Categoria de gasto atualizada com sucesso.' })
+  @ApiResponse({ status: 409, description: 'Categoria de gasto já existe.' })
+  @ApiResponse({ status: 404, description: 'Categoria de gasto não existe.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   async update(@Param('id') id: number, @Body() updateCategoriaDto: CategoriaGastoUpdateInputDto) {
     return this.categoriasGastosService.update(id, updateCategoriaDto);
   }
@@ -33,6 +39,8 @@ export class CategoriasGastosController {
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar uma categoria de gasto (soft delete)' })
   @ApiResponse({ status: 200, description: 'Categoria de gasto deletada com sucesso.' })
+  @ApiResponse({ status: 404, description: 'Categoria de gasto não existe.' })
+  @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   async remove(@Param('id') id: number) {
     return this.categoriasGastosService.softDelete(id);
   }
