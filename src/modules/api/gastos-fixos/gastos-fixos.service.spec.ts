@@ -43,7 +43,7 @@ describe('GastosFixosService', () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
-        orcamento_id: faker.number.int(),
+        //orcamento_id: faker.number.int(),
         previsto: faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }).toString(),
       };
 

@@ -11,6 +11,8 @@ import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
 import { CategoriaGasto, Orcamento } from '@prisma/client';
+import { OrcamentoCreateInputDto } from '../../src/modules/api/orcamentos/dtos/OrcamentoCreateInput.dto';
+import { OrcamentosModule } from '../../src/modules/api/orcamentos/orcamentos.module';
 
 const apiGlobalPrefix = '/api/v1';
 
@@ -25,7 +27,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
     await runPrismaMigrations();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [GastosFixosModule],
+      imports: [OrcamentosModule, GastosFixosModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -65,11 +67,10 @@ describe('GastosFixosController (v1) (E2E)', () => {
         descricao: faker.string.alphanumeric(5),
         previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
         categoria_id: categoriaMock.id,
-        orcamento_id: orcamentoMock.id,
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(201);
 
@@ -77,36 +78,34 @@ describe('GastosFixosController (v1) (E2E)', () => {
         expect(response.body.descricao).toBe(createGastoDto.descricao);
         expect(response.body.previsto).toBe(createGastoDto.previsto);
         expect(response.body.categoria_id).toBe(createGastoDto.categoria_id);
-        expect(response.body.orcamento_id).toBe(createGastoDto.orcamento_id);
+        expect(response.body.orcamento_id).toBe(orcamentoMock.id);
         
     });
 
-    it('should return 409 when categoria gasto does not exists', async () => {
+    it('should return 404 when categoria gasto does not exists', async () => {
       const createGastoDto: GastoFixoCreateInputDto = {
         descricao: faker.string.alphanumeric(5),
         previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
         categoria_id: 999,
-        orcamento_id: orcamentoMock.id,
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(404);
 
         expect(response.body.message).toBe("A categoria informada não foi encontrada.");
     });
 
-    it('should return 409 when orcamento does not exists', async () => {
+    it('should return 404 when orcamento does not exists', async () => {
       const createGastoDto: GastoFixoCreateInputDto = {
         descricao: faker.string.alphanumeric(5),
         previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
         categoria_id: categoriaMock.id,
-        orcamento_id: 999,
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/999/gastos-fixos`)
         .send(createGastoDto)
         .expect(404);
 
@@ -118,13 +117,12 @@ describe('GastosFixosController (v1) (E2E)', () => {
             descricao: faker.string.alphanumeric(5),
             previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
             categoria_id: categoriaMock.id,
-            orcamento_id: orcamentoMock.id,
             invalid_field: 'invalid'
         } as GastoFixoCreateInputDto;
     
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(400);
     });
@@ -132,12 +130,41 @@ describe('GastosFixosController (v1) (E2E)', () => {
 
   describe(`GET ${apiGlobalPrefix}/gastos-fixos`, () => {
     it('should return all gastos fixos', async () => {
-      const response = await request(app.getHttpServer())
-        .get(`${apiGlobalPrefix}/gastos-fixos`)
+      const orcamentoMock2: OrcamentoCreateInputDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
+      }
+
+      const orcamento2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock2)
+        .expect(201);
+
+      const gastoFixoOrcamento2: GastoFixoCreateInputDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock2}/gastos-fixos`)
+        .send(gastoFixoOrcamento2)
+        .expect(201);
+
+      const responseOrcamentoMock = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .expect(200);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
+        const responseOrcamentoMock2 = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos`)
+        .expect(200);
+
+      const orcamento1Ok = responseOrcamentoMock.body.every(reg => reg.orcamento_id === orcamentoMock.id);
+      const orcamento2Ok = responseOrcamentoMock2.body.every(reg => reg.orcamento_id === orcamento2.body.id);
+
+      expect(orcamento1Ok).toBeTruthy();
+      expect(orcamento2Ok).toBeTruthy();
     });
   });
 
@@ -147,30 +174,58 @@ describe('GastosFixosController (v1) (E2E)', () => {
             descricao: faker.string.alphanumeric(5),
             previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
             categoria_id: categoriaMock.id,
-            orcamento_id: orcamentoMock.id,
         };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(201);
 
       const gastoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-        .get(`${apiGlobalPrefix}/gastos-fixos/${gastoId}`)
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`)
         .expect(200);
 
       expect(response.body.id).toBe(gastoId);
       expect(response.body.descricao).toBe(createGastoDto.descricao);
       expect(response.body.previsto).toBe(createGastoDto.previsto);
       expect(response.body.categoria_id).toBe(createGastoDto.categoria_id);
-      expect(response.body.orcamento_id).toBe(createGastoDto.orcamento_id);
+      expect(response.body.orcamento_id).toBe(orcamentoMock.id);
     });
+
+    it('should return a 404 error if the gasto fixo exists but does not belong to the specified orcamento', async () => {
+      const orcamentoMock2: OrcamentoCreateInputDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
+      }
+
+      const orcamento2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock2)
+        .expect(201);
+      
+      const createGastoDto: GastoFixoCreateInputDto = {
+          descricao: faker.string.alphanumeric(5),
+          previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+          categoria_id: categoriaMock.id,
+      };
+
+    const createResponse = await request(app.getHttpServer())
+      .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+      .send(createGastoDto)
+      .expect(201);
+
+    const gastoId = createResponse.body.id;
+
+    await request(app.getHttpServer())
+      .get(`${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos/${gastoId}`)
+      .expect(404);    
+  });
 
     it('should return 404 if gasto fixo not found', async () => {
       const response = await request(app.getHttpServer())
-        .get(`${apiGlobalPrefix}/gastos-fixos/9999`)
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/9999`)
         .expect(404);
 
       expect(response.body.message).toBe('Not Found');
@@ -183,11 +238,10 @@ describe('GastosFixosController (v1) (E2E)', () => {
             descricao: 'Descrição antiga',
             previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
             categoria_id: categoriaMock.id,
-            orcamento_id: orcamentoMock.id,
         };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(201);
 
@@ -200,7 +254,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/gastos-fixos/${gastoId}`)
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`)
         .send(updateGastoDto)
         .expect(200);
 
@@ -208,16 +262,51 @@ describe('GastosFixosController (v1) (E2E)', () => {
       expect(response.body.valor).toBe(updateGastoDto.valor);
     });
 
+    it('should return a 404 error if the gasto fixo exists but does not belong to the specified orcamento', async () => {
+      const orcamentoMock2: OrcamentoCreateInputDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
+      }
+
+      const orcamento2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock2)
+        .expect(201);
+      
+      const createGastoDto: GastoFixoCreateInputDto = {
+          descricao: 'Descrição antiga',
+          previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+          categoria_id: categoriaMock.id,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      const updateGastoDto: GastoFixoUpdateInputDto = {
+        descricao: 'Gasto Fixo D Atualizado',
+        valor: '500.35',
+        data_pgto: new Date()
+      };
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos/${gastoId}`)
+        .send(updateGastoDto)
+        .expect(404);
+    });
+
     it('should return 409 if add valor without data_pgto', async () => {
         const createGastoDto: GastoFixoCreateInputDto = {
             descricao: 'Descrição antiga',
             previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
             categoria_id: categoriaMock.id,
-            orcamento_id: orcamentoMock.id,
         };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(201);
 
@@ -229,7 +318,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/gastos-fixos/${gastoId}`)
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`)
         .send(updateGastoDto)
         .expect(409);
 
@@ -243,7 +332,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
       };
 
       await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/gastos-fixos/9999`)
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/9999`)
         .send(updateGastoDto)
         .expect(404);
     });
@@ -255,18 +344,17 @@ describe('GastosFixosController (v1) (E2E)', () => {
             descricao: faker.string.alphanumeric(5),
             previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
             categoria_id: categoriaMock.id,
-            orcamento_id: orcamentoMock.id,
         };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(201);
 
       const gastoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/gastos-fixos/${gastoId}`)
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`)
         .expect(200);
 
       expect(response.body.soft_delete).toBeTruthy();
@@ -274,8 +362,37 @@ describe('GastosFixosController (v1) (E2E)', () => {
 
     it('should return 404 if gasto fixo not found for delete', async () => {
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/gastos-fixos/9999`)
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/9999`)
         .expect(404);
     });
+
+    it('should return a 404 error if the gasto fixo exists but does not belong to the specified orcamento', async () => {
+      const orcamentoMock2: OrcamentoCreateInputDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
+      }
+
+      const orcamento2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock2)
+        .expect(201);
+      
+      const createGastoDto: GastoFixoCreateInputDto = {
+          descricao: faker.string.alphanumeric(5),
+          previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+          categoria_id: categoriaMock.id,
+      };
+
+    const createResponse = await request(app.getHttpServer())
+      .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+      .send(createGastoDto)
+      .expect(201);
+
+    const gastoId = createResponse.body.id;
+
+    const response = await request(app.getHttpServer())
+      .delete(`${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos/${gastoId}`)
+      .expect(404);
+  });
   });
 });

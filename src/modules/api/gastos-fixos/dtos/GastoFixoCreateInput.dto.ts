@@ -23,12 +23,12 @@ export class GastoFixoCreateInputDto {
   @IsInt()
   categoria_id: number;
 
-  @ApiProperty({
+  /*@ApiProperty({
     description: 'ID do orçamento',
     example: 1,
   })
   @IsInt()
-  orcamento_id: number;
+  orcamento_id: number;*/
 
   @ApiProperty({
     description: 'Observações adicionais sobre o gasto fixo',
