@@ -9,7 +9,6 @@ import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
-import { CategoriaGastoUpdateInputDto } from 'src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdateInput.dto';
 
 const apiGlobalPrefix = '/api/v1';
 
@@ -115,10 +114,12 @@ describe('CategoriasGastosController (e2e)', () => {
         nome,
       };
 
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)
         .send(newCategoria)
         .expect(409);
+
+      expect(response.body.message).toBe('A categoria já existe. Por favor, escolha outro nome.');
     });
 
     it('should return 400 on pass an invalid field on create a categoria de gasto', async () => {
@@ -136,7 +137,7 @@ describe('CategoriasGastosController (e2e)', () => {
     });
 
     it('should return a 400 error if invalid data is passed', async () => {
-      const invalidCategoria = {}; // Missing required fields
+      const invalidCategoria = {};
 
       const response = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)

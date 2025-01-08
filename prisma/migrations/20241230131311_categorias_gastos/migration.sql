@@ -8,7 +8,7 @@ CREATE TABLE categorias_gastos (
     soft_delete TIMESTAMP,  -- Coluna para soft delete
     CHECK (data_inatividade IS NULL OR data_inatividade >= data_criacao),  -- Garante que a data de inatividade seja válida
     CHECK (soft_delete IS NULL OR soft_delete >= data_criacao),  -- Garante que a data de soft delete seja válida
-    UNIQUE KEY (nome,(coalesce(soft_delete, '1900-01-01')))
+    UNIQUE KEY unique_categoria_gasto (nome,(coalesce(soft_delete, '1900-01-01')))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Inserindo categorias
