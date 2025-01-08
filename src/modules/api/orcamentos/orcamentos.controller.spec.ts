@@ -1,19 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrcamentosController } from './orcamentos.controller';
 import { OrcamentosService } from './orcamentos.service';
-import { PrismaService } from '../../prisma/prisma.service';
 import { OrcamentoCreateInputDto } from './dtos/OrcamentoCreateInput.dto';
 import { OrcamentoUpdateInputDto } from './dtos/OrcamentoUpdateInput.dto';
-
-const mockPrismaService = {
-  orcamentos: {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
-};
 
 const mockOrcamentosService = {
   create: jest.fn(),
@@ -26,17 +15,12 @@ const mockOrcamentosService = {
 describe('OrcamentoController', () => {
   let controller: OrcamentosController;
   let service: OrcamentosService;
-  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrcamentosController],
       providers: [
         OrcamentosService,
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
         {
           provide: OrcamentosService,
           useValue: mockOrcamentosService,
@@ -46,7 +30,6 @@ describe('OrcamentoController', () => {
 
     controller = module.get<OrcamentosController>(OrcamentosController);
     service = module.get<OrcamentosService>(OrcamentosService);
-    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
