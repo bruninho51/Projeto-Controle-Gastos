@@ -9,7 +9,7 @@ export class OrcamentoCreateInputDto {
       })
     nome: string;
 
-    @IsDecimal({ decimal_digits: '2' })
+    @IsDecimal()
     @ApiProperty({
         description: 'Valor inicial/salário',
         example: '2000.00',

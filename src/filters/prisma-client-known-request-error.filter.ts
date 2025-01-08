@@ -9,21 +9,21 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
     const response = context.getResponse<Response>();
 
     switch (exception.code) {
-      case 'P2025': // "An operation failed because it depends on one or more records that were required but not found. {cause}"
-        return response
-          .status(HttpStatus.NOT_FOUND)
-          .send();
-          
-      case 'P2002': // "Unique constraint failed on the {constraint}"
+      case 'P2025':
+        return this.handleRecordNotFound(response);
+      case 'P2002':
         return this.handleUniqueConstraintError(exception, response);
-        
+      case 'P2003':
+        return this.handleForeignKeyConstraintFailed(exception, response);
       default:
-        console.error('Erro desconhecido do Prisma:', exception);
+        return this.handleUnknownError(exception, response);
+    }
+  }
 
-        return response
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .send();
-    }    
+  private handleRecordNotFound(response: Response) {
+    return response
+      .status(HttpStatus.NOT_FOUND)
+      .json({ message: 'Registro não encontrado.' });
   }
 
   private handleUniqueConstraintError(
@@ -42,8 +42,32 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
       }
     }
 
-    console.error('Erro desconhecido de unique constraint:', exception);
+    return response
+      .status(HttpStatus.CONFLICT)
+      .json({ message: 'Violação de restrição única. Verifique os dados inseridos.' });
+  }
 
-    return response.status(HttpStatus.CONFLICT).send();
+  private handleForeignKeyConstraintFailed(
+    exception: Prisma.PrismaClientKnownRequestError,
+    response: Response
+  ) {
+    const fieldName = exception.meta?.['field_name'] as string;
+    const messages: Record<string, string> = {
+      categoria_id: 'A categoria informada não foi encontrada.',
+      orcamento_id: 'O orçamento informado não foi encontrado.',
+    };
+
+    const message = messages[fieldName] || 'Entidade associada não encontrada.';
+    return response.status(HttpStatus.NOT_FOUND).json({ message });
+  }
+
+  private handleUnknownError(
+    exception: Prisma.PrismaClientKnownRequestError,
+    response: Response
+  ) {
+    console.error('Erro desconhecido do Prisma:', exception);
+    return response
+      .status(HttpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: 'Erro interno no servidor. Por favor, tente novamente mais tarde.' });
   }
 }

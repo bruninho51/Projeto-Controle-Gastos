@@ -11,7 +11,7 @@ export class OrcamentoUpdateInputDto {
       })
     nome?: string;
 
-    @IsDecimal({ decimal_digits: '2' })
+    @IsDecimal()
     @IsOptional()
     @ApiProperty({
         description: 'Valor inicial/salário',

@@ -81,6 +81,38 @@ describe('GastosFixosController (v1) (E2E)', () => {
         
     });
 
+    it('should return 409 when categoria gasto does not exists', async () => {
+      const createGastoDto: GastoFixoCreateInputDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+        categoria_id: 999,
+        orcamento_id: orcamentoMock.id,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(404);
+
+        expect(response.body.message).toBe("A categoria informada não foi encontrada.");
+    });
+
+    it('should return 409 when orcamento does not exists', async () => {
+      const createGastoDto: GastoFixoCreateInputDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+        categoria_id: categoriaMock.id,
+        orcamento_id: 999,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(404);
+
+        expect(response.body.message).toBe("O orçamento informado não foi encontrado.");
+    });
+
     it('should return 400 on passing an invalid field on create a new gasto fixo', async () => {
         const createGastoDto = {
             descricao: faker.string.alphanumeric(5),

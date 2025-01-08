@@ -13,7 +13,7 @@ export class GastoFixoCreateInputDto {
     description: 'Valor previsto',
     example: '130.00',
   })
-  @IsDecimal({ decimal_digits: '2' })
+  @IsDecimal()
   previsto: string;
   
   @ApiProperty({
