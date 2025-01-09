@@ -16,7 +16,6 @@ const mockPrismaService = {
 
 describe('GastosFixosService', () => {
   let service: GastosFixosService;
-  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,7 +29,6 @@ describe('GastosFixosService', () => {
     }).compile();
 
     service = module.get<GastosFixosService>(GastosFixosService);
-    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {
