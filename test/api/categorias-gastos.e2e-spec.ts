@@ -9,6 +9,7 @@ import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
+import { CategoriaGastoUpdateInputDto } from 'src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdateInput.dto';
 
 const apiGlobalPrefix = '/api/v1';
 
@@ -81,6 +82,25 @@ describe('CategoriasGastosController (e2e)', () => {
 
       expect(response.body).toHaveProperty('id');
       expect(response.body.nome).toBe(newCategoria.nome);
+    });
+
+    it('should return 400 with correct messages when create a new categoria gasto when all fiends as null', async () => {
+      const newCategoria: Required<CategoriaGastoCreateInputDto> = {
+        nome: null,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .send(newCategoria)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          'nome should not be empty',
+          'nome must be a string',
+        ]);
     });
 
     it('should create categoria gasto even if it has already been created and deleted (soft delete)', async () => {
@@ -188,6 +208,73 @@ describe('CategoriasGastosController (e2e)', () => {
 
       expect(response.body.id).toBe(categoria.id);
       expect(response.body.nome).toBe(updatedCategoria.nome);
+    });
+
+    it('should return 200 when inactivate a categoria gasto', async () => {
+      const nome = faker.string.alphanumeric(6).toUpperCase();
+      const categoria = await prisma.categoriaGasto.create({
+        data: {
+          nome,
+        },
+      });
+
+      const updatedCategoria: CategoriaGastoUpdateInputDto = {
+        data_inatividade: new Date(),
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .send(updatedCategoria)
+        .expect(200);
+
+      expect(response.body.data_inatividade).toBeTruthy();
+    });
+
+    it('should return 200 when activate a categoria gasto', async () => {
+      const nome = faker.string.alphanumeric(6).toUpperCase();
+      const categoria = await prisma.categoriaGasto.create({
+        data: {
+          nome,
+        },
+      });
+
+      const updatedCategoria: CategoriaGastoUpdateInputDto = {
+        data_inatividade: null,
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .send(updatedCategoria)
+        .expect(200);
+
+      expect(response.body.data_inatividade).toBeNull();
+    });
+
+    it('should return 400 with correct messages when update a categoria gasto when all fiends as null', async () => {
+      const nome = faker.string.alphanumeric(6).toUpperCase();
+      const categoria = await prisma.categoriaGasto.create({
+        data: {
+          nome,
+        },
+      });
+
+      const updatedCategoria: Required<CategoriaGastoUpdateInputDto> = {
+        nome: null,
+        data_inatividade: null
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .send(updatedCategoria)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          "nome should not be empty",
+          "nome must be a string",
+        ]);
     });
 
     it('should return 404 if categoria de gasto does not exist', async () => {

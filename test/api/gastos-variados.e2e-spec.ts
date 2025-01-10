@@ -2,9 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { PrismaService } from '../../src/modules/prisma/prisma.service';
-import { GastosFixosModule } from '../../src/modules/api/gastos-fixos/gastos-fixos.module';
-import { GastoFixoCreateInputDto } from '../../src/modules/api/gastos-fixos/dtos/GastoFixoCreateInput.dto';
-import { GastoFixoUpdateInputDto } from '../../src/modules/api/gastos-fixos/dtos/GastoFixoUpdateInput.dto';
 import { globalPipes } from '../../src/pipes/globalPipes';
 import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
@@ -14,8 +11,8 @@ import { CategoriaGasto, Orcamento } from '@prisma/client';
 import { OrcamentoCreateInputDto } from '../../src/modules/api/orcamentos/dtos/OrcamentoCreateInput.dto';
 import { OrcamentosModule } from '../../src/modules/api/orcamentos/orcamentos.module';
 import { GastosVariadosModule } from '../../src/modules/api/gastos-variados/gastos-variados.module';
-import { GastoVariadoCreateInputDto } from 'src/modules/api/gastos-variados/dtos/GastoVariadoCreateInput.dto';
-import { GastoVariadoUpdateInputDto } from 'src/modules/api/gastos-variados/dtos/GastoVariadoUpdateInput.dto';
+import { GastoVariadoCreateInputDto } from '../../src/modules/api/gastos-variados/dtos/GastoVariadoCreateInput.dto';
+import { GastoVariadoUpdateInputDto } from '../../src/modules/api/gastos-variados/dtos/GastoVariadoUpdateInput.dto';
 
 const apiGlobalPrefix = '/api/v1';
 
@@ -66,10 +63,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
 
   describe(`POST ${apiGlobalPrefix}/gastos-variados`, () => {
     it('should create a new gasto variado', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
       const createGastoDto: GastoVariadoCreateInputDto = {
         descricao: faker.string.alphanumeric(5),
         valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-        data_pgto: new Date(),
+        data_pgto: mockDataPgto,
         categoria_id: categoriaMock.id,
       };
 
@@ -80,13 +80,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
 
         expect(response.body).toHaveProperty('id');
         expect(response.body.descricao).toBe(createGastoDto.descricao);
-        expect(response.body.previsto).toBe(createGastoDto.valor);
-        expect(response.body.data_pgto).toBe(createGastoDto.data_pgto);
+        expect(response.body.valor).toBe(createGastoDto.valor);
+        expect(response.body.data_pgto).toBe(mockDataPgto.toISOString());
         expect(response.body.categoria_id).toBe(createGastoDto.categoria_id);
         expect(response.body.orcamento_id).toBe(orcamentoMock.id);
     });
 
-    it('should return 400 if data_pgto is passed null', async () => {
+    it('should return 400 if data_pgto is passed as null', async () => {
       const createGastoDto: GastoVariadoCreateInputDto = {
         descricao: faker.string.alphanumeric(5),
         valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
@@ -103,10 +103,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
     });
 
     it('should return 404 when categoria gasto does not exists', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
       const createGastoDto: GastoVariadoCreateInputDto = {
         descricao: faker.string.alphanumeric(5),
         valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-        data_pgto: new Date(),
+        data_pgto: mockDataPgto,
         categoria_id: 999,
       };
 
@@ -119,10 +122,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
     });
 
     it('should return 404 when orcamento does not exists', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
       const createGastoDto: GastoVariadoCreateInputDto = {
         descricao: faker.string.alphanumeric(5),
         valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-        data_pgto: new Date(),
+        data_pgto: mockDataPgto,
         categoria_id: categoriaMock.id,
       };
 
@@ -135,10 +141,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
     });
 
     it('should return 400 on passing an invalid field on create a new gasto variado', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
         const createGastoDto = {
             descricao: faker.string.alphanumeric(5),
             valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-            data_pgto: new Date(),
+            data_pgto: mockDataPgto,
             categoria_id: categoriaMock.id,
             invalid_field: 'invalid'
         } as GastoVariadoCreateInputDto;
@@ -153,6 +162,9 @@ describe('GastosVariadosController (v1) (E2E)', () => {
 
   describe(`GET ${apiGlobalPrefix}/gastos-variados`, () => {
     it('should return all gastos variados', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
       const orcamentoMock2: OrcamentoCreateInputDto = {
         nome: faker.string.alphanumeric(5),
         valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
@@ -167,7 +179,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
         categoria_id: categoriaMock.id,
         descricao: faker.string.alphanumeric(5),
         valor: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
-        data_pgto: new Date(),
+        data_pgto: mockDataPgto,
         observacoes: faker.string.alphanumeric(5),
       }
 
@@ -194,10 +206,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
 
   describe(`GET ${apiGlobalPrefix}/gastos-variados/:id`, () => {
     it('should return a single gasto variado', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
         const createGastoDto: GastoVariadoCreateInputDto = {
             descricao: faker.string.alphanumeric(5),
             valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-            data_pgto: new Date(),
+            data_pgto: mockDataPgto,
             categoria_id: categoriaMock.id,
         };
 
@@ -215,12 +230,15 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       expect(response.body.id).toBe(gastoId);
       expect(response.body.descricao).toBe(createGastoDto.descricao);
       expect(response.body.valor).toBe(createGastoDto.valor);
-      expect(response.body.data_pgto).toBe(createGastoDto.data_pgto);
+      expect(response.body.data_pgto).toBe(mockDataPgto.toISOString());
       expect(response.body.categoria_id).toBe(createGastoDto.categoria_id);
       expect(response.body.orcamento_id).toBe(orcamentoMock.id);
     });
 
     it('should return a 404 error if the gasto variado exists but does not belong to the specified orcamento', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
       const orcamentoMock2: OrcamentoCreateInputDto = {
         nome: faker.string.alphanumeric(5),
         valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
@@ -234,7 +252,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       const createGastoDto: GastoVariadoCreateInputDto = {
           descricao: faker.string.alphanumeric(5),
           valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-          data_pgto: new Date(),
+          data_pgto: mockDataPgto,
           categoria_id: categoriaMock.id,
       };
 
@@ -261,10 +279,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
 
   describe(`PATCH ${apiGlobalPrefix}/gastos-variados/:id`, () => {
     it('should update an existing gasto variado', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
         const createGastoDto: GastoVariadoCreateInputDto = {
             descricao: 'Descrição antiga',
             valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-            data_pgto: new Date(),
+            data_pgto: mockDataPgto,
             categoria_id: categoriaMock.id,
         };
 
@@ -278,7 +299,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       const updateGastoDto: GastoVariadoUpdateInputDto = {
         descricao: 'Gasto Variado D Atualizado',
         valor: '500.35',
-        data_pgto: new Date()
+        data_pgto: mockDataPgto
       };
 
       const response = await request(app.getHttpServer())
@@ -288,10 +309,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
 
       expect(response.body.descricao).toBe(updateGastoDto.descricao);
       expect(response.body.valor).toBe(updateGastoDto.valor);
-      expect(response.body.data_pgto).toBe(updateGastoDto.data_pgto);
+      expect(response.body.data_pgto).toBe(mockDataPgto.toISOString());
     });
 
     it('should return a 404 error if the gasto variado exists but does not belong to the specified orcamento', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
       const orcamentoMock2: OrcamentoCreateInputDto = {
         nome: faker.string.alphanumeric(5),
         valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
@@ -305,7 +329,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       const createGastoDto: GastoVariadoCreateInputDto = {
           descricao: 'Descrição antiga',
           valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-          data_pgto: new Date(),
+          data_pgto: mockDataPgto,
           categoria_id: categoriaMock.id,
       };
 
@@ -319,7 +343,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       const updateGastoDto: GastoVariadoUpdateInputDto = {
         descricao: 'Gasto Variado D Atualizado',
         valor: '500.35',
-        data_pgto: new Date()
+        data_pgto: mockDataPgto
       };
 
       await request(app.getHttpServer())
@@ -328,39 +352,14 @@ describe('GastosVariadosController (v1) (E2E)', () => {
         .expect(404);
     });
 
-    it('should return 409 if add valor without data_pgto', async () => {
-        const createGastoDto: GastoVariadoCreateInputDto = {
-            descricao: 'Descrição antiga',
-            valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-            data_pgto: new Date(),
-            categoria_id: categoriaMock.id,
-        };
+    it('should return 409 if add valor with a null data_pgto', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
 
-      const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados`)
-        .send(createGastoDto)
-        .expect(201);
-
-      const gastoId = createResponse.body.id;
-
-      const updateGastoDto: GastoVariadoUpdateInputDto = {
-        descricao: 'Gasto Variado D Atualizado',
-        valor: '500.35',
-      };
-
-      const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados/${gastoId}`)
-        .send(updateGastoDto)
-        .expect(409);
-
-      expect(response.body.message).toBe("Se o valor for preenchido, a data_pgto também deve ser preenchida.");
-    });
-
-    it('should return 409 if add valor without a null data_pgto', async () => {
       const createGastoDto: GastoVariadoCreateInputDto = {
           descricao: 'Descrição antiga',
           valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-          data_pgto: new Date(),
+          data_pgto: mockDataPgto,
           categoria_id: categoriaMock.id,
       };
 
@@ -400,10 +399,13 @@ describe('GastosVariadosController (v1) (E2E)', () => {
 
   describe(`DELETE ${apiGlobalPrefix}/gastos-variados/:id`, () => {
     it('should soft delete a gasto variado', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
         const createGastoDto: GastoVariadoCreateInputDto = {
             descricao: faker.string.alphanumeric(5),
             valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-            data_pgto: new Date(),
+            data_pgto: mockDataPgto,
             categoria_id: categoriaMock.id,
         };
 
@@ -428,6 +430,9 @@ describe('GastosVariadosController (v1) (E2E)', () => {
     });
 
     it('should return a 404 error if the gasto variado exists but does not belong to the specified orcamento', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
       const orcamentoMock2: OrcamentoCreateInputDto = {
         nome: faker.string.alphanumeric(5),
         valor_inicial: faker.number.float({ min: 100, max: 999, fractionDigits: 2 }).toString(),
@@ -441,7 +446,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       const createGastoDto: GastoVariadoCreateInputDto = {
           descricao: faker.string.alphanumeric(5),
           valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
-          data_pgto: new Date(),
+          data_pgto: mockDataPgto,
           categoria_id: categoriaMock.id,
       };
 

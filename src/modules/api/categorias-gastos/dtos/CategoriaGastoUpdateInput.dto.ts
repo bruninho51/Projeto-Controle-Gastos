@@ -1,18 +1,19 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsNotEmpty, ValidateIf } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 export class CategoriaGastoUpdateInputDto {
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
+  @ValidateIf(o => o.nome === null)
   @ApiProperty({
     description: 'Nome da categoria',
     example: 'Alimentação',
   })
   nome?: string;
 
-  @IsDate()
   @IsOptional()
+  @IsDate()
   @Transform(({ value }) => value ? new Date(value) : null)
   @ApiProperty({
     description: 'Inativar a categoria de gastos',

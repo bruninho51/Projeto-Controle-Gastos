@@ -1,8 +1,10 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDecimal, IsString } from "class-validator";
+import { IsDecimal, IsNotEmpty, IsString } from "class-validator";
 
 export class OrcamentoCreateInputDto {
+    
     @IsString()
+    @IsNotEmpty()
     @ApiProperty({
         description: 'Nome do orçamento',
         example: 'JANEIRO 2025',
@@ -10,6 +12,7 @@ export class OrcamentoCreateInputDto {
     nome: string;
 
     @IsDecimal()
+    @IsNotEmpty()
     @ApiProperty({
         description: 'Valor inicial/salário',
         example: '2000.00',

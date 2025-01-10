@@ -6,6 +6,7 @@ CREATE TABLE gastos_variados (
     categoria_id INT,
     orcamento_id INT,
     data_pgto DATE,
+    observacoes TEXT,
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     data_inatividade TIMESTAMP,  -- Coluna de inatividade

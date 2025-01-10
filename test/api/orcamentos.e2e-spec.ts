@@ -9,6 +9,7 @@ import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
+import { OrcamentoUpdateInputDto } from 'src/modules/api/orcamentos/dtos/OrcamentoUpdateInput.dto';
 
 const apiGlobalPrefix = '/api/v1';
 
@@ -58,6 +59,28 @@ describe('OrcamentoController (v1) (E2E)', () => {
       expect(response.body.valor_inicial).toBe(createOrcamentoDto.valor_inicial);
       expect(response.body.valor_atual).toBe(createOrcamentoDto.valor_inicial);
       expect(response.body.valor_livre).toBe(createOrcamentoDto.valor_inicial);
+    });
+
+    it('should return 400 with correct messages when create a new orcamento when all fiends as null', async () => {
+      const createOrcamentoDto: Required<OrcamentoCreateInputDto> = {
+        nome: null,
+        valor_inicial: null,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          'nome should not be empty',
+          'nome must be a string',
+          'valor_inicial should not be empty',
+          'valor_inicial is not a valid decimal number.'
+        ]);
     });
 
     it('should create orcamento even if it has already been created and deleted (soft delete)', async () => {
@@ -188,6 +211,92 @@ describe('OrcamentoController (v1) (E2E)', () => {
 
       expect(response.body.valor_atual).toBe('850');
       expect(response.body.valor_livre).toBe('850');
+    });
+
+    it('should return 200 when inactivate an orcamento', async () => {
+      const createOrcamentoDto = {
+        nome: 'Orçamento C',
+        valor_inicial: '700.10',
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(201);
+
+      const orcamentoId = createResponse.body.id;
+
+      const updateOrcamentoDto: OrcamentoUpdateInputDto = {
+        data_inatividade: new Date(),
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
+        .send(updateOrcamentoDto)
+        .expect(200);
+
+        expect(response.body.data_inatividade).toBeTruthy();
+    });
+
+    it('should return 200 when activate an orcamento', async () => {
+      const createOrcamentoDto: OrcamentoCreateInputDto = {
+        nome: 'Orçamento C',
+        valor_inicial: '700.10',
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(201);
+
+      const orcamentoId = createResponse.body.id;
+
+      const updateOrcamentoDto: OrcamentoUpdateInputDto = {
+        data_inatividade: null,
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
+        .send(updateOrcamentoDto)
+        .expect(200);
+
+      expect(response.body.data_inatividade).toBeNull();
+    });
+
+    it('should return 400 with correct messages when update an orcamento when all fiends as null', async () => {
+      const createOrcamentoDto = {
+        nome: 'Orçamento C',
+        valor_inicial: '700.10',
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(201);
+
+      const orcamentoId = createResponse.body.id;
+
+      const updateOrcamentoDto: Required<OrcamentoUpdateInputDto> = {
+        nome: null,
+        valor_inicial: null,
+        data_encerramento: null,
+        data_inatividade: null,
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
+        .send(updateOrcamentoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          "nome should not be empty",
+          "nome must be a string",
+          "valor_inicial should not be empty",
+          "valor_inicial is not a valid decimal number.",
+        ]);
     });
 
     it('should return 404 if try to update an orcamento was deleted (soft delete)', async () => {

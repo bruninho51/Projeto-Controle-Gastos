@@ -1,10 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsDate, IsDecimal, IsOptional, IsString } from "class-validator";
+import { IsDate, IsDecimal, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
 
 export class OrcamentoUpdateInputDto {
     @IsString()
-    @IsOptional()
+    @IsNotEmpty()
+    @ValidateIf(o => o.nome === null)
     @ApiProperty({
         description: 'Nome do orçamento',
         example: 'JANEIRO 2025',
@@ -12,15 +13,16 @@ export class OrcamentoUpdateInputDto {
     nome?: string;
 
     @IsDecimal()
-    @IsOptional()
+    @IsNotEmpty()
+    @ValidateIf(o => o.valor_inicial === null)
     @ApiProperty({
         description: 'Valor inicial/salário',
         example: '2000.00',
       })
     valor_inicial?:string;
 
-    @IsDate()
     @IsOptional()
+    @IsDate()
     @Transform(({ value }) => value ? new Date(value) : null)
     @ApiProperty({
         description: 'Data de fechamento do orçamento',
@@ -28,8 +30,8 @@ export class OrcamentoUpdateInputDto {
       })
     data_encerramento?: Date;
     
-    @IsDate()
     @IsOptional()
+    @IsDate()
     @Transform(({ value }) => value ? new Date(value) : null)
     @ApiProperty({
         description: 'Inativar um registro de orçamento',
