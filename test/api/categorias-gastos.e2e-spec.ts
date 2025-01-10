@@ -9,7 +9,7 @@ import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
-import { CategoriaGastoUpdateInputDto } from 'src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdateInput.dto';
+import { CategoriaGastoUpdateInputDto } from '../../src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdateInput.dto';
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -86,7 +86,7 @@ describe('CategoriasGastosController (e2e)', () => {
       expect(response.body.nome).toBe(newCategoria.nome);
     });
 
-    it('should return 400 with correct messages when create a new categoria gasto when all fiends as null', async () => {
+    it('should return 400 with correct messages when create a new categoria gasto when all fields as null', async () => {
       const newCategoria: Required<CategoriaGastoCreateInputDto> = {
         nome: null,
       };
@@ -105,7 +105,7 @@ describe('CategoriasGastosController (e2e)', () => {
         ]);
     });
 
-    it('should return 400 with correct messages when create a new categoria gasto when all fiends as wrong', async () => {
+    it('should return 400 with correct messages when create a new categoria gasto when all fields as wrong', async () => {
       const newCategoria: Required<CategoriaGastoCreateInputDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
       };
@@ -270,7 +270,7 @@ describe('CategoriasGastosController (e2e)', () => {
       expect(response.body.data_inatividade).toBeNull();
     });
 
-    it('should return 400 with correct messages when update a categoria gasto when all fiends as null', async () => {
+    it('should return 400 with correct messages when update a categoria gasto when all fields as null', async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
         data: {
@@ -297,7 +297,7 @@ describe('CategoriasGastosController (e2e)', () => {
         ]);
     });
 
-    it('should return 400 with correct messages when update a categoria gasto when all fiends as wrong', async () => {
+    it('should return 400 with correct messages when update a categoria gasto when all fields as wrong', async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
         data: {

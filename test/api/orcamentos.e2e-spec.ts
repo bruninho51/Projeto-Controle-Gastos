@@ -9,7 +9,7 @@ import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
-import { OrcamentoUpdateInputDto } from 'src/modules/api/orcamentos/dtos/OrcamentoUpdateInput.dto';
+import { OrcamentoUpdateInputDto } from '../../src/modules/api/orcamentos/dtos/OrcamentoUpdateInput.dto';
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -63,7 +63,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
       expect(response.body.valor_livre).toBe(createOrcamentoDto.valor_inicial);
     });
 
-    it('should return 400 with correct messages when create a new orcamento when all fiends as null', async () => {
+    it('should return 400 with correct messages when create a new orcamento when all fields as null', async () => {
       const createOrcamentoDto: Required<OrcamentoCreateInputDto> = {
         nome: null,
         valor_inicial: null,
@@ -85,7 +85,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
         ]);
     });
 
-    it('should return 400 with correct messages when create a new orcamento when all fiends wrong', async () => {
+    it('should return 400 with correct messages when create a new orcamento when all fields wrong', async () => {
       const createOrcamentoDto: Required<OrcamentoCreateInputDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
         valor_inicial: faker.string.alpha(5),
@@ -285,7 +285,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
       expect(response.body.data_inatividade).toBeNull();
     });
 
-    it('should return 400 with correct messages when update an orcamento when all fiends as null', async () => {
+    it('should return 400 with correct messages when update an orcamento when all fields as null', async () => {
       const createOrcamentoDto = {
         nome: 'Orçamento C',
         valor_inicial: '700.10',
@@ -321,7 +321,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
         ]);
     });
 
-    it('should return 400 with correct messages when update an orcamento when all fiends as wrong', async () => {
+    it('should return 400 with correct messages when update an orcamento when all fields as wrong', async () => {
       const createOrcamentoDto = {
         nome: 'Orçamento C',
         valor_inicial: '700.10',

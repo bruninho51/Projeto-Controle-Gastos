@@ -88,6 +88,67 @@ describe('GastosVariadosController (v1) (E2E)', () => {
         expect(response.body.orcamento_id).toBe(orcamentoMock.id);
     });
 
+    it('should return 400 with correct messages when create a new gasto variado when all fields as null', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
+      const createGastoDto: Required<GastoVariadoCreateInputDto> = {
+        descricao: null,
+        valor: null,
+        data_pgto: null,
+        categoria_id: null,
+        observacoes: null
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados`)
+        .send(createGastoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          'descricao should not be empty',
+          'descricao must be a string',
+          'valor should not be empty',
+          'valor is not a valid decimal number.',
+          'data_pgto should not be empty',
+          'data_pgto must be a Date instance',
+          'categoria_id should not be empty',
+          'categoria_id must be an integer number',
+        ]);
+    });
+
+    it('should return 400 with correct messages when create a new gasto variado when all fields as wrong', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
+      const createGastoDto: Required<GastoVariadoCreateInputDto> = {
+        descricao: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        valor: faker.string.alpha(5),
+        data_pgto: faker.string.alpha(5) as unknown as Date,
+        categoria_id: faker.string.alpha(5) as unknown as number,
+        observacoes: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados`)
+        .send(createGastoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          'descricao must be a string',
+          'valor is not a valid decimal number.',
+          'data_pgto must be a Date instance',
+          'categoria_id must be an integer number',
+          'observacoes must be a string',
+        ]);
+    });
+
     it('should return 400 if data_pgto is passed as null', async () => {
       const createGastoDto: GastoVariadoCreateInputDto = {
         descricao: faker.string.alphanumeric(5),
@@ -101,7 +162,10 @@ describe('GastosVariadosController (v1) (E2E)', () => {
         .send(createGastoDto)
         .expect(400);
 
-        expect(response.body.message).toEqual(['data_pgto must be a Date instance']);
+        expect(response.body.message).toEqual([
+          'data_pgto should not be empty',
+          'data_pgto must be a Date instance'
+        ]);
     });
 
     it('should return 404 when categoria gasto does not exists', async () => {
@@ -312,6 +376,154 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       expect(response.body.descricao).toBe(updateGastoDto.descricao);
       expect(response.body.valor).toBe(updateGastoDto.valor);
       expect(response.body.data_pgto).toBe(mockDataPgto.toISOString());
+    });
+
+    it('should return 400 with correct messages when update a gasto variado when all fields as null', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
+        const createGastoDto: GastoVariadoCreateInputDto = {
+            descricao: 'Descrição antiga',
+            valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+            data_pgto: mockDataPgto,
+            categoria_id: categoriaMock.id,
+        };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      const updateGastoDto: Required<GastoVariadoUpdateInputDto> = {
+        descricao: null,
+        valor: null,
+        data_pgto: null,
+        categoria_id: null,
+        data_inatividade: null,
+        observacoes: null
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados/${gastoId}`)
+        .send(updateGastoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          "descricao should not be empty",
+          "descricao must be a string",
+          "valor should not be empty",
+          "valor is not a valid decimal number.",
+          "categoria_id should not be empty",
+          "categoria_id must be an integer number",
+        ]);
+    });
+
+    it('should return 400 with correct messages when update a gasto variado when all fields as wrong', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
+        const createGastoDto: GastoVariadoCreateInputDto = {
+            descricao: 'Descrição antiga',
+            valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+            data_pgto: mockDataPgto,
+            categoria_id: categoriaMock.id,
+        };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      const updateGastoDto: Required<GastoVariadoUpdateInputDto> = {
+        descricao: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        valor: faker.string.alpha(5),
+        data_pgto: faker.number.int({ min: 100, max: 999 }) as unknown as Date,
+        categoria_id: faker.string.alpha(5) as unknown as number,
+        data_inatividade: faker.number.int({ min: 100, max: 999 }) as unknown as Date,
+        observacoes: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados/${gastoId}`)
+        .send(updateGastoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          "descricao must be a string",
+          "valor is not a valid decimal number.",
+          "categoria_id must be an integer number",
+          "observacoes must be a string"
+        ]);
+    });
+
+    it('should return 200 when inactivate a gasto variado', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
+        const createGastoDto: GastoVariadoCreateInputDto = {
+            descricao: 'Descrição antiga',
+            valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+            data_pgto: mockDataPgto,
+            categoria_id: categoriaMock.id,
+        };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      const updateGastoDto: GastoVariadoUpdateInputDto = {
+        data_inatividade: new Date()
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados/${gastoId}`)
+        .send(updateGastoDto)
+        .expect(200);
+
+        expect(response.body.data_inatividade).toBeTruthy();
+    });
+
+    it('should return 200 when activate a gasto fixo', async () => {
+      const mockDataPgto = new Date();
+      mockDataPgto.setUTCHours(0, 0, 0, 0);
+
+        const createGastoDto: GastoVariadoCreateInputDto = {
+            descricao: 'Descrição antiga',
+            valor: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
+            data_pgto: mockDataPgto,
+            categoria_id: categoriaMock.id,
+        };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      const updateGastoDto: GastoVariadoUpdateInputDto = {
+        data_inatividade: null
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados/${gastoId}`)
+        .send(updateGastoDto)
+        .expect(200);
+
+        expect(response.body.data_inatividade).toBeNull();
     });
 
     it('should return a 404 error if the gasto variado exists but does not belong to the specified orcamento', async () => {

@@ -83,7 +83,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
         expect(response.body.orcamento_id).toBe(orcamentoMock.id);
     });
 
-    it('should return 400 with correct messages when create a new gasto fixo when all fiends as null', async () => {
+    it('should return 400 with correct messages when create a new gasto fixo when all fields as null', async () => {
       const createGastoDto: Required<GastoFixoCreateInputDto> = {
         descricao: null,
         previsto: null,
@@ -109,7 +109,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
         ]);
     });
 
-    it('should return 400 with correct messages when create a new gasto fixo when all fiends as wrong', async () => {
+    it('should return 400 with correct messages when create a new gasto fixo when all fields as wrong', async () => {
       const createGastoDto: Required<GastoFixoCreateInputDto> = {
         descricao: faker.number.int({ min: 100, max: 999 }) as unknown as string,
         previsto: faker.string.alpha(5),
@@ -313,7 +313,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
       expect(response.body.valor).toBe(updateGastoDto.valor);
     });
 
-    it('should return 400 with correct messages when update a gasto fixo when all fiends as null', async () => {
+    it('should return 400 with correct messages when update a gasto fixo when all fields as null', async () => {
       const createGastoDto: GastoFixoCreateInputDto = {
           descricao: 'Descrição antiga',
           previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
@@ -356,7 +356,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
       
     });
 
-      it('should return 400 with correct messages when update a gasto fixo when all fiends as wrong', async () => {
+      it('should return 400 with correct messages when update a gasto fixo when all fields as wrong', async () => {
         const createGastoDto: GastoFixoCreateInputDto = {
             descricao: 'Descrição antiga',
             previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
@@ -512,7 +512,7 @@ describe('GastosFixosController (v1) (E2E)', () => {
       expect(response.body.message).toBe("Se o valor for preenchido, a data_pgto também deve ser preenchida.");
     });
 
-    it('should return 409 if add valor without a null data_pgto', async () => {
+    it('should return 409 if add valor with a null data_pgto', async () => {
       const createGastoDto: GastoFixoCreateInputDto = {
           descricao: 'Descrição antiga',
           previsto: faker.number.float({ min: 1, max: 50, fractionDigits: 2 }).toString(),
