@@ -5,7 +5,7 @@ import { IsDate, IsDecimal, IsNotEmpty, IsOptional, IsString, ValidateIf } from 
 export class OrcamentoUpdateInputDto {
     @IsString()
     @IsNotEmpty()
-    @ValidateIf(o => o.nome === null)
+    @ValidateIf(o => o.nome === null || !!o.nome)
     @ApiProperty({
         description: 'Nome do orçamento',
         example: 'JANEIRO 2025',
@@ -14,7 +14,7 @@ export class OrcamentoUpdateInputDto {
 
     @IsDecimal()
     @IsNotEmpty()
-    @ValidateIf(o => o.valor_inicial === null)
+    @ValidateIf(o => o.valor_inicial === null || !!o.valor_inicial)
     @ApiProperty({
         description: 'Valor inicial/salário',
         example: '2000.00',

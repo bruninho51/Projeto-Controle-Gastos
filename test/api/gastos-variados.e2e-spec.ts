@@ -14,6 +14,8 @@ import { GastosVariadosModule } from '../../src/modules/api/gastos-variados/gast
 import { GastoVariadoCreateInputDto } from '../../src/modules/api/gastos-variados/dtos/GastoVariadoCreateInput.dto';
 import { GastoVariadoUpdateInputDto } from '../../src/modules/api/gastos-variados/dtos/GastoVariadoUpdateInput.dto';
 
+jest.setTimeout(10000); // 10 segundos
+
 const apiGlobalPrefix = '/api/v1';
 
 describe('GastosVariadosController (v1) (E2E)', () => {

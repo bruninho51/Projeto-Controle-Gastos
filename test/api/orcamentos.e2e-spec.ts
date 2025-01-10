@@ -11,6 +11,8 @@ import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
 import { OrcamentoUpdateInputDto } from 'src/modules/api/orcamentos/dtos/OrcamentoUpdateInput.dto';
 
+jest.setTimeout(10000); // 10 segundos
+
 const apiGlobalPrefix = '/api/v1';
 
 describe('OrcamentoController (v1) (E2E)', () => {
@@ -79,6 +81,26 @@ describe('OrcamentoController (v1) (E2E)', () => {
           'nome should not be empty',
           'nome must be a string',
           'valor_inicial should not be empty',
+          'valor_inicial is not a valid decimal number.'
+        ]);
+    });
+
+    it('should return 400 with correct messages when create a new orcamento when all fiends wrong', async () => {
+      const createOrcamentoDto: Required<OrcamentoCreateInputDto> = {
+        nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        valor_inicial: faker.string.alpha(5),
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          'nome must be a string',
           'valor_inicial is not a valid decimal number.'
         ]);
     });
@@ -296,6 +318,42 @@ describe('OrcamentoController (v1) (E2E)', () => {
           "nome must be a string",
           "valor_inicial should not be empty",
           "valor_inicial is not a valid decimal number.",
+        ]);
+    });
+
+    it('should return 400 with correct messages when update an orcamento when all fiends as wrong', async () => {
+      const createOrcamentoDto = {
+        nome: 'Orçamento C',
+        valor_inicial: '700.10',
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(201);
+
+      const orcamentoId = createResponse.body.id;
+
+      const updateOrcamentoDto: Required<OrcamentoUpdateInputDto> = {
+        nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        valor_inicial: faker.string.alpha(5),
+        data_encerramento: faker.string.alpha(5) as unknown as Date,
+        data_inatividade: faker.string.alpha(5) as unknown as Date,
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
+        .send(updateOrcamentoDto)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          "nome must be a string",
+          "valor_inicial is not a valid decimal number.",
+          "data_encerramento must be a Date instance",
+          "data_inatividade must be a Date instance",
         ]);
     });
 

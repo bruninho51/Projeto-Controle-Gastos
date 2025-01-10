@@ -11,6 +11,8 @@ import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
 import { CategoriaGastoUpdateInputDto } from 'src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdateInput.dto';
 
+jest.setTimeout(10000); // 10 segundos
+
 const apiGlobalPrefix = '/api/v1';
 
 describe('CategoriasGastosController (e2e)', () => {
@@ -99,6 +101,24 @@ describe('CategoriasGastosController (e2e)', () => {
       
         expect(response.body.message).toEqual([
           'nome should not be empty',
+          'nome must be a string',
+        ]);
+    });
+
+    it('should return 400 with correct messages when create a new categoria gasto when all fiends as wrong', async () => {
+      const newCategoria: Required<CategoriaGastoCreateInputDto> = {
+        nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .send(newCategoria)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
           'nome must be a string',
         ]);
     });
@@ -274,6 +294,33 @@ describe('CategoriasGastosController (e2e)', () => {
         expect(response.body.message).toEqual([
           "nome should not be empty",
           "nome must be a string",
+        ]);
+    });
+
+    it('should return 400 with correct messages when update a categoria gasto when all fiends as wrong', async () => {
+      const nome = faker.string.alphanumeric(6).toUpperCase();
+      const categoria = await prisma.categoriaGasto.create({
+        data: {
+          nome,
+        },
+      });
+
+      const updatedCategoria: Required<CategoriaGastoUpdateInputDto> = {
+        nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        data_inatividade: faker.string.alpha(5) as unknown as Date,
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .send(updatedCategoria)
+        .expect(400);
+
+        expect(response.body).toHaveProperty('message');
+        expect(Array.isArray(response.body.message)).toBe(true);
+      
+        expect(response.body.message).toEqual([
+          "nome must be a string",
+          "data_inatividade must be a Date instance"
         ]);
     });
 

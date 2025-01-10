@@ -5,7 +5,7 @@ import { Transform } from 'class-transformer';
 export class CategoriaGastoUpdateInputDto {
   @IsString()
   @IsNotEmpty()
-  @ValidateIf(o => o.nome === null)
+  @ValidateIf(o => o.nome === null || !!o.nome)
   @ApiProperty({
     description: 'Nome da categoria',
     example: 'Alimentação',

@@ -1,41 +1,37 @@
-import { IsString, IsOptional, IsDecimal, IsInt } from 'class-validator';
+import { IsString, IsOptional, IsDecimal, IsInt, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class GastoFixoCreateInputDto {
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     description: 'Descrição do gasto fixo',
     example: 'CONTA DE LUZ',
   })
-  @IsString()
   descricao: string;
 
+  @IsDecimal()
+  @IsNotEmpty()
   @ApiProperty({
     description: 'Valor previsto',
     example: '130.00',
   })
-  @IsDecimal()
   previsto: string;
   
+  @IsInt()
+  @IsNotEmpty()
   @ApiProperty({
     description: 'ID da categoria do gasto',
     example: 1,
   })
-  @IsInt()
   categoria_id: number;
 
-  /*@ApiProperty({
-    description: 'ID do orçamento',
-    example: 1,
-  })
-  @IsInt()
-  orcamento_id: number;*/
-
+  @IsOptional()
+  @IsString()
   @ApiProperty({
     description: 'Observações adicionais sobre o gasto fixo',
     example: 'Pagar até o dia 20 desse mês.',
   })
-  @IsOptional()
-  @IsString()
   observacoes?: string;
 
 }
