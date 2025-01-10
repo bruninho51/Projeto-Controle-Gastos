@@ -2,29 +2,21 @@ import { IsString, IsOptional, IsDate, IsDecimal, IsInt, IsNotEmpty, ValidateIf 
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
-export class GastoFixoUpdateInputDto {
+export class GastoVariadoUpdateDto {
   @IsString()
   @IsNotEmpty()
   @ValidateIf(o => o.descricao === null || !!o.descricao)
   @ApiProperty({
-    description: 'Descrição do gasto fixo',
-    example: 'CONTA DE LUZ',
+    description: 'Descrição do gasto variado',
+    example: 'PIZZA',
   })
   descricao?: string;
 
   @IsDecimal()
   @IsNotEmpty()
-  @ValidateIf(o => o.previsto === null || !!o.previsto)
+  @ValidateIf(o => o.valor === null || !!o.valor)
   @ApiProperty({
-    description: 'Valor previsto',
-    example: '130.00',
-  })
-  previsto?: string;
-
-  @IsOptional()
-  @IsDecimal({ decimal_digits: '2' })
-  @ApiProperty({
-    description: 'Valor efetivamente pago',
+    description: 'Valor',
     example: '130.00',
   })
   valor?: string;
@@ -50,16 +42,16 @@ export class GastoFixoUpdateInputDto {
   @IsOptional()
   @IsString()
   @ApiProperty({
-    description: 'Observações adicionais sobre o gasto fixo',
-    example: 'Pagar até o dia 20 desse mês.',
+    description: 'Observações adicionais sobre o gasto variado',
+    example: 'Pizza de mussarela.',
   })
   observacoes?: string;
 
-  @IsOptional()
   @IsDate()
+  @IsOptional()
   @Transform(({ value }) => value ? new Date(value) : null)
   @ApiProperty({
-    description: 'Inativar o gasto fixo',
+    description: 'Inativar o gasto variado',
     example: '2024-12-01',
   })
   data_inatividade?: Date;

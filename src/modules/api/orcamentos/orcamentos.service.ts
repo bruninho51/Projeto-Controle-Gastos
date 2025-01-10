@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Orcamento } from '@prisma/client';
-import { OrcamentoUpdateInputDto } from './dtos/OrcamentoUpdateInput.dto';
-import { OrcamentoCreateInputDto } from './dtos/OrcamentoCreateInput.dto';
+import { OrcamentoUpdateDto } from './dtos/OrcamentoUpdate.dto';
+import { OrcamentoCreateDto } from './dtos/OrcamentoCreate.dto';
 
 @Injectable()
 export class OrcamentosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createOrcamentoDto: OrcamentoCreateInputDto): Promise<Orcamento> {
+  async create(createOrcamentoDto: OrcamentoCreateDto): Promise<Orcamento> {
     return await this.prisma.orcamento.create({
       data: createOrcamentoDto,
     });
@@ -26,7 +26,7 @@ export class OrcamentosService {
     });
   }
 
-  async update(id: number, updateOrcamentoDto: OrcamentoUpdateInputDto): Promise<Orcamento> {
+  async update(id: number, updateOrcamentoDto: OrcamentoUpdateDto): Promise<Orcamento> {
     return this.prisma.orcamento.update({
       where: { id, soft_delete: null },
       data: updateOrcamentoDto,

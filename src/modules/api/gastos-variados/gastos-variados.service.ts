@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { GastoVariadoCreateInputDto } from './dtos/GastoVariadoCreateInput.dto';
-import { GastoVariadoUpdateInputDto } from './dtos/GastoVariadoUpdateInput.dto';
+import { GastoVariadoCreateDto } from './dtos/GastoVariadoCreate.dto';
+import { GastoVariadoUpdateDto } from './dtos/GastoVariadoUpdate.dto';
 import { GastoVariado } from '@prisma/client';
 
 @Injectable()
 export class GastosVariadosService {
   constructor(private prisma: PrismaService) {}
 
-  async create(orcamento_id: number, createGastoDto: GastoVariadoCreateInputDto): Promise<GastoVariado> {
+  async create(orcamento_id: number, createGastoDto: GastoVariadoCreateDto): Promise<GastoVariado> {
     return await this.prisma.gastoVariado.create({
       data: {
         ...createGastoDto,
@@ -29,7 +29,7 @@ export class GastosVariadosService {
     });
   }
 
-  async update(orcamento_id: number, id: number, updateGastoDto: GastoVariadoUpdateInputDto): Promise<GastoVariado> {
+  async update(orcamento_id: number, id: number, updateGastoDto: GastoVariadoUpdateDto): Promise<GastoVariado> {
     return this.prisma.gastoVariado.update({
       where: { id, orcamento_id, soft_delete: null },
       data: updateGastoDto,

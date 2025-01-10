@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GastosVariadosController } from './gastos-variados.controller';
 import { GastosVariadosService } from './gastos-variados.service';
-import { GastoVariadoCreateInputDto } from './dtos/GastoVariadoCreateInput.dto';
-import { GastoVariadoUpdateInputDto } from './dtos/GastoVariadoUpdateInput.dto';
+import { GastoVariadoCreateDto } from './dtos/GastoVariadoCreate.dto';
+import { GastoVariadoUpdateDto } from './dtos/GastoVariadoUpdate.dto';
 import { faker } from '@faker-js/faker';
 
 const mockGastosVariadosService = {
@@ -41,7 +41,7 @@ describe('GastosVariadosController', () => {
     it('should create a new gasto variado', async () => {
       const orcamento_id = faker.number.int().toString();
 
-      const createGastoDto: GastoVariadoCreateInputDto = {
+      const createGastoDto: GastoVariadoCreateDto = {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
@@ -116,7 +116,7 @@ describe('GastosVariadosController', () => {
       const orcamento_id = faker.number.int().toString();
       const gasto_variado_id = faker.number.int().toString();
 
-      const updateGastoDto: GastoVariadoUpdateInputDto = {
+      const updateGastoDto: GastoVariadoUpdateDto = {
         descricao: 'Aluguel Atualizado',
         valor: '1300.00',
         data_pgto: new Date(),

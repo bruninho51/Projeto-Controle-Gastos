@@ -1,7 +1,7 @@
 import { IsString, IsOptional, IsDecimal, IsInt, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GastoFixoCreateInputDto {
+export class GastoFixoCreateDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({

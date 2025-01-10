@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsDecimal, IsNotEmpty, IsString } from "class-validator";
 
-export class OrcamentoCreateInputDto {
+export class OrcamentoCreateDto {
     
     @IsString()
     @IsNotEmpty()

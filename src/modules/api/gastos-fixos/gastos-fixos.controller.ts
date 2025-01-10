@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
 import { GastosFixosService } from './gastos-fixos.service';
-import { GastoFixoCreateInputDto } from './dtos/GastoFixoCreateInput.dto';
-import { GastoFixoUpdateInputDto } from './dtos/GastoFixoUpdateInput.dto';
+import { GastoFixoCreateDto } from './dtos/GastoFixoCreate.dto';
+import { GastoFixoUpdateDto } from './dtos/GastoFixoUpdate.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Gastos Fixos') 
@@ -11,10 +11,10 @@ export class GastosFixosController {
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo gasto fixo' })
-  @ApiBody({ type: GastoFixoCreateInputDto })
+  @ApiBody({ type: GastoFixoCreateDto })
   @ApiResponse({ status: 201, description: 'Gasto fixo criado com sucesso.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
-  create(@Param("orcamento_id") orcamento_id: String,@Body() createGastoDto: GastoFixoCreateInputDto) {
+  create(@Param("orcamento_id") orcamento_id: String,@Body() createGastoDto: GastoFixoCreateDto) {
     return this.gastosFixosService.create(+orcamento_id, createGastoDto);
   }
 
@@ -39,14 +39,14 @@ export class GastosFixosController {
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar um gasto fixo' })
   @ApiParam({ name: 'id', type: 'string', description: 'ID do gasto fixo', required: true })
-  @ApiBody({ type: GastoFixoUpdateInputDto })
+  @ApiBody({ type: GastoFixoUpdateDto })
   @ApiResponse({ status: 200, description: 'Gasto fixo atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Gasto fixo não encontrado.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   update(
     @Param('orcamento_id') orcamento_id: string,
     @Param('id') id: string, 
-    @Body() updateGastoDto: GastoFixoUpdateInputDto
+    @Body() updateGastoDto: GastoFixoUpdateDto
   ) {
     return this.gastosFixosService.update(+orcamento_id, +id, updateGastoDto);
   }

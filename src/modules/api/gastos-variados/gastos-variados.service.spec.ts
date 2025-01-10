@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GastosVariadosService } from './gastos-variados.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { GastoVariadoCreateInputDto } from './dtos/GastoVariadoCreateInput.dto';
-import { GastoVariadoUpdateInputDto } from './dtos/GastoVariadoUpdateInput.dto';
+import { GastoVariadoCreateDto } from './dtos/GastoVariadoCreate.dto';
+import { GastoVariadoUpdateDto } from './dtos/GastoVariadoUpdate.dto';
 import { faker } from '@faker-js/faker';
 
 const mockPrismaService = {
@@ -40,7 +40,7 @@ describe('GastosVariadosService', () => {
       const orcamento_id = faker.number.int();
       const gasto_variado_id = faker.number.int();
 
-      const createGastoDto: GastoVariadoCreateInputDto = {
+      const createGastoDto: GastoVariadoCreateDto = {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
@@ -132,7 +132,7 @@ describe('GastosVariadosService', () => {
       const orcamento_id = faker.number.int();
       const gasto_variado_id = faker.number.int();
 
-      const updateGastoDto: GastoVariadoUpdateInputDto = {
+      const updateGastoDto: GastoVariadoUpdateDto = {
         descricao: 'Gasto Variado A Atualizado',
         valor: '1500.00',
         data_pgto: new Date(),

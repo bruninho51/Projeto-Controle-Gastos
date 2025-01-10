@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrcamentosService } from './orcamentos.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { OrcamentoCreateInputDto } from './dtos/OrcamentoCreateInput.dto';
-import { OrcamentoUpdateInputDto } from './dtos/OrcamentoUpdateInput.dto';
+import { OrcamentoCreateDto } from './dtos/OrcamentoCreate.dto';
+import { OrcamentoUpdateDto } from './dtos/OrcamentoUpdate.dto';
 
 const mockPrismaService = {
   orcamento: {
@@ -39,7 +39,7 @@ describe('OrcamentosService', () => {
 
   describe('create', () => {
     it('should create a new orcamento', async () => {
-      const createOrcamentoDto: OrcamentoCreateInputDto = {
+      const createOrcamentoDto: OrcamentoCreateDto = {
         nome: 'Orçamento A',
         valor_inicial: '1000.00',
       };
@@ -115,7 +115,7 @@ describe('OrcamentosService', () => {
 
   describe('update', () => {
     it('should update an orcamento', async () => {
-      const updateOrcamentoDto: OrcamentoUpdateInputDto = {
+      const updateOrcamentoDto: OrcamentoUpdateDto = {
         nome: 'Orçamento A Atualizado',
         valor_inicial: '1300.00',
       };

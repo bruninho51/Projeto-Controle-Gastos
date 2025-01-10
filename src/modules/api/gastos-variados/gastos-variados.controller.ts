@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
 import { GastosVariadosService } from './gastos-variados.service';
-import { GastoVariadoCreateInputDto } from './dtos/GastoVariadoCreateInput.dto';
-import { GastoVariadoUpdateInputDto } from './dtos/GastoVariadoUpdateInput.dto';
+import { GastoVariadoCreateDto } from './dtos/GastoVariadoCreate.dto';
+import { GastoVariadoUpdateDto } from './dtos/GastoVariadoUpdate.dto';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Gastos Variados') 
@@ -11,10 +11,10 @@ export class GastosVariadosController {
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo gasto variado' })
-  @ApiBody({ type: GastoVariadoCreateInputDto })
+  @ApiBody({ type: GastoVariadoCreateDto })
   @ApiResponse({ status: 201, description: 'Gasto variado criado com sucesso.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
-  create(@Param("orcamento_id") orcamento_id: String,@Body() createGastoDto: GastoVariadoCreateInputDto) {
+  create(@Param("orcamento_id") orcamento_id: String,@Body() createGastoDto: GastoVariadoCreateDto) {
     return this.gastosVariadosService.create(+orcamento_id, createGastoDto);
   }
 
@@ -39,14 +39,14 @@ export class GastosVariadosController {
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar um gasto variado' })
   @ApiParam({ name: 'id', type: 'string', description: 'ID do gasto variado', required: true })
-  @ApiBody({ type: GastoVariadoUpdateInputDto })
+  @ApiBody({ type: GastoVariadoUpdateDto })
   @ApiResponse({ status: 200, description: 'Gasto variado atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Gasto variado não encontrado.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   update(
     @Param('orcamento_id') orcamento_id: string,
     @Param('id') id: string, 
-    @Body() updateGastoDto: GastoVariadoUpdateInputDto
+    @Body() updateGastoDto: GastoVariadoUpdateDto
   ) {
     return this.gastosVariadosService.update(+orcamento_id, +id, updateGastoDto);
   }

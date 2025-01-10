@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
 import { OrcamentosService } from './orcamentos.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
-import { OrcamentoCreateInputDto } from './dtos/OrcamentoCreateInput.dto';
-import { OrcamentoUpdateInputDto } from './dtos/OrcamentoUpdateInput.dto';
+import { OrcamentoCreateDto } from './dtos/OrcamentoCreate.dto';
+import { OrcamentoUpdateDto } from './dtos/OrcamentoUpdate.dto';
 
 @ApiTags('Orçamentos') 
 @Controller('orcamentos')
@@ -11,10 +11,10 @@ export class OrcamentosController {
 
   @Post()
   @ApiOperation({ summary: 'Criar um novo orçamento' })
-  @ApiBody({ type: OrcamentoCreateInputDto })
+  @ApiBody({ type: OrcamentoCreateDto })
   @ApiResponse({ status: 201, description: 'Orçamento criado com sucesso.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
-  create(@Body() createOrcamentoDto: OrcamentoCreateInputDto) {
+  create(@Body() createOrcamentoDto: OrcamentoCreateDto) {
     return this.orcamentoService.create(createOrcamentoDto);
   }
 
@@ -39,13 +39,13 @@ export class OrcamentosController {
   @Patch(':id')
   @ApiOperation({ summary: 'Atualizar um orçamento' })
   @ApiParam({ name: 'id', type: 'string', description: 'ID do orçamento', required: true })
-  @ApiBody({ type: OrcamentoUpdateInputDto })
+  @ApiBody({ type: OrcamentoUpdateDto })
   @ApiResponse({ status: 200, description: 'Orçamento atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Orçamento não encontrado.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
   update(
     @Param('id') id: string,
-    @Body() updateOrcamentoDto: OrcamentoUpdateInputDto,
+    @Body() updateOrcamentoDto: OrcamentoUpdateDto,
   ) {
     return this.orcamentoService.update(+id, updateOrcamentoDto);
   }

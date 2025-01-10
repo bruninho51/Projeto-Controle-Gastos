@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GastosFixosService } from './gastos-fixos.service';
 import { PrismaService } from '../../prisma/prisma.service';
-import { GastoFixoCreateInputDto } from './dtos/GastoFixoCreateInput.dto';
-import { GastoFixoUpdateInputDto } from './dtos/GastoFixoUpdateInput.dto';
+import { GastoFixoCreateDto } from './dtos/GastoFixoCreate.dto';
+import { GastoFixoUpdateDto } from './dtos/GastoFixoUpdate.dto';
 import { faker } from '@faker-js/faker';
 
 const mockPrismaService = {
@@ -40,7 +40,7 @@ describe('GastosFixosService', () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
 
-      const createGastoDto: GastoFixoCreateInputDto = {
+      const createGastoDto: GastoFixoCreateDto = {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
@@ -130,7 +130,7 @@ describe('GastosFixosService', () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
 
-      const updateGastoDto: GastoFixoUpdateInputDto = {
+      const updateGastoDto: GastoFixoUpdateDto = {
         descricao: 'Gasto Fixo A Atualizado',
         previsto: '1500.00',
         observacoes: 'Descrição do Gasto Fixo A Atualizado',

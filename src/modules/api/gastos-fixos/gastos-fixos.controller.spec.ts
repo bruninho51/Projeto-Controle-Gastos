@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GastosFixosController } from './gastos-fixos.controller';
 import { GastosFixosService } from './gastos-fixos.service';
-import { GastoFixoCreateInputDto } from './dtos/GastoFixoCreateInput.dto';
-import { GastoFixoUpdateInputDto } from './dtos/GastoFixoUpdateInput.dto';
+import { GastoFixoCreateDto } from './dtos/GastoFixoCreate.dto';
+import { GastoFixoUpdateDto } from './dtos/GastoFixoUpdate.dto';
 import { faker } from '@faker-js/faker';
 
 const mockGastosFixosService = {
@@ -41,7 +41,7 @@ describe('GastosFixosController', () => {
     it('should create a new gasto fixo', async () => {
       const orcamento_id = faker.number.int().toString();
 
-      const createGastoDto: GastoFixoCreateInputDto = {
+      const createGastoDto: GastoFixoCreateDto = {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
@@ -115,7 +115,7 @@ describe('GastosFixosController', () => {
       const orcamento_id = faker.number.int().toString();
       const gasto_fixo_id = faker.number.int().toString();
 
-      const updateGastoDto: GastoFixoUpdateInputDto = {
+      const updateGastoDto: GastoFixoUpdateDto = {
         descricao: 'Aluguel Atualizado',
         previsto: '1300.00',
       };

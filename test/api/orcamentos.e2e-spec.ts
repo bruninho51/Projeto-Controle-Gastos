@@ -3,13 +3,13 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { PrismaService } from '../../src/modules/prisma/prisma.service';
 import { OrcamentosModule } from '../../src/modules/api/orcamentos/orcamentos.module';
-import { OrcamentoCreateInputDto } from '../../src/modules/api/orcamentos/dtos/OrcamentoCreateInput.dto';
+import { OrcamentoCreateDto } from '../../src/modules/api/orcamentos/dtos/OrcamentoCreate.dto';
 import { globalPipes } from '../../src/pipes/globalPipes';
 import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
-import { OrcamentoUpdateInputDto } from '../../src/modules/api/orcamentos/dtos/OrcamentoUpdateInput.dto';
+import { OrcamentoUpdateDto } from '../../src/modules/api/orcamentos/dtos/OrcamentoUpdate.dto';
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -64,7 +64,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
     });
 
     it('should return 400 with correct messages when create a new orcamento when all fields as null', async () => {
-      const createOrcamentoDto: Required<OrcamentoCreateInputDto> = {
+      const createOrcamentoDto: Required<OrcamentoCreateDto> = {
         nome: null,
         valor_inicial: null,
       };
@@ -86,7 +86,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
     });
 
     it('should return 400 with correct messages when create a new orcamento when all fields wrong', async () => {
-      const createOrcamentoDto: Required<OrcamentoCreateInputDto> = {
+      const createOrcamentoDto: Required<OrcamentoCreateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
         valor_inicial: faker.string.alpha(5),
       };
@@ -135,7 +135,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
         nome: 'Orçamento A',
         valor_inicial: '1000.45',
         valor_atual: '1030.32'
-      } as OrcamentoCreateInputDto;
+      } as OrcamentoCreateDto;
   
       await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
@@ -248,7 +248,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
 
       const orcamentoId = createResponse.body.id;
 
-      const updateOrcamentoDto: OrcamentoUpdateInputDto = {
+      const updateOrcamentoDto: OrcamentoUpdateDto = {
         data_inatividade: new Date(),
       };
 
@@ -261,7 +261,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
     });
 
     it('should return 200 when activate an orcamento', async () => {
-      const createOrcamentoDto: OrcamentoCreateInputDto = {
+      const createOrcamentoDto: OrcamentoCreateDto = {
         nome: 'Orçamento C',
         valor_inicial: '700.10',
       };
@@ -273,7 +273,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
 
       const orcamentoId = createResponse.body.id;
 
-      const updateOrcamentoDto: OrcamentoUpdateInputDto = {
+      const updateOrcamentoDto: OrcamentoUpdateDto = {
         data_inatividade: null,
       };
 
@@ -298,7 +298,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
 
       const orcamentoId = createResponse.body.id;
 
-      const updateOrcamentoDto: Required<OrcamentoUpdateInputDto> = {
+      const updateOrcamentoDto: Required<OrcamentoUpdateDto> = {
         nome: null,
         valor_inicial: null,
         data_encerramento: null,
@@ -334,7 +334,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
 
       const orcamentoId = createResponse.body.id;
 
-      const updateOrcamentoDto: Required<OrcamentoUpdateInputDto> = {
+      const updateOrcamentoDto: Required<OrcamentoUpdateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
         valor_inicial: faker.string.alpha(5),
         data_encerramento: faker.string.alpha(5) as unknown as Date,

@@ -2,7 +2,7 @@ import { IsString, IsOptional, IsDecimal, IsInt, IsDate, IsNotEmpty } from 'clas
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
-export class GastoVariadoCreateInputDto {
+export class GastoVariadoCreateDto {
   @IsString()
   @IsNotEmpty()
   @ApiProperty({

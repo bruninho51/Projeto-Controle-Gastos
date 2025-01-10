@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import { IsDate, IsDecimal, IsNotEmpty, IsOptional, IsString, ValidateIf } from "class-validator";
 
-export class OrcamentoUpdateInputDto {
+export class OrcamentoUpdateDto {
     @IsString()
     @IsNotEmpty()
     @ValidateIf(o => o.nome === null || !!o.nome)

@@ -2,7 +2,7 @@ import { IsString, IsOptional, IsDate, IsNotEmpty, ValidateIf } from 'class-vali
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
-export class CategoriaGastoUpdateInputDto {
+export class CategoriaGastoUpdateDto {
   @IsString()
   @IsNotEmpty()
   @ValidateIf(o => o.nome === null || !!o.nome)

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Param, Delete, Patch } from '@nestjs/common';
 import { CategoriasGastosService } from './categorias-gastos.service';
-import { CategoriaGastoCreateInputDto } from './dtos/CategoriaGastoCreateInput.dto';
-import { CategoriaGastoUpdateInputDto } from './dtos/CategoriaGastoUpdateInput.dto';
+import { CategoriaGastoCreateDto } from './dtos/CategoriaGastoCreate.dto';
+import { CategoriaGastoUpdateDto } from './dtos/CategoriaGastoUpdate.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Categorias de Gastos')
@@ -22,7 +22,7 @@ export class CategoriasGastosController {
   @ApiResponse({ status: 201, description: 'Categoria de gasto criada com sucesso.' })
   @ApiResponse({ status: 409, description: 'Categoria de gasto já existe.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
-  async create(@Body() createCategoriaDto: CategoriaGastoCreateInputDto) {
+  async create(@Body() createCategoriaDto: CategoriaGastoCreateDto) {
     return this.categoriasGastosService.create(createCategoriaDto);
   }
 
@@ -32,7 +32,7 @@ export class CategoriasGastosController {
   @ApiResponse({ status: 409, description: 'Categoria de gasto já existe.' })
   @ApiResponse({ status: 404, description: 'Categoria de gasto não existe.' })
   @ApiResponse({ status: 500, description: 'Erro interno no servidor.' })
-  async update(@Param('id') id: number, @Body() updateCategoriaDto: CategoriaGastoUpdateInputDto) {
+  async update(@Param('id') id: number, @Body() updateCategoriaDto: CategoriaGastoUpdateDto) {
     return this.categoriasGastosService.update(id, updateCategoriaDto);
   }
 

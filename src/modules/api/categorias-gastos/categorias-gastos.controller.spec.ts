@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CategoriasGastosController } from './categorias-gastos.controller';
 import { CategoriasGastosService } from './categorias-gastos.service';
-import { CategoriaGastoCreateInputDto } from './dtos/CategoriaGastoCreateInput.dto';
-import { CategoriaGastoUpdateInputDto } from './dtos/CategoriaGastoUpdateInput.dto';
+import { CategoriaGastoCreateDto } from './dtos/CategoriaGastoCreate.dto';
+import { CategoriaGastoUpdateDto } from './dtos/CategoriaGastoUpdate.dto';
 import { CategoriaGasto } from '@prisma/client';
 
 describe('CategoriasGastosController', () => {
@@ -40,7 +40,7 @@ describe('CategoriasGastosController', () => {
 
   describe('create', () => {
     it('should create a new categoria de gasto', async () => {
-      const createCategoriaDto: CategoriaGastoCreateInputDto = { nome: 'Transporte' };
+      const createCategoriaDto: CategoriaGastoCreateDto = { nome: 'Transporte' };
       const result = { id: 1, ...createCategoriaDto } as CategoriaGasto;
 
       jest.spyOn(service, 'create').mockResolvedValue(result);
@@ -52,7 +52,7 @@ describe('CategoriasGastosController', () => {
   describe('update', () => {
     it('should update an existing categoria de gasto', async () => {
       const id = 1;
-      const updateCategoriaDto: CategoriaGastoUpdateInputDto = { nome: 'Saúde' };
+      const updateCategoriaDto: CategoriaGastoUpdateDto = { nome: 'Saúde' };
       const result = { id, ...updateCategoriaDto } as CategoriaGasto;
 
       jest.spyOn(service, 'update').mockResolvedValue(result);

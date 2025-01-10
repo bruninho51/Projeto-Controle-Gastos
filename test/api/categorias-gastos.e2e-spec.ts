@@ -2,14 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { CategoriasGastosModule } from '../../src/modules/api/categorias-gastos/categorias-gastos.module';
 import { PrismaService } from '../../src/modules/prisma/prisma.service';
-import { CategoriaGastoCreateInputDto } from '../../src/modules/api/categorias-gastos/dtos/CategoriaGastoCreateInput.dto';
+import { CategoriaGastoCreateDto } from '../../src/modules/api/categorias-gastos/dtos/CategoriaGastoCreate.dto';
 import * as request from 'supertest';
 import { globalPipes } from '../../src/pipes/globalPipes';
 import { globalFilters } from '../../src/filters/global-filters';
 import { globalInterceptors } from '../../src/interceptors/globalInterceptors';
 import { runPrismaMigrations } from '../utils/run-prisma-migrations';
 import { faker } from '@faker-js/faker';
-import { CategoriaGastoUpdateInputDto } from '../../src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdateInput.dto';
+import { CategoriaGastoUpdateDto } from '../../src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdate.dto';
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -73,7 +73,7 @@ describe('CategoriasGastosController (e2e)', () => {
 
   describe(`POST ${apiGlobalPrefix}/categorias-gastos`, () => {
     it('should create a new categoria de gasto', async () => {
-      const newCategoria: CategoriaGastoCreateInputDto = {
+      const newCategoria: CategoriaGastoCreateDto = {
         nome: faker.string.alphanumeric(6).toUpperCase(),
       };
 
@@ -87,7 +87,7 @@ describe('CategoriasGastosController (e2e)', () => {
     });
 
     it('should return 400 with correct messages when create a new categoria gasto when all fields as null', async () => {
-      const newCategoria: Required<CategoriaGastoCreateInputDto> = {
+      const newCategoria: Required<CategoriaGastoCreateDto> = {
         nome: null,
       };
 
@@ -106,7 +106,7 @@ describe('CategoriasGastosController (e2e)', () => {
     });
 
     it('should return 400 with correct messages when create a new categoria gasto when all fields as wrong', async () => {
-      const newCategoria: Required<CategoriaGastoCreateInputDto> = {
+      const newCategoria: Required<CategoriaGastoCreateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
       };
 
@@ -150,7 +150,7 @@ describe('CategoriasGastosController (e2e)', () => {
         },
       });
 
-      const newCategoria: CategoriaGastoCreateInputDto = {
+      const newCategoria: CategoriaGastoCreateDto = {
         nome,
       };
 
@@ -168,7 +168,7 @@ describe('CategoriasGastosController (e2e)', () => {
       const newCategoria = {
         nome,
         stanger_field: 'hello'
-      } as CategoriaGastoCreateInputDto;
+      } as CategoriaGastoCreateDto;
 
       await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)
@@ -238,7 +238,7 @@ describe('CategoriasGastosController (e2e)', () => {
         },
       });
 
-      const updatedCategoria: CategoriaGastoUpdateInputDto = {
+      const updatedCategoria: CategoriaGastoUpdateDto = {
         data_inatividade: new Date(),
       };
 
@@ -258,7 +258,7 @@ describe('CategoriasGastosController (e2e)', () => {
         },
       });
 
-      const updatedCategoria: CategoriaGastoUpdateInputDto = {
+      const updatedCategoria: CategoriaGastoUpdateDto = {
         data_inatividade: null,
       };
 
@@ -278,7 +278,7 @@ describe('CategoriasGastosController (e2e)', () => {
         },
       });
 
-      const updatedCategoria: Required<CategoriaGastoUpdateInputDto> = {
+      const updatedCategoria: Required<CategoriaGastoUpdateDto> = {
         nome: null,
         data_inatividade: null
       };
@@ -305,7 +305,7 @@ describe('CategoriasGastosController (e2e)', () => {
         },
       });
 
-      const updatedCategoria: Required<CategoriaGastoUpdateInputDto> = {
+      const updatedCategoria: Required<CategoriaGastoUpdateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
         data_inatividade: faker.string.alpha(5) as unknown as Date,
       };
