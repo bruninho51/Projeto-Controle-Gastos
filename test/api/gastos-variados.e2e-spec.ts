@@ -466,7 +466,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
         ]);
     });
 
-    it('should return 200 when inactivate a gasto variado', async () => {
+    it('should return 200 when update observacoes', async () => {
       const mockDataPgto = new Date();
       mockDataPgto.setUTCHours(0, 0, 0, 0);
 
@@ -485,7 +485,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       const gastoId = createResponse.body.id;
 
       const updateGastoDto: GastoVariadoUpdateDto = {
-        data_inatividade: new Date()
+        observacoes: faker.string.alphanumeric(5)
       };
 
       const response = await request(app.getHttpServer())
@@ -493,10 +493,10 @@ describe('GastosVariadosController (v1) (E2E)', () => {
         .send(updateGastoDto)
         .expect(200);
 
-        expect(response.body.data_inatividade).toBeTruthy();
+        expect(response.body.observacoes).toBe(updateGastoDto.observacoes);
     });
 
-    it('should return 200 when activate a gasto fixo', async () => {
+    it('should return 200 when setting observacoes to null.', async () => {
       const mockDataPgto = new Date();
       mockDataPgto.setUTCHours(0, 0, 0, 0);
 
@@ -515,7 +515,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
       const gastoId = createResponse.body.id;
 
       const updateGastoDto: GastoVariadoUpdateDto = {
-        data_inatividade: null
+        observacoes: null
       };
 
       const response = await request(app.getHttpServer())
@@ -523,7 +523,7 @@ describe('GastosVariadosController (v1) (E2E)', () => {
         .send(updateGastoDto)
         .expect(200);
 
-        expect(response.body.data_inatividade).toBeNull();
+        expect(response.body.observacoes).toBeNull();
     });
 
     it('should return a 404 error if the gasto variado exists but does not belong to the specified orcamento', async () => {
