@@ -586,5 +586,7 @@ describe('OrcamentoController (v1) (E2E)', () => {
           soft_delete: null
       });
     });
+
+    // TODO fazer teste apagando o gasto para saber se vai atualizar o orçamento corretamente
   });
 });
