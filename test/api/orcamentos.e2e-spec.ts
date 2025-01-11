@@ -14,8 +14,8 @@ import { GastoFixoCreateDto } from '../../src/modules/api/gastos-fixos/dtos/Gast
 import { CategoriasGastosModule } from '../../src/modules/api/categorias-gastos/categorias-gastos.module';
 import { GastosFixosModule } from '../../src/modules/api/gastos-fixos/gastos-fixos.module';
 import { GastosVariadosModule } from '../../src/modules/api/gastos-variados/gastos-variados.module';
-import { GastoVariadoCreateDto } from 'src/modules/api/gastos-variados/dtos/GastoVariadoCreate.dto';
-import { GastoFixoUpdateDto } from 'src/modules/api/gastos-fixos/dtos/GastoFixoUpdate.dto';
+import { GastoVariadoCreateDto } from '../../src/modules/api/gastos-variados/dtos/GastoVariadoCreate.dto';
+import { GastoFixoUpdateDto } from '../../src/modules/api/gastos-fixos/dtos/GastoFixoUpdate.dto';
 import { formatValue } from '../utils/format-value';
 
 jest.setTimeout(10000); // 10 segundos

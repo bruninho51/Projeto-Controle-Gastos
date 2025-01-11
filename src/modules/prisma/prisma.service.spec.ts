@@ -8,7 +8,6 @@ describe('PrismaService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PrismaService,
-     
       ],
     }).compile();
 
@@ -21,7 +20,7 @@ describe('PrismaService', () => {
 
   describe('onModuleInit', () => {
     it('should call $connect on PrismaClient when the module is initialized', async () => {
-      const $connect = jest.spyOn(prismaService, '$connect');
+      const $connect = jest.spyOn(prismaService, '$connect').mockImplementation(async () => {});
       
       await prismaService.onModuleInit();
 
@@ -31,7 +30,7 @@ describe('PrismaService', () => {
 
   describe('onModuleDestroy', () => {
     it('should call $disconnect on PrismaClient when the module is destroyed', async () => {
-      const $disconnect = jest.spyOn(prismaService, '$disconnect');
+      const $disconnect = jest.spyOn(prismaService, '$disconnect').mockImplementation(async () => {});
       
       await prismaService.onModuleDestroy();
 
