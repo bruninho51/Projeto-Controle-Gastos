@@ -1,5 +1,7 @@
 import * as Docker from 'dockerode';
 
+process.env.DATABASE_URL="mysql://root:root@localhost:10330/orcamentos";
+
 export default async function() {
 
     return new Promise(async (resolve, reject) => {
@@ -21,7 +23,7 @@ export default async function() {
             PortBindings: {
                 '3306/tcp': [
                 {
-                    HostPort: '3306',
+                    HostPort: '10330',
                 },
                 ],
             },
