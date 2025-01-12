@@ -7,11 +7,13 @@ BEGIN
             - (SELECT IFNULL(SUM(valor), 0) 
                FROM gastos_fixos 
                WHERE orcamento_id = o.id 
-                 AND data_pgto IS NOT NULL)
+                 AND data_pgto IS NOT NULL
+                 AND soft_delete IS NULL)
             - (SELECT IFNULL(SUM(valor), 0) 
                FROM gastos_variados 
                WHERE orcamento_id = o.id 
-                 AND data_pgto IS NOT NULL),
+                 AND data_pgto IS NOT NULL
+                 AND soft_delete IS NULL),
                  
         valor_livre = valor_inicial 
             - (SELECT IFNULL(SUM(
@@ -20,10 +22,12 @@ BEGIN
                     ELSE previsto 
                 END), 0) 
                FROM gastos_fixos 
-               WHERE orcamento_id = o.id)
+               WHERE orcamento_id = o.id
+               AND soft_delete IS NULL)
             - (SELECT IFNULL(SUM(valor), 0) 
                FROM gastos_variados 
                WHERE orcamento_id = o.id 
-                 AND data_pgto IS NOT NULL)
+                 AND data_pgto IS NOT NULL
+                 AND soft_delete IS NULL)
     WHERE id = orc_id;
 END

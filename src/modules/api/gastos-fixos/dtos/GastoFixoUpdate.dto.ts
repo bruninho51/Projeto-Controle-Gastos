@@ -22,7 +22,7 @@ export class GastoFixoUpdateDto {
   previsto?: string;
 
   @IsOptional()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsDecimal()
   @ApiProperty({
     description: 'Valor efetivamente pago',
     example: '130.00',

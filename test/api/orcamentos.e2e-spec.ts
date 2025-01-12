@@ -514,10 +514,12 @@ describe('OrcamentoController (v1) (E2E)', () => {
         data_pgto: new Date(),
       }
 
-      await request(app.getHttpServer())
+      const res = await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos/${gastoFixo.body.id}`)
         .send(gastoFixoUpdateMock)
         .expect(200);
+      
+      expect(res.status).toBe(200);
 
       const response = await request(app.getHttpServer())
         .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
@@ -587,6 +589,390 @@ describe('OrcamentoController (v1) (E2E)', () => {
       });
     });
 
-    // TODO fazer teste apagando o gasto para saber se vai atualizar o orçamento corretamente
+    it('should correctly update valor_inicial, valor_atual, and valor_livre when deleting an unpaid gasto fixo', async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 })),
+      }
+
+      const orcamento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoFixoMock: GastoFixoCreateDto = {
+        categoria_id: 1,
+        descricao: faker.string.alphanumeric(5),
+        previsto: formatValue(faker.number.float({ min: 50, max: Number(orcamentoMock.valor_inicial), fractionDigits: 2 })),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      const gastoFixo = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos`)
+        .send(gastoFixoMock)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos/${gastoFixo.body.id}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .expect(200);
+
+      const valor_inicial = orcamentoMock.valor_inicial;
+      const valor_atual = valor_inicial;
+      const valor_livre = valor_inicial;
+
+      expect(response.body).toEqual({
+          id: orcamento.body.id,
+          nome: orcamentoMock.nome,
+          valor_inicial: valor_inicial,
+          valor_atual: valor_atual,
+          valor_livre: valor_livre,
+          data_encerramento: null,
+          data_criacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_atualizacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_inatividade: null,
+          soft_delete: null
+      });
+    });
+
+    it('should correctly update valor_inicial, valor_atual, and valor_livre when deleting a paid gasto fixo', async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 })),
+      }
+
+      const orcamento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoFixoMock: GastoFixoCreateDto = {
+        categoria_id: 1,
+        descricao: faker.string.alphanumeric(5),
+        previsto: formatValue(faker.number.float({ min: 50, max: Number(orcamentoMock.valor_inicial), fractionDigits: 2 })),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      const gastoFixo = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos`)
+        .send(gastoFixoMock)
+        .expect(201);
+
+      const gastoFixoUpdateMock: GastoFixoUpdateDto = {
+        valor: formatValue(faker.number.float({ min: 25, max: Number(gastoFixoMock.previsto), fractionDigits: 2 })),
+        data_pgto: new Date(),
+      }
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos/${gastoFixo.body.id}`)
+        .send(gastoFixoUpdateMock)
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos/${gastoFixo.body.id}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .expect(200);
+
+      const valor_inicial = orcamentoMock.valor_inicial;
+      const valor_atual = valor_inicial;
+      const valor_livre = valor_inicial;
+
+      expect(response.body).toEqual({
+          id: orcamento.body.id,
+          nome: orcamentoMock.nome,
+          valor_inicial: valor_inicial,
+          valor_atual: valor_atual,
+          valor_livre: valor_livre,
+          data_encerramento: null,
+          data_criacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_atualizacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_inatividade: null,
+          soft_delete: null
+      });
+    });
+
+    it('should correctly update valor_inicial, valor_atual, and valor_livre when deleting a gasto variado', async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 })),
+      }
+
+      const orcamento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoVariadoMock: GastoVariadoCreateDto = {
+        categoria_id: 1,
+        descricao: faker.string.alphanumeric(5),
+        valor: formatValue(faker.number.float({ min: 50, max: Number(orcamentoMock.valor_inicial), fractionDigits: 2 })),
+        data_pgto: new Date(),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      const gastoVariado = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-variados`)
+        .send(gastoVariadoMock)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-variados/${gastoVariado.body.id}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .expect(200);
+
+        const valor_inicial = orcamentoMock.valor_inicial;
+        const valor_atual = valor_inicial;
+        const valor_livre = valor_inicial;
+
+      expect(response.body).toEqual({
+          id: orcamento.body.id,
+          nome: orcamentoMock.nome,
+          valor_inicial: valor_inicial,
+          valor_atual: valor_atual,
+          valor_livre: valor_livre,
+          data_encerramento: null,
+          data_criacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_atualizacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_inatividade: null,
+          soft_delete: null
+      });
+    });
+
+    it('should correctly update valor_inicial, valor_atual, and valor_livre when add and delete an unpaid gasto fixo and update valor_inicial', async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 })),
+      }
+
+      const orcamento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoFixoMock: GastoFixoCreateDto = {
+        categoria_id: 1,
+        descricao: faker.string.alphanumeric(5),
+        previsto: formatValue(faker.number.float({ min: 50, max: Number(orcamentoMock.valor_inicial), fractionDigits: 2 })),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      const gastoFixo = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos`)
+        .send(gastoFixoMock)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos/${gastoFixo.body.id}`)
+        .expect(200);
+
+      const sum_valor_inicial = formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }));
+
+      const new_valor_inicial = formatValue(Number(orcamentoMock.valor_inicial) + Number(sum_valor_inicial));
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .send({ valor_inicial: new_valor_inicial });
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .expect(200);
+
+      const valor_inicial = new_valor_inicial;
+      const valor_atual = new_valor_inicial;
+      const valor_livre = new_valor_inicial;
+
+      expect(response.body).toEqual({
+          id: orcamento.body.id,
+          nome: orcamentoMock.nome,
+          valor_inicial: valor_inicial,
+          valor_atual: valor_atual,
+          valor_livre: valor_livre,
+          data_encerramento: null,
+          data_criacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_atualizacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_inatividade: null,
+          soft_delete: null
+      });
+    });
+
+    it('should correctly update valor_inicial, valor_atual, and valor_livre when add an unpaid gasto fixo and update valor_inicial', async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 })),
+      }
+
+      const orcamento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoFixoMock: GastoFixoCreateDto = {
+        categoria_id: 1,
+        descricao: faker.string.alphanumeric(5),
+        previsto: formatValue(faker.number.float({ min: 50, max: Number(orcamentoMock.valor_inicial), fractionDigits: 2 })),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos`)
+        .send(gastoFixoMock)
+        .expect(201);
+
+      const sum_valor_inicial = formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }));
+
+      const new_valor_inicial = formatValue(Number(orcamentoMock.valor_inicial) + Number(sum_valor_inicial));
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .send({ valor_inicial: new_valor_inicial });
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .expect(200);
+
+      const valor_inicial = new_valor_inicial;
+      const valor_atual = new_valor_inicial;
+      const valor_livre = formatValue(Number(new_valor_inicial) - Number(gastoFixoMock.previsto));
+
+      expect(response.body).toEqual({
+          id: orcamento.body.id,
+          nome: orcamentoMock.nome,
+          valor_inicial: valor_inicial,
+          valor_atual: valor_atual,
+          valor_livre: valor_livre,
+          data_encerramento: null,
+          data_criacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_atualizacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_inatividade: null,
+          soft_delete: null
+      });
+    });
+
+    it('should correctly update valor_inicial, valor_atual, and valor_livre when paying a gasto fixo and update valor_inicial', async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 })),
+      }
+
+      const orcamento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoFixoMock: GastoFixoCreateDto = {
+        categoria_id: 1,
+        descricao: faker.string.alphanumeric(5),
+        previsto: formatValue(faker.number.float({ min: 50, max: Number(orcamentoMock.valor_inicial), fractionDigits: 2 })),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      const gastoFixo = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos`)
+        .send(gastoFixoMock)
+        .expect(201);
+
+      const gastoFixoUpdateMock: GastoFixoUpdateDto = {
+        valor: formatValue(faker.number.float({ min: 25, max: Number(gastoFixoMock.previsto), fractionDigits: 2 })),
+        data_pgto: new Date(),
+      }
+
+      const res = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos/${gastoFixo.body.id}`)
+        .send(gastoFixoUpdateMock)
+        .expect(200);
+        
+      const sum_valor_inicial = formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }));
+
+      const new_valor_inicial = formatValue(Number(orcamentoMock.valor_inicial) + Number(sum_valor_inicial));
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .send({ valor_inicial: new_valor_inicial });
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .expect(200);
+
+      
+      const valor_inicial = new_valor_inicial;
+      const valor_atual = formatValue(Number(new_valor_inicial) - Number(gastoFixoUpdateMock.valor));
+      const valor_livre = formatValue(Number(new_valor_inicial) - Number(gastoFixoUpdateMock.valor));
+
+      expect(response.body).toEqual({
+          id: orcamento.body.id,
+          nome: orcamentoMock.nome,
+          valor_inicial: valor_inicial,
+          valor_atual: valor_atual,
+          valor_livre: valor_livre,
+          data_encerramento: null,
+          data_criacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_atualizacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_inatividade: null,
+          soft_delete: null
+      });
+    });
+
+    it('should correctly update valor_inicial, valor_atual, and valor_livre when creating a new gasto variado and update valor_inicial', async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 })),
+      }
+
+      const orcamento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoVariadoMock: GastoVariadoCreateDto = {
+        categoria_id: 1,
+        descricao: faker.string.alphanumeric(5),
+        valor: formatValue(faker.number.float({ min: 50, max: Number(orcamentoMock.valor_inicial), fractionDigits: 2 })),
+        data_pgto: new Date(),
+        observacoes: faker.string.alphanumeric(5),
+      }
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-variados`)
+        .send(gastoVariadoMock)
+        .expect(201);
+
+      const sum_valor_inicial = formatValue(faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }));
+
+      const new_valor_inicial = formatValue(Number(orcamentoMock.valor_inicial) + Number(sum_valor_inicial));
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .send({ valor_inicial: new_valor_inicial });
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamento.body.id}`)
+        .expect(200);
+
+        const valor_inicial = new_valor_inicial;
+        const valor_atual = formatValue(Number(new_valor_inicial) - Number(gastoVariadoMock.valor));
+        const valor_livre = formatValue(Number(new_valor_inicial) - Number(gastoVariadoMock.valor));
+
+      expect(response.body).toEqual({
+          id: orcamento.body.id,
+          nome: orcamentoMock.nome,
+          valor_inicial: valor_inicial,
+          valor_atual: valor_atual,
+          valor_livre: valor_livre,
+          data_encerramento: null,
+          data_criacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_atualizacao: expect.stringMatching(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/),
+          data_inatividade: null,
+          soft_delete: null
+      });
+    });
   });
 });
