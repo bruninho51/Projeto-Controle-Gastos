@@ -79,7 +79,7 @@ model Investimento {
   nome                      String                     @db.VarChar(255)
   descricao                 String                     @db.VarChar(255)
   valor_inicial             Decimal                    @db.Decimal(10, 2)
-  valor_atual               Decimal                    @db.Decimal(10, 2)
+  valor_atual               Decimal?                   @db.Decimal(10, 2)
   categoria_id              Int?
   data_criacao              DateTime?                  @default(now()) @db.Timestamp(0)
   data_atualizacao          DateTime?                  @default(now()) @db.Timestamp(0)

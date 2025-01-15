@@ -47,11 +47,9 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
       }
     }
 
-    return response
-      .status(HttpStatus.CONFLICT)
-      .json({
-        message: "Violação de restrição única. Verifique os dados inseridos.",
-      });
+    return response.status(HttpStatus.CONFLICT).json({
+      message: "Violação de restrição única. Verifique os dados inseridos.",
+    });
   }
 
   private handleForeignKeyConstraintFailed(
@@ -73,11 +71,9 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
     response: Response,
   ) {
     console.error("Erro desconhecido do Prisma:", exception);
-    return response
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({
-        message:
-          "Erro interno no servidor. Por favor, tente novamente mais tarde.",
-      });
+    return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      message:
+        "Erro interno no servidor. Por favor, tente novamente mais tarde.",
+    });
   }
 }

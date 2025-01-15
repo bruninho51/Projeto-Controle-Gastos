@@ -3,7 +3,7 @@ CREATE TABLE investimentos (
     nome VARCHAR(255) NOT NULL,
     descricao VARCHAR(255) NOT NULL,           -- Tipo de investimento (ex: "Ações", "Fundos Imobiliários", etc.)
     valor_inicial DECIMAL(10, 2) NOT NULL,        -- Valor inicial do investimento
-    valor_atual DECIMAL(10, 2) NOT NULL,        -- Valor atual do investimento
+    valor_atual DECIMAL(10, 2),        -- Valor atual do investimento
     categoria_id INT,        -- Relaciona com a tabela categorias_investimentos
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
