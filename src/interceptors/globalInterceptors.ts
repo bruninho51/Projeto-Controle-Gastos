@@ -1,5 +1,3 @@
 import { NullResponseInterceptor } from "./null-response.interceptor";
 
-export const globalInterceptors = [
-    new NullResponseInterceptor()
-];
+export const globalInterceptors = [new NullResponseInterceptor()];

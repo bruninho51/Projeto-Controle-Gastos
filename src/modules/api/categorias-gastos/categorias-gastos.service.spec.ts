@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CategoriasGastosService } from './categorias-gastos.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CategoriaGasto } from '@prisma/client';
+import { Test, TestingModule } from "@nestjs/testing";
+import { CategoriasGastosService } from "./categorias-gastos.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CategoriaGasto } from "@prisma/client";
 
-describe('CategoriasGastosService', () => {
+describe("CategoriasGastosService", () => {
   let service: CategoriasGastosService;
   let prismaService: PrismaService;
 
@@ -30,9 +30,9 @@ describe('CategoriasGastosService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  describe('findAll', () => {
-    it('should return an array of categorias de gastos', async () => {
-      const result = [{ id: 1, nome: 'Alimentação' }] as CategoriaGasto[];
+  describe("findAll", () => {
+    it("should return an array of categorias de gastos", async () => {
+      const result = [{ id: 1, nome: "Alimentação" }] as CategoriaGasto[];
       prismaServiceMock.categoriaGasto.findMany.mockResolvedValue(result);
 
       const categories = await service.findAll();
@@ -43,9 +43,9 @@ describe('CategoriasGastosService', () => {
     });
   });
 
-  describe('create', () => {
-    it('should create a new categoria de gasto', async () => {
-      const createCategoriaDto = { nome: 'Transporte' };
+  describe("create", () => {
+    it("should create a new categoria de gasto", async () => {
+      const createCategoriaDto = { nome: "Transporte" };
       const result = { id: 1, ...createCategoriaDto } as CategoriaGasto;
       prismaServiceMock.categoriaGasto.create.mockResolvedValue(result);
 
@@ -57,10 +57,10 @@ describe('CategoriasGastosService', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update an existing categoria de gasto', async () => {
+  describe("update", () => {
+    it("should update an existing categoria de gasto", async () => {
       const id = 1;
-      const updateCategoriaDto = { nome: 'Saúde' };
+      const updateCategoriaDto = { nome: "Saúde" };
       const result = { id, ...updateCategoriaDto } as CategoriaGasto;
       prismaServiceMock.categoriaGasto.update.mockResolvedValue(result);
 
@@ -73,10 +73,14 @@ describe('CategoriasGastosService', () => {
     });
   });
 
-  describe('softDelete', () => {
-    it('should soft delete a categoria de gasto', async () => {
+  describe("softDelete", () => {
+    it("should soft delete a categoria de gasto", async () => {
       const id = 1;
-      const result = { id, nome: 'Transporte', soft_delete: new Date() } as CategoriaGasto;
+      const result = {
+        id,
+        nome: "Transporte",
+        soft_delete: new Date(),
+      } as CategoriaGasto;
       prismaServiceMock.categoriaGasto.update.mockResolvedValue(result);
 
       const category = await service.softDelete(id);

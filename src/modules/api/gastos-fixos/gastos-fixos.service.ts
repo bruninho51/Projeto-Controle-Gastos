@@ -1,25 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { GastoFixoCreateDto } from './dtos/GastoFixoCreate.dto';
-import { GastoFixoUpdateDto } from './dtos/GastoFixoUpdate.dto';
-import { GastoFixo } from '@prisma/client';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { GastoFixoCreateDto } from "./dtos/GastoFixoCreate.dto";
+import { GastoFixoUpdateDto } from "./dtos/GastoFixoUpdate.dto";
+import { GastoFixo } from "@prisma/client";
 
 @Injectable()
 export class GastosFixosService {
   constructor(private prisma: PrismaService) {}
 
-  async create(orcamento_id: number, createGastoDto: GastoFixoCreateDto): Promise<GastoFixo> {
+  async create(
+    orcamento_id: number,
+    createGastoDto: GastoFixoCreateDto,
+  ): Promise<GastoFixo> {
     return await this.prisma.gastoFixo.create({
       data: {
         ...createGastoDto,
-        orcamento_id
+        orcamento_id,
       },
     });
   }
 
   async findAll(orcamento_id: number): Promise<GastoFixo[]> {
     return this.prisma.gastoFixo.findMany({
-        where: { soft_delete: null, orcamento_id }
+      where: { soft_delete: null, orcamento_id },
     });
   }
 
@@ -29,7 +32,11 @@ export class GastosFixosService {
     });
   }
 
-  async update(orcamento_id: number, id: number, updateGastoDto: GastoFixoUpdateDto): Promise<GastoFixo> {
+  async update(
+    orcamento_id: number,
+    id: number,
+    updateGastoDto: GastoFixoUpdateDto,
+  ): Promise<GastoFixo> {
     return this.prisma.gastoFixo.update({
       where: { id, orcamento_id, soft_delete: null },
       data: updateGastoDto,

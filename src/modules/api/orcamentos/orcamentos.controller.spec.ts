@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { OrcamentosController } from './orcamentos.controller';
-import { OrcamentosService } from './orcamentos.service';
-import { OrcamentoCreateDto } from './dtos/OrcamentoCreate.dto';
-import { OrcamentoUpdateDto } from './dtos/OrcamentoUpdate.dto';
+import { Test, TestingModule } from "@nestjs/testing";
+import { OrcamentosController } from "./orcamentos.controller";
+import { OrcamentosService } from "./orcamentos.service";
+import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
+import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
 
 const mockOrcamentosService = {
   create: jest.fn(),
@@ -12,7 +12,7 @@ const mockOrcamentosService = {
   softDelete: jest.fn(),
 };
 
-describe('OrcamentoController', () => {
+describe("OrcamentoController", () => {
   let controller: OrcamentosController;
   let service: OrcamentosService;
 
@@ -32,15 +32,15 @@ describe('OrcamentoController', () => {
     service = module.get<OrcamentosService>(OrcamentosService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create a new orcamento', async () => {
+  describe("create", () => {
+    it("should create a new orcamento", async () => {
       const createOrcamentoDto: OrcamentoCreateDto = {
-        nome: 'Orçamento A',
-        valor_inicial: '1000.00',
+        nome: "Orçamento A",
+        valor_inicial: "1000.00",
       };
 
       const createdOrcamento = {
@@ -59,11 +59,23 @@ describe('OrcamentoController', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('should return an array of orcamentos', async () => {
+  describe("findAll", () => {
+    it("should return an array of orcamentos", async () => {
       const orcamentos = [
-        { id: 1, nome: 'Orçamento A', valor_inicial: '1000.00', valor_atual: '1200.00', valor_livre: '200.00' },
-        { id: 2, nome: 'Orçamento B', valor_inicial: '500.00', valor_atual: '600.00', valor_livre: '100.00' },
+        {
+          id: 1,
+          nome: "Orçamento A",
+          valor_inicial: "1000.00",
+          valor_atual: "1200.00",
+          valor_livre: "200.00",
+        },
+        {
+          id: 2,
+          nome: "Orçamento B",
+          valor_inicial: "500.00",
+          valor_atual: "600.00",
+          valor_livre: "100.00",
+        },
       ];
 
       mockOrcamentosService.findAll.mockResolvedValue(orcamentos);
@@ -75,56 +87,66 @@ describe('OrcamentoController', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should return a single orcamento by id', async () => {
-      const orcamento = { id: 1, nome: 'Orçamento A', valor_inicial: '1000.00', valor_atual: '1200.00', valor_livre: '200.00' };
+  describe("findOne", () => {
+    it("should return a single orcamento by id", async () => {
+      const orcamento = {
+        id: 1,
+        nome: "Orçamento A",
+        valor_inicial: "1000.00",
+        valor_atual: "1200.00",
+        valor_livre: "200.00",
+      };
 
       mockOrcamentosService.findOne.mockResolvedValue(orcamento);
 
-      const result = await controller.findOne('1');
+      const result = await controller.findOne("1");
 
       expect(result).toEqual(orcamento);
       expect(service.findOne).toHaveBeenCalledWith(1);
     });
 
-    it('should return null if orcamento not found', async () => {
+    it("should return null if orcamento not found", async () => {
       mockOrcamentosService.findOne.mockResolvedValue(null);
 
-      const result = await controller.findOne('999');
+      const result = await controller.findOne("999");
 
       expect(result).toBeNull();
       expect(service.findOne).toHaveBeenCalledWith(999);
     });
   });
 
-  describe('update', () => {
-    it('should update an orcamento', async () => {
+  describe("update", () => {
+    it("should update an orcamento", async () => {
       const updateOrcamentoDto: OrcamentoUpdateDto = {
-        nome: 'Orçamento A Atualizado',
-        valor_inicial: '1300.00',
+        nome: "Orçamento A Atualizado",
+        valor_inicial: "1300.00",
       };
 
-      const updatedOrcamento: OrcamentoUpdateDto = { 
-        nome: 'Orçamento A Atualizado', 
-        valor_inicial: '1000.00', 
+      const updatedOrcamento: OrcamentoUpdateDto = {
+        nome: "Orçamento A Atualizado",
+        valor_inicial: "1000.00",
       };
 
       mockOrcamentosService.update.mockResolvedValue(updatedOrcamento);
 
-      const result = await controller.update('1', updateOrcamentoDto);
+      const result = await controller.update("1", updateOrcamentoDto);
 
       expect(result).toEqual(updatedOrcamento);
       expect(service.update).toHaveBeenCalledWith(1, updateOrcamentoDto);
     });
   });
 
-  describe('remove', () => {
-    it('should perform a soft delete of an orcamento', async () => {
-      const orcamentoToDelete = { id: 1, nome: 'Orçamento A', valor_inicial: '1000.00' };
+  describe("remove", () => {
+    it("should perform a soft delete of an orcamento", async () => {
+      const orcamentoToDelete = {
+        id: 1,
+        nome: "Orçamento A",
+        valor_inicial: "1000.00",
+      };
 
       mockOrcamentosService.softDelete.mockResolvedValue(orcamentoToDelete);
 
-      const result = await controller.remove('1');
+      const result = await controller.remove("1");
 
       expect(result).toEqual(orcamentoToDelete);
       expect(service.softDelete).toHaveBeenCalledWith(1);

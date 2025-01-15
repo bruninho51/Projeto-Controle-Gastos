@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { CategoriaGastoCreateDto } from './dtos/CategoriaGastoCreate.dto';
-import { CategoriaGastoUpdateDto } from './dtos/CategoriaGastoUpdate.dto';
-import { CategoriaGasto } from '@prisma/client';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
+import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
+import { CategoriaGasto } from "@prisma/client";
 
 @Injectable()
 export class CategoriasGastosService {
@@ -16,13 +16,18 @@ export class CategoriasGastosService {
     });
   }
 
-  async create(createCategoriaDto: CategoriaGastoCreateDto): Promise<CategoriaGasto> {
+  async create(
+    createCategoriaDto: CategoriaGastoCreateDto,
+  ): Promise<CategoriaGasto> {
     return this.prisma.categoriaGasto.create({
       data: createCategoriaDto,
     });
   }
 
-  async update(id: number, updateCategoriaDto: CategoriaGastoUpdateDto): Promise<CategoriaGasto> {
+  async update(
+    id: number,
+    updateCategoriaDto: CategoriaGastoUpdateDto,
+  ): Promise<CategoriaGasto> {
     return this.prisma.categoriaGasto.update({
       where: { id, soft_delete: null },
       data: updateCategoriaDto,

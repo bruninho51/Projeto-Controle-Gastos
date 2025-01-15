@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { GastosVariadosService } from './gastos-variados.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { GastoVariadoCreateDto } from './dtos/GastoVariadoCreate.dto';
-import { GastoVariadoUpdateDto } from './dtos/GastoVariadoUpdate.dto';
-import { faker } from '@faker-js/faker';
+import { Test, TestingModule } from "@nestjs/testing";
+import { GastosVariadosService } from "./gastos-variados.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
+import { GastoVariadoUpdateDto } from "./dtos/GastoVariadoUpdate.dto";
+import { faker } from "@faker-js/faker";
 
 const mockPrismaService = {
   gastoVariado: {
@@ -14,7 +14,7 @@ const mockPrismaService = {
   },
 };
 
-describe('GastosVariadosService', () => {
+describe("GastosVariadosService", () => {
   let service: GastosVariadosService;
 
   beforeEach(async () => {
@@ -31,12 +31,12 @@ describe('GastosVariadosService', () => {
     service = module.get<GastosVariadosService>(GastosVariadosService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create a new gasto variado', async () => {
+  describe("create", () => {
+    it("should create a new gasto variado", async () => {
       const orcamento_id = faker.number.int();
       const gasto_variado_id = faker.number.int();
 
@@ -44,7 +44,9 @@ describe('GastosVariadosService', () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
-        valor: faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }).toString(),
+        valor: faker.number
+          .float({ min: 100, max: 9999, fractionDigits: 2 })
+          .toString(),
         data_pgto: new Date(),
       };
 
@@ -56,7 +58,9 @@ describe('GastosVariadosService', () => {
         data_atualizacao: new Date(),
       };
 
-      mockPrismaService.gastoVariado.create.mockResolvedValue(createdGastoVariado);
+      mockPrismaService.gastoVariado.create.mockResolvedValue(
+        createdGastoVariado,
+      );
 
       const result = await service.create(orcamento_id, createGastoDto);
 
@@ -67,13 +71,25 @@ describe('GastosVariadosService', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('should return an array of gasto variado', async () => {
+  describe("findAll", () => {
+    it("should return an array of gasto variado", async () => {
       const orcamento_id = faker.number.int();
-      
+
       const gastosVariados = [
-        { id: 1, descricao: 'Gasto Variado A', valor: '1000.00', data_pgto: new Date(), observacoes: 'Descrição A' },
-        { id: 2, descricao: 'Gasto Variado B', valor: '500.00', data_pgto: new Date(), observacoes: 'Descrição B' },
+        {
+          id: 1,
+          descricao: "Gasto Variado A",
+          valor: "1000.00",
+          data_pgto: new Date(),
+          observacoes: "Descrição A",
+        },
+        {
+          id: 2,
+          descricao: "Gasto Variado B",
+          valor: "500.00",
+          data_pgto: new Date(),
+          observacoes: "Descrição B",
+        },
       ];
 
       mockPrismaService.gastoVariado.findMany.mockResolvedValue(gastosVariados);
@@ -87,17 +103,17 @@ describe('GastosVariadosService', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should return a single gasto variado by id', async () => {
+  describe("findOne", () => {
+    it("should return a single gasto variado by id", async () => {
       const orcamento_id = faker.number.int();
       const gasto_variado_id = faker.number.int();
 
       const gastoVariado = {
         id: gasto_variado_id,
-        descricao: 'Gasto Variado A',
-        valor: 1000.00,
+        descricao: "Gasto Variado A",
+        valor: 1000.0,
         data_pgto: new Date(),
-        observacoes: 'Descrição A',
+        observacoes: "Descrição A",
         data_criacao: new Date(),
         data_atualizacao: new Date(),
       };
@@ -112,7 +128,7 @@ describe('GastosVariadosService', () => {
       });
     });
 
-    it('should return null if gasto variado not found', async () => {
+    it("should return null if gasto variado not found", async () => {
       const orcamento_id = faker.number.int();
       const gasto_variado_id = 999;
 
@@ -127,16 +143,16 @@ describe('GastosVariadosService', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update a gasto variado', async () => {
+  describe("update", () => {
+    it("should update a gasto variado", async () => {
       const orcamento_id = faker.number.int();
       const gasto_variado_id = faker.number.int();
 
       const updateGastoDto: GastoVariadoUpdateDto = {
-        descricao: 'Gasto Variado A Atualizado',
-        valor: '1500.00',
+        descricao: "Gasto Variado A Atualizado",
+        valor: "1500.00",
         data_pgto: new Date(),
-        observacoes: 'Descrição do Gasto Variado A Atualizado',
+        observacoes: "Descrição do Gasto Variado A Atualizado",
       };
 
       const updatedGastoVariado = {
@@ -146,9 +162,15 @@ describe('GastosVariadosService', () => {
         data_atualizacao: new Date(),
       };
 
-      mockPrismaService.gastoVariado.update.mockResolvedValue(updatedGastoVariado);
+      mockPrismaService.gastoVariado.update.mockResolvedValue(
+        updatedGastoVariado,
+      );
 
-      const result = await service.update(orcamento_id, gasto_variado_id, updateGastoDto);
+      const result = await service.update(
+        orcamento_id,
+        gasto_variado_id,
+        updateGastoDto,
+      );
 
       expect(result).toEqual(updatedGastoVariado);
       expect(mockPrismaService.gastoVariado.update).toHaveBeenCalledWith({
@@ -158,17 +180,17 @@ describe('GastosVariadosService', () => {
     });
   });
 
-  describe('softDelete', () => {
-    it('should perform a soft delete of a gasto variado', async () => {
+  describe("softDelete", () => {
+    it("should perform a soft delete of a gasto variado", async () => {
       const orcamento_id = faker.number.int();
       const gasto_variado_id = faker.number.int();
 
       const gastoVariadoToDelete = {
         id: gasto_variado_id,
-        descricao: 'Gasto Variado A',
-        valor: '1000.00',
+        descricao: "Gasto Variado A",
+        valor: "1000.00",
         data_pgto: new Date(),
-        observacoes: 'Descrição A',
+        observacoes: "Descrição A",
       };
 
       const softDeletedGastoVariado = {
@@ -176,7 +198,9 @@ describe('GastosVariadosService', () => {
         soft_delete: new Date(),
       };
 
-      mockPrismaService.gastoVariado.update.mockResolvedValue(softDeletedGastoVariado);
+      mockPrismaService.gastoVariado.update.mockResolvedValue(
+        softDeletedGastoVariado,
+      );
 
       const result = await service.softDelete(orcamento_id, gasto_variado_id);
 

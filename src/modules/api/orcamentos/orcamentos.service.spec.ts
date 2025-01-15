@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { OrcamentosService } from './orcamentos.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { OrcamentoCreateDto } from './dtos/OrcamentoCreate.dto';
-import { OrcamentoUpdateDto } from './dtos/OrcamentoUpdate.dto';
+import { Test, TestingModule } from "@nestjs/testing";
+import { OrcamentosService } from "./orcamentos.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
+import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
 
 const mockPrismaService = {
   orcamento: {
@@ -14,7 +14,7 @@ const mockPrismaService = {
   },
 };
 
-describe('OrcamentosService', () => {
+describe("OrcamentosService", () => {
   let service: OrcamentosService;
   let prismaService: PrismaService;
 
@@ -33,15 +33,15 @@ describe('OrcamentosService', () => {
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create a new orcamento', async () => {
+  describe("create", () => {
+    it("should create a new orcamento", async () => {
       const createOrcamentoDto: OrcamentoCreateDto = {
-        nome: 'Orçamento A',
-        valor_inicial: '1000.00',
+        nome: "Orçamento A",
+        valor_inicial: "1000.00",
       };
 
       const createdOrcamento = {
@@ -62,11 +62,23 @@ describe('OrcamentosService', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('should return an array of orcamentos', async () => {
+  describe("findAll", () => {
+    it("should return an array of orcamentos", async () => {
       const orcamentos = [
-        { id: 1, nome: 'Orçamento A', valor_inicial: '1000.00', valor_atual: '1200.00', valor_livre: '200.00' },
-        { id: 2, nome: 'Orçamento B', valor_inicial: '500.00', valor_atual: '600.00', valor_livre: '100.00' },
+        {
+          id: 1,
+          nome: "Orçamento A",
+          valor_inicial: "1000.00",
+          valor_atual: "1200.00",
+          valor_livre: "200.00",
+        },
+        {
+          id: 2,
+          nome: "Orçamento B",
+          valor_inicial: "500.00",
+          valor_atual: "600.00",
+          valor_livre: "100.00",
+        },
       ];
 
       mockPrismaService.orcamento.findMany.mockResolvedValue(orcamentos);
@@ -78,15 +90,15 @@ describe('OrcamentosService', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should return a single orcamento by id', async () => {
+  describe("findOne", () => {
+    it("should return a single orcamento by id", async () => {
       const orcamento = {
         id: 1,
-        nome: 'Orçamento A',
-        valor_inicial: '1000.00',
-        valor_atual: '1200.00',
-        valor_livre: '200.00',
-        data_encerramento: new Date('2024-12-31'),
+        nome: "Orçamento A",
+        valor_inicial: "1000.00",
+        valor_atual: "1200.00",
+        valor_livre: "200.00",
+        data_encerramento: new Date("2024-12-31"),
         data_criacao: new Date(),
         data_atualizacao: new Date(),
       };
@@ -101,7 +113,7 @@ describe('OrcamentosService', () => {
       });
     });
 
-    it('should return null if orcamento not found', async () => {
+    it("should return null if orcamento not found", async () => {
       mockPrismaService.orcamento.findUnique.mockResolvedValue(null);
 
       const result = await service.findOne(999);
@@ -113,19 +125,19 @@ describe('OrcamentosService', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update an orcamento', async () => {
+  describe("update", () => {
+    it("should update an orcamento", async () => {
       const updateOrcamentoDto: OrcamentoUpdateDto = {
-        nome: 'Orçamento A Atualizado',
-        valor_inicial: '1300.00',
+        nome: "Orçamento A Atualizado",
+        valor_inicial: "1300.00",
       };
 
       const updatedOrcamento = {
         id: 1,
-        nome: 'Orçamento A Atualizado',
-        valor_inicial: '1300.00',
-        valor_atual: '1300.00',
-        valor_livre: '1300.00',
+        nome: "Orçamento A Atualizado",
+        valor_inicial: "1300.00",
+        valor_atual: "1300.00",
+        valor_livre: "1300.00",
         data_encerramento: null,
         data_criacao: new Date(),
         data_atualizacao: new Date(),
@@ -143,14 +155,14 @@ describe('OrcamentosService', () => {
     });
   });
 
-  describe('softDelete', () => {
-    it('should perform a soft delete of an orcamento', async () => {
+  describe("softDelete", () => {
+    it("should perform a soft delete of an orcamento", async () => {
       const orcamentoToDelete = {
         id: 1,
-        nome: 'Orçamento A',
-        valor_inicial: '1000.00',
-        valor_atual: '1200.00',
-        valor_livre: '200.00',
+        nome: "Orçamento A",
+        valor_inicial: "1000.00",
+        valor_atual: "1200.00",
+        valor_livre: "200.00",
       };
 
       const softDeletedOrcamento = {
@@ -158,7 +170,9 @@ describe('OrcamentosService', () => {
         soft_delete: new Date(),
       };
 
-      mockPrismaService.orcamento.update.mockResolvedValue(softDeletedOrcamento);
+      mockPrismaService.orcamento.update.mockResolvedValue(
+        softDeletedOrcamento,
+      );
 
       const result = await service.softDelete(1);
 

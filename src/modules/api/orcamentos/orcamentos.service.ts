@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { Orcamento } from '@prisma/client';
-import { OrcamentoUpdateDto } from './dtos/OrcamentoUpdate.dto';
-import { OrcamentoCreateDto } from './dtos/OrcamentoCreate.dto';
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { Orcamento } from "@prisma/client";
+import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
+import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 
 @Injectable()
 export class OrcamentosService {
@@ -26,7 +26,10 @@ export class OrcamentosService {
     });
   }
 
-  async update(id: number, updateOrcamentoDto: OrcamentoUpdateDto): Promise<Orcamento> {
+  async update(
+    id: number,
+    updateOrcamentoDto: OrcamentoUpdateDto,
+  ): Promise<Orcamento> {
     return this.prisma.orcamento.update({
       where: { id, soft_delete: null },
       data: updateOrcamentoDto,

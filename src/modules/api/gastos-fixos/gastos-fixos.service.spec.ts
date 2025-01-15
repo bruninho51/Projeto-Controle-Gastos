@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { GastosFixosService } from './gastos-fixos.service';
-import { PrismaService } from '../../prisma/prisma.service';
-import { GastoFixoCreateDto } from './dtos/GastoFixoCreate.dto';
-import { GastoFixoUpdateDto } from './dtos/GastoFixoUpdate.dto';
-import { faker } from '@faker-js/faker';
+import { Test, TestingModule } from "@nestjs/testing";
+import { GastosFixosService } from "./gastos-fixos.service";
+import { PrismaService } from "../../prisma/prisma.service";
+import { GastoFixoCreateDto } from "./dtos/GastoFixoCreate.dto";
+import { GastoFixoUpdateDto } from "./dtos/GastoFixoUpdate.dto";
+import { faker } from "@faker-js/faker";
 
 const mockPrismaService = {
   gastoFixo: {
@@ -14,7 +14,7 @@ const mockPrismaService = {
   },
 };
 
-describe('GastosFixosService', () => {
+describe("GastosFixosService", () => {
   let service: GastosFixosService;
 
   beforeEach(async () => {
@@ -31,12 +31,12 @@ describe('GastosFixosService', () => {
     service = module.get<GastosFixosService>(GastosFixosService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe('create', () => {
-    it('should create a new gasto fixo', async () => {
+  describe("create", () => {
+    it("should create a new gasto fixo", async () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
 
@@ -44,7 +44,9 @@ describe('GastosFixosService', () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
-        previsto: faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }).toString(),
+        previsto: faker.number
+          .float({ min: 100, max: 9999, fractionDigits: 2 })
+          .toString(),
       };
 
       const createdGastoFixo = {
@@ -66,13 +68,23 @@ describe('GastosFixosService', () => {
     });
   });
 
-  describe('findAll', () => {
-    it('should return an array of gasto fixo', async () => {
+  describe("findAll", () => {
+    it("should return an array of gasto fixo", async () => {
       const orcamento_id = faker.number.int();
-      
+
       const gastosFixos = [
-        { id: 1, descricao: 'Gasto Fixo A', previsto: '1000.00', observacoes: 'Descrição A' },
-        { id: 2, descricao: 'Gasto Fixo B', previsto: '500.00', observacoes: 'Descrição B' },
+        {
+          id: 1,
+          descricao: "Gasto Fixo A",
+          previsto: "1000.00",
+          observacoes: "Descrição A",
+        },
+        {
+          id: 2,
+          descricao: "Gasto Fixo B",
+          previsto: "500.00",
+          observacoes: "Descrição B",
+        },
       ];
 
       mockPrismaService.gastoFixo.findMany.mockResolvedValue(gastosFixos);
@@ -86,16 +98,16 @@ describe('GastosFixosService', () => {
     });
   });
 
-  describe('findOne', () => {
-    it('should return a single gasto fixo by id', async () => {
+  describe("findOne", () => {
+    it("should return a single gasto fixo by id", async () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
 
       const gastoFixo = {
         id: gasto_fixo_id,
-        descricao: 'Gasto Fixo A',
-        previsto: 1000.00,
-        observacoes: 'Descrição A',
+        descricao: "Gasto Fixo A",
+        previsto: 1000.0,
+        observacoes: "Descrição A",
         data_criacao: new Date(),
         data_atualizacao: new Date(),
       };
@@ -110,7 +122,7 @@ describe('GastosFixosService', () => {
       });
     });
 
-    it('should return null if gasto fixo not found', async () => {
+    it("should return null if gasto fixo not found", async () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = 999;
 
@@ -125,15 +137,15 @@ describe('GastosFixosService', () => {
     });
   });
 
-  describe('update', () => {
-    it('should update a gasto fixo', async () => {
+  describe("update", () => {
+    it("should update a gasto fixo", async () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
 
       const updateGastoDto: GastoFixoUpdateDto = {
-        descricao: 'Gasto Fixo A Atualizado',
-        previsto: '1500.00',
-        observacoes: 'Descrição do Gasto Fixo A Atualizado',
+        descricao: "Gasto Fixo A Atualizado",
+        previsto: "1500.00",
+        observacoes: "Descrição do Gasto Fixo A Atualizado",
       };
 
       const updatedGastoFixo = {
@@ -145,7 +157,11 @@ describe('GastosFixosService', () => {
 
       mockPrismaService.gastoFixo.update.mockResolvedValue(updatedGastoFixo);
 
-      const result = await service.update(orcamento_id, gasto_fixo_id, updateGastoDto);
+      const result = await service.update(
+        orcamento_id,
+        gasto_fixo_id,
+        updateGastoDto,
+      );
 
       expect(result).toEqual(updatedGastoFixo);
       expect(mockPrismaService.gastoFixo.update).toHaveBeenCalledWith({
@@ -155,16 +171,16 @@ describe('GastosFixosService', () => {
     });
   });
 
-  describe('softDelete', () => {
-    it('should perform a soft delete of a gasto fixo', async () => {
+  describe("softDelete", () => {
+    it("should perform a soft delete of a gasto fixo", async () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
 
       const gastoFixoToDelete = {
         id: gasto_fixo_id,
-        descricao: 'Gasto Fixo A',
-        previsto: '1000.00',
-        observacoes: 'Descrição A',
+        descricao: "Gasto Fixo A",
+        previsto: "1000.00",
+        observacoes: "Descrição A",
       };
 
       const softDeletedGastoFixo = {
@@ -172,7 +188,9 @@ describe('GastosFixosService', () => {
         soft_delete: new Date(),
       };
 
-      mockPrismaService.gastoFixo.update.mockResolvedValue(softDeletedGastoFixo);
+      mockPrismaService.gastoFixo.update.mockResolvedValue(
+        softDeletedGastoFixo,
+      );
 
       const result = await service.softDelete(orcamento_id, gasto_fixo_id);
 

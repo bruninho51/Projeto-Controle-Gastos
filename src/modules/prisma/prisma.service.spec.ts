@@ -1,37 +1,39 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from './prisma.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { PrismaService } from "./prisma.service";
 
-describe('PrismaService', () => {
+describe("PrismaService", () => {
   let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PrismaService,
-      ],
+      providers: [PrismaService],
     }).compile();
 
     prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(prismaService).toBeDefined();
   });
 
-  describe('onModuleInit', () => {
-    it('should call $connect on PrismaClient when the module is initialized', async () => {
-      const $connect = jest.spyOn(prismaService, '$connect').mockImplementation(async () => {});
-      
+  describe("onModuleInit", () => {
+    it("should call $connect on PrismaClient when the module is initialized", async () => {
+      const $connect = jest
+        .spyOn(prismaService, "$connect")
+        .mockImplementation(async () => {});
+
       await prismaService.onModuleInit();
 
       expect($connect).toHaveBeenCalled();
     });
   });
 
-  describe('onModuleDestroy', () => {
-    it('should call $disconnect on PrismaClient when the module is destroyed', async () => {
-      const $disconnect = jest.spyOn(prismaService, '$disconnect').mockImplementation(async () => {});
-      
+  describe("onModuleDestroy", () => {
+    it("should call $disconnect on PrismaClient when the module is destroyed", async () => {
+      const $disconnect = jest
+        .spyOn(prismaService, "$disconnect")
+        .mockImplementation(async () => {});
+
       await prismaService.onModuleDestroy();
 
       expect($disconnect).toHaveBeenCalled();
