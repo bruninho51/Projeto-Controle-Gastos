@@ -22,7 +22,7 @@ jest.setTimeout(10000); // 10 segundos
 
 const apiGlobalPrefix = "/api/v1";
 
-describe("OrcamentoController (v1) (E2E)", () => {
+describe("OrcamentosController (v1) (E2E)", () => {
   let app: INestApplication;
   let prismaService: PrismaService;
 
@@ -150,7 +150,7 @@ describe("OrcamentoController (v1) (E2E)", () => {
       const createOrcamentoDto = {
         nome: "Orçamento A",
         valor_inicial: "1000.45",
-        valor_atual: "1030.32",
+        valor_atual: "1030.32", // campo inválido (calculado pela aplicação)
       } as OrcamentoCreateDto;
 
       await request(app.getHttpServer())

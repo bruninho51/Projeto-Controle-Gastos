@@ -4,6 +4,7 @@ import { CategoriasGastosModule } from "./api/categorias-gastos/categorias-gasto
 import { OrcamentosModule } from "./api/orcamentos/orcamentos.module";
 import { GastosFixosModule } from "./api/gastos-fixos/gastos-fixos.module";
 import { GastosVariadosModule } from "./api/gastos-variados/gastos-variados.module";
+import { InvestimentosModule } from "./api/investimentos/investimentos.module";
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { GastosVariadosModule } from "./api/gastos-variados/gastos-variados.modu
     OrcamentosModule,
     GastosFixosModule,
     GastosVariadosModule,
+    InvestimentosModule,
   ],
 })
 export class AppModule {}
