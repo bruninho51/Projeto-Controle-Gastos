@@ -263,7 +263,6 @@ describe("InvestimentosController (v1) (E2E)", () => {
 
       expect(response.body.nome).toBe(updateInvestimentoDto.nome);
       expect(response.body.valor_inicial).toBe("850");
-      expect(response.body.valor_atual).toBe("850");
     });
 
     // TODO criar aqui um teste que cadastra na linha do tempo e depois atualiza o valor_inicial e verifica
@@ -512,7 +511,33 @@ describe("InvestimentosController (v1) (E2E)", () => {
     });
 
     it("should correctly update valor_inicial and valor_atual when update valor_inicial in an investimento without investimento linha do tempo", async () => {
-      expect(true).toBe(false);
+      const createInvestimentoDto: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        categoria_id: 1,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(createInvestimentoDto)
+        .expect(201);
+
+      const investimentoId = createResponse.body.id;
+
+      const updateInvestimentoDto: InvestimentoUpdateDto = {
+        nome: "Investimento C Atualizado",
+        valor_inicial: "850.00",
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .send(updateInvestimentoDto)
+        .expect(200);
+
+      expect(response.body.nome).toBe(updateInvestimentoDto.nome);
+      expect(response.body.valor_inicial).toBe("850");
+      expect(response.body.valor_atual).toBe("850");
     });
 
   });
