@@ -9,8 +9,8 @@ import { runPrismaMigrations } from "../utils/run-prisma-migrations";
 import { faker } from "@faker-js/faker";
 import { formatValue } from "../utils/format-value";
 import { InvestimentosModule } from "../../src/modules/api/investimentos/investimentos.module";
-import { InvestimentoCreateDto } from "src/modules/api/investimentos/dtos/InvestimentoCreate.dto";
-import { InvestimentoUpdateDto } from "src/modules/api/investimentos/dtos/InvestimentoUpdate.dto";
+import { InvestimentoCreateDto } from "../../src/modules/api/investimentos/dtos/InvestimentoCreate.dto";
+import { InvestimentoUpdateDto } from "../../src/modules/api/investimentos/dtos/InvestimentoUpdate.dto";
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -24,9 +24,7 @@ describe("InvestimentosController (v1) (E2E)", () => {
     await runPrismaMigrations();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        InvestimentosModule,
-      ],
+      imports: [InvestimentosModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -52,8 +50,10 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 })),
-        categoria_id: 1
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
+        categoria_id: 1,
       };
 
       const response = await request(app.getHttpServer())
@@ -66,7 +66,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       expect(response.body.valor_inicial).toBe(
         createInvestimentoDto.valor_inicial,
       );
-      expect(response.body.valor_atual).toBe(createInvestimentoDto.valor_inicial);
+      expect(response.body.valor_atual).toBe(
+        createInvestimentoDto.valor_inicial,
+      );
     });
 
     it("should return 400 with correct messages when create a new investimento when all fields as null", async () => {
@@ -100,7 +102,10 @@ describe("InvestimentosController (v1) (E2E)", () => {
     it("should return 400 with correct messages when create a new investimento when all fields wrong", async () => {
       const createInvestimentoDto: Required<InvestimentoCreateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
-        descricao: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        descricao: faker.number.int({
+          min: 100,
+          max: 999,
+        }) as unknown as string,
         valor_inicial: faker.string.alpha(5),
         categoria_id: faker.string.alpha(5) as unknown as number,
       };
@@ -132,7 +137,7 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimento = await prismaService.investimento.create({
         data: {
           nome,
-          descricao, 
+          descricao,
           valor_inicial,
           categoria_id,
           soft_delete: new Date(),
@@ -156,9 +161,11 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
-        invalid_field: faker.string.alphanumeric(5)
+        invalid_field: faker.string.alphanumeric(5),
       } as InvestimentoCreateDto;
 
       await request(app.getHttpServer())
@@ -183,7 +190,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
         data: {
           nome: faker.string.alphanumeric(5),
           descricao: faker.string.alphanumeric(5),
-          valor_inicial: formatValue(faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 })),
+          valor_inicial: formatValue(
+            faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+          ),
           categoria_id: 1,
           soft_delete: new Date(),
         },
@@ -204,7 +213,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -222,8 +233,12 @@ describe("InvestimentosController (v1) (E2E)", () => {
       expect(response.body.id).toBe(investimentoId);
       expect(response.body.nome).toBe(createInvestimentoDto.nome);
       expect(response.body.descricao).toBe(createInvestimentoDto.descricao);
-      expect(response.body.valor_inicial).toBe(createInvestimentoDto.valor_inicial);
-      expect(response.body.categoria_id).toBe(createInvestimentoDto.categoria_id);
+      expect(response.body.valor_inicial).toBe(
+        createInvestimentoDto.valor_inicial,
+      );
+      expect(response.body.categoria_id).toBe(
+        createInvestimentoDto.categoria_id,
+      );
     });
 
     it("should return 404 if investimento not found", async () => {
@@ -240,7 +255,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -272,7 +289,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -299,7 +318,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -331,7 +352,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -374,7 +397,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -387,7 +412,10 @@ describe("InvestimentosController (v1) (E2E)", () => {
 
       const updateInvestimentoDto: Required<InvestimentoUpdateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
-        descricao: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        descricao: faker.number.int({
+          min: 100,
+          max: 999,
+        }) as unknown as string,
         valor_inicial: faker.string.alpha(5),
         data_inatividade: faker.string.alpha(5) as unknown as Date,
         categoria_id: faker.string.alphanumeric(5) as unknown as number,
@@ -414,7 +442,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -446,7 +476,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -468,7 +500,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -514,7 +548,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 100, max: 599, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 100, max: 599, fractionDigits: 2 }),
+        ),
         categoria_id: 1,
       };
 
@@ -539,6 +575,5 @@ describe("InvestimentosController (v1) (E2E)", () => {
       expect(response.body.valor_inicial).toBe("850");
       expect(response.body.valor_atual).toBe("850");
     });
-
   });
 });
