@@ -532,6 +532,10 @@ describe("InvestimentosController (v1) (E2E)", () => {
       expect(true).toBe(false);
     });
 
+    it("should correctly update valor_inicial and valor_atual when creating two new investimento linha do tempo in same day", async () => {
+      expect(true).toBe(false);
+    });
+
     it("should correctly update valor_inicial and valor_atual when creating a new investimento linha do tempo and update value of investimento linha do tempo", async () => {
       expect(true).toBe(false);
     });
