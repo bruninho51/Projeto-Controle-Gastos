@@ -18,9 +18,9 @@ export class RegistroInvestimentoLinhaDoTempoUpdateDto {
     })
     valor?: string;
   
-    @IsOptional()
     @IsDate()
     @Transform(({ value }) => (value ? new Date(value) : null))
+    @ValidateIf((o) => o.data_registro === null || !!o.data_registro)
     @ApiProperty({
       description: "Dia em que o investimento esteve com o referido valor",
       example: "2024-12-01",

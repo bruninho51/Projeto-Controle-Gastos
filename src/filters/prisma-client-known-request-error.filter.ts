@@ -60,6 +60,7 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
     const messages: Record<string, string> = {
       categoria_id: "A categoria informada não foi encontrada.",
       orcamento_id: "O orçamento informado não foi encontrado.",
+      investimento_id: "O investimento informado não foi encontrado.",
     };
 
     const message = messages[fieldName] || "Entidade associada não encontrada.";
