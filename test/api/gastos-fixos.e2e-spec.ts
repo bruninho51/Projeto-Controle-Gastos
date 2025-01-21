@@ -13,6 +13,9 @@ import { faker } from "@faker-js/faker";
 import { CategoriaGasto, Orcamento } from "@prisma/client";
 import { OrcamentoCreateDto } from "../../src/modules/api/orcamentos/dtos/OrcamentoCreate.dto";
 import { OrcamentosModule } from "../../src/modules/api/orcamentos/orcamentos.module";
+import { CategoriaGastoCreateDto } from "../../src/modules/api/categorias-gastos/dtos/CategoriaGastoCreate.dto";
+import { CategoriasGastosModule } from "../../src/modules/api/categorias-gastos/categorias-gastos.module";
+import { formatValue } from "../utils/format-value";
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -29,7 +32,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
     await runPrismaMigrations();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [OrcamentosModule, GastosFixosModule],
+      imports: [OrcamentosModule, GastosFixosModule, CategoriasGastosModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -159,6 +162,38 @@ describe("GastosFixosController (v1) (E2E)", () => {
       );
     });
 
+    it("should return 404 when categoria gasto was soft deleted", async () => {
+      const newCategoria: CategoriaGastoCreateDto = {
+        nome: faker.string.alphanumeric(6).toUpperCase(),
+      };
+      
+      const categoriaResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .send(newCategoria)
+        .expect(201);
+      
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/categorias-gastos/${categoriaResponse.body.id}`)
+        .expect(200);
+
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaResponse.body.id,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "A categoria informada não foi encontrada.",
+      );
+    });
+
     it("should return 404 when orcamento does not exists", async () => {
       const createGastoDto: GastoFixoCreateDto = {
         descricao: faker.string.alphanumeric(5),
@@ -170,6 +205,39 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const response = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/999/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O orçamento informado não foi encontrado.",
+      );
+    });
+
+    it("should return 404 when orcamento was soft deleted", async () => {
+      const createOrcamentoDto: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(faker.number.float({ min: 1000, max: 5000, fractionDigits: 2 })),
+      };
+      
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(201);
+      
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
+        .expect(200);
+      
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
         .send(createGastoDto)
         .expect(404);
 
@@ -240,6 +308,84 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       expect(orcamento1Ok).toBeTruthy();
       expect(orcamento2Ok).toBeTruthy();
+    });
+
+    it("should not return soft deleted gasto fixo", async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoFixoOrcamento: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+        observacoes: faker.string.alphanumeric(5),
+      };
+
+      const gastoFixoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .send(gastoFixoOrcamento)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoFixoResponse.body.id}`)
+        .expect(200);
+      
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .expect(200);
+
+      expect(response.body.length).toBe(0);
+    });
+
+    it("should return 404 if orcamento was soft deleted", async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const gastoFixoOrcamento: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+        observacoes: faker.string.alphanumeric(5),
+      };
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .send(gastoFixoOrcamento)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
+        .expect(200);
+      
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O orçamento informado não foi encontrado.",
+      );
     });
   });
 
@@ -316,6 +462,90 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .expect(404);
 
       expect(response.body.message).toBe("Not Found");
+    });
+
+    it("should return 404 if gasto fixo was soft deleted", async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .expect(404);
+
+      expect(response.body.message).toBe("Not Found");
+    });
+
+    it("should return 404 if orcamento was soft deleted", async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O orçamento informado não foi encontrado.",
+      );
     });
   });
 
@@ -635,6 +865,90 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .send(updateGastoDto)
         .expect(404);
     });
+
+    it("should return 404 if gasto fixo was soft deleted", async () => {
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: "Descrição antiga",
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${createResponse.body.id}`)
+        .expect(200);
+
+      const updateGastoDto: GastoFixoUpdateDto = {
+        descricao: "Gasto Fixo D Atualizado",
+        valor: "500.35",
+        data_pgto: new Date(),
+      };
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
+        )
+        .send(updateGastoDto)
+        .expect(404);
+    });
+
+    it("should return 404 if orcamento was soft deleted", async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+      
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: "Descrição antiga",
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
+        .expect(200);
+
+      const updateGastoDto: GastoFixoUpdateDto = {
+        descricao: "Gasto Fixo D Atualizado",
+        valor: "500.35",
+        data_pgto: new Date(),
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .send(updateGastoDto)
+        .expect(404);
+
+        expect(response.body.message).toBe(
+          "O orçamento informado não foi encontrado.",
+        );
+    });
   });
 
   describe(`DELETE ${apiGlobalPrefix}/gastos-fixos/:id`, () => {
@@ -704,6 +1018,92 @@ describe("GastosFixosController (v1) (E2E)", () => {
           `${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos/${gastoId}`,
         )
         .expect(404);
+    });
+
+    it("should return a 404 error if the gasto fixo was soft deleted", async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .expect(404);
+    });
+
+    it("should return a 404 error if orcamento was soft deleted", async () => {
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .send(createGastoDto)
+        .expect(201);
+
+      const gastoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`,
+        )
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O orçamento informado não foi encontrado.",
+      );
     });
   });
 });
