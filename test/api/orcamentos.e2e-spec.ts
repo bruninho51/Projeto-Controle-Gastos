@@ -218,6 +218,32 @@ describe("OrcamentosController (v1) (E2E)", () => {
 
       expect(response.body.message).toBe("Not Found");
     });
+
+    it("should return 404 if orcamento was soft deleted", async () => {
+      const createOrcamentoDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1999, max: 9999, fractionDigits: 2 }),
+        ),
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .send(createOrcamentoDto)
+        .expect(201);
+
+      const orcamentoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
+        .expect(404);
+
+      expect(response.body.message).toBe("Not Found");
+    });
   });
 
   describe(`PATCH ${apiGlobalPrefix}/orcamentos/:id`, () => {
