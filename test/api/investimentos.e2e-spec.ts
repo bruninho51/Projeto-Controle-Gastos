@@ -544,12 +544,16 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createInvestimentoResponse.body.id;
 
       const linhaDoTempoDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 100, max: 199, fractionDigits: 2 })),
+        valor: formatValue(
+          faker.number.float({ min: 100, max: 199, fractionDigits: 2 }),
+        ),
         data_registro: new Date(),
-      }
+      };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempoDto)
         .expect(201);
 
@@ -582,22 +586,30 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createInvestimentoResponse.body.id;
 
       const linhaDoTempo1Dto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 100, max: 999, fractionDigits: 2 })),
-        data_registro: new Date('2025-01-16T03:00:00.000Z'),
-      }
+        valor: formatValue(
+          faker.number.float({ min: 100, max: 999, fractionDigits: 2 }),
+        ),
+        data_registro: new Date("2025-01-16T03:00:00.000Z"),
+      };
 
       const linhaDoTempo2Dto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 })),
-        data_registro: new Date('2025-01-17T03:00:00.000Z'),
-      }
+        valor: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
+        data_registro: new Date("2025-01-17T03:00:00.000Z"),
+      };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempo1Dto)
         .expect(201);
-      
+
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempo2Dto)
         .expect(201);
 
@@ -630,22 +642,30 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createInvestimentoResponse.body.id;
 
       const linhaDoTempo1Dto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 100, max: 999, fractionDigits: 2 })),
-        data_registro: new Date('2025-01-16T03:00:00.000Z'),
-      }
+        valor: formatValue(
+          faker.number.float({ min: 100, max: 999, fractionDigits: 2 }),
+        ),
+        data_registro: new Date("2025-01-16T03:00:00.000Z"),
+      };
 
       const linhaDoTempo2Dto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 })),
-        data_registro: new Date('2025-01-16T03:00:00.000Z'),
-      }
+        valor: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
+        data_registro: new Date("2025-01-16T03:00:00.000Z"),
+      };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempo1Dto)
         .expect(201);
-      
+
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempo2Dto)
         .expect(201);
 
@@ -678,18 +698,24 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createInvestimentoResponse.body.id;
 
       const linhaDoTempoDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 100, max: 999, fractionDigits: 2 })),
-        data_registro: new Date('2025-01-16T03:00:00.000Z'),
-      }
+        valor: formatValue(
+          faker.number.float({ min: 100, max: 999, fractionDigits: 2 }),
+        ),
+        data_registro: new Date("2025-01-16T03:00:00.000Z"),
+      };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempoDto)
         .expect(201);
 
       const updateInvestimentoDto: InvestimentoUpdateDto = {
-        valor_inicial: formatValue(faker.number.float( { min: 10, max: 99, fractionDigits: 2 }))
-      }
+        valor_inicial: formatValue(
+          faker.number.float({ min: 10, max: 99, fractionDigits: 2 }),
+        ),
+      };
 
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
@@ -725,17 +751,23 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createInvestimentoResponse.body.id;
 
       const linhaDoTempoDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 100, max: 199, fractionDigits: 2 })),
+        valor: formatValue(
+          faker.number.float({ min: 100, max: 199, fractionDigits: 2 }),
+        ),
         data_registro: new Date(),
-      }
+      };
 
       const linhaDoTempo = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempoDto)
         .expect(201);
-      
+
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${linhaDoTempo.body.id}`)
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${linhaDoTempo.body.id}`,
+        )
         .expect(200);
 
       const investimento = await request(app.getHttpServer())
@@ -767,27 +799,37 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createInvestimentoResponse.body.id;
 
       const linhaDoTempo1Dto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 100, max: 999, fractionDigits: 2 })),
-        data_registro: new Date('2025-01-15T03:00:00.000Z'),
-      }
+        valor: formatValue(
+          faker.number.float({ min: 100, max: 999, fractionDigits: 2 }),
+        ),
+        data_registro: new Date("2025-01-15T03:00:00.000Z"),
+      };
 
       const linhaDoTempo2Dto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 })),
-        data_registro: new Date('2025-01-16T03:00:00.000Z'),
-      }
+        valor: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
+        data_registro: new Date("2025-01-16T03:00:00.000Z"),
+      };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempo1Dto)
         .expect(201);
-      
+
       const responseLinhaDoTempo2 = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempo2Dto)
         .expect(201);
 
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${responseLinhaDoTempo2.body.id}`)
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${responseLinhaDoTempo2.body.id}`,
+        )
         .expect(200);
 
       const investimento = await request(app.getHttpServer())
@@ -819,16 +861,20 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createInvestimentoResponse.body.id;
 
       const linhaDoTempoDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: formatValue(faker.number.float({ min: 100, max: 199, fractionDigits: 2 })),
+        valor: formatValue(
+          faker.number.float({ min: 100, max: 199, fractionDigits: 2 }),
+        ),
         data_registro: new Date(),
-      }
+      };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
         .send(linhaDoTempoDto)
         .expect(201);
 
-      const new_valor_inicial = '665.45';
+      const new_valor_inicial = "665.45";
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
         .send({ valor_inicial: new_valor_inicial })
@@ -863,7 +909,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
       const investimentoId = createResponse.body.id;
 
       const updateInvestimentoDto: InvestimentoUpdateDto = {
-        valor_inicial: formatValue(faker.number.float({ min: 10, max: 99, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 10, max: 99, fractionDigits: 2 }),
+        ),
       };
 
       const response = await request(app.getHttpServer())
@@ -871,8 +919,12 @@ describe("InvestimentosController (v1) (E2E)", () => {
         .send(updateInvestimentoDto)
         .expect(200);
 
-      expect(response.body.valor_inicial).toBe(updateInvestimentoDto.valor_inicial);
-      expect(response.body.valor_atual).toBe(updateInvestimentoDto.valor_inicial);
+      expect(response.body.valor_inicial).toBe(
+        updateInvestimentoDto.valor_inicial,
+      );
+      expect(response.body.valor_atual).toBe(
+        updateInvestimentoDto.valor_inicial,
+      );
     });
   });
 });

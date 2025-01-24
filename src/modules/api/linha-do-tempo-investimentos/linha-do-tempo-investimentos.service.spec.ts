@@ -28,7 +28,9 @@ describe("LinhaDoTempoInvestimentosService", () => {
       ],
     }).compile();
 
-    service = module.get<LinhaDoTempoInvestimentosService>(LinhaDoTempoInvestimentosService);
+    service = module.get<LinhaDoTempoInvestimentosService>(
+      LinhaDoTempoInvestimentosService,
+    );
   });
 
   it("should be defined", () => {
@@ -59,10 +61,15 @@ describe("LinhaDoTempoInvestimentosService", () => {
         createdLinhaDoTempo,
       );
 
-      const result = await service.create(investimento_id, createLinhaDoTempoDto);
+      const result = await service.create(
+        investimento_id,
+        createLinhaDoTempoDto,
+      );
 
       expect(result).toEqual(createdLinhaDoTempo);
-      expect(mockPrismaService.linhaDoTempoInvestimento.create).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.linhaDoTempoInvestimento.create,
+      ).toHaveBeenCalledWith({
         data: { ...createLinhaDoTempoDto, investimento_id },
       });
     });
@@ -76,8 +83,8 @@ describe("LinhaDoTempoInvestimentosService", () => {
         {
           id: 1,
           valor: faker.number
-          .float({ min: 100, max: 9999, fractionDigits: 2 })
-          .toString(),
+            .float({ min: 100, max: 9999, fractionDigits: 2 })
+            .toString(),
           data_registro: new Date(),
           data_criacao: new Date(),
           data_atualizacao: new Date(),
@@ -85,20 +92,24 @@ describe("LinhaDoTempoInvestimentosService", () => {
         {
           id: 2,
           valor: faker.number
-          .float({ min: 100, max: 9999, fractionDigits: 2 })
-          .toString(),
+            .float({ min: 100, max: 9999, fractionDigits: 2 })
+            .toString(),
           data_registro: new Date(),
           data_criacao: new Date(),
           data_atualizacao: new Date(),
         },
       ];
 
-      mockPrismaService.linhaDoTempoInvestimento.findMany.mockResolvedValue(linhaDoTempo);
+      mockPrismaService.linhaDoTempoInvestimento.findMany.mockResolvedValue(
+        linhaDoTempo,
+      );
 
       const result = await service.findAll(investimento_id);
 
       expect(result).toEqual(linhaDoTempo);
-      expect(mockPrismaService.linhaDoTempoInvestimento.findMany).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.linhaDoTempoInvestimento.findMany,
+      ).toHaveBeenCalledWith({
         where: { investimento_id, soft_delete: null },
       });
     });
@@ -119,12 +130,16 @@ describe("LinhaDoTempoInvestimentosService", () => {
         data_atualizacao: new Date(),
       };
 
-      mockPrismaService.linhaDoTempoInvestimento.findUnique.mockResolvedValue(linhaDoTempo);
+      mockPrismaService.linhaDoTempoInvestimento.findUnique.mockResolvedValue(
+        linhaDoTempo,
+      );
 
       const result = await service.findOne(investimento_id, linha_do_tempo_id);
 
       expect(result).toEqual(linhaDoTempo);
-      expect(mockPrismaService.linhaDoTempoInvestimento.findUnique).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.linhaDoTempoInvestimento.findUnique,
+      ).toHaveBeenCalledWith({
         where: { id: linha_do_tempo_id, investimento_id, soft_delete: null },
       });
     });
@@ -133,12 +148,16 @@ describe("LinhaDoTempoInvestimentosService", () => {
       const investimento_id = faker.number.int();
       const linha_do_tempo_id = 999;
 
-      mockPrismaService.linhaDoTempoInvestimento.findUnique.mockResolvedValue(null);
+      mockPrismaService.linhaDoTempoInvestimento.findUnique.mockResolvedValue(
+        null,
+      );
 
       const result = await service.findOne(investimento_id, linha_do_tempo_id);
 
       expect(result).toBeNull();
-      expect(mockPrismaService.linhaDoTempoInvestimento.findUnique).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.linhaDoTempoInvestimento.findUnique,
+      ).toHaveBeenCalledWith({
         where: { id: 999, investimento_id, soft_delete: null },
       });
     });
@@ -172,7 +191,9 @@ describe("LinhaDoTempoInvestimentosService", () => {
       );
 
       expect(result).toEqual(updatedLinhaDoTempo);
-      expect(mockPrismaService.linhaDoTempoInvestimento.update).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.linhaDoTempoInvestimento.update,
+      ).toHaveBeenCalledWith({
         where: { id: linha_do_tempo_id, investimento_id, soft_delete: null },
         data: updateLinhaDoTempoDto,
       });
@@ -199,10 +220,15 @@ describe("LinhaDoTempoInvestimentosService", () => {
         softDeletedLinhaDoTempo,
       );
 
-      const result = await service.softDelete(investimento_id, linha_do_tempo_id);
+      const result = await service.softDelete(
+        investimento_id,
+        linha_do_tempo_id,
+      );
 
       expect(result).toEqual(softDeletedLinhaDoTempo);
-      expect(mockPrismaService.linhaDoTempoInvestimento.update).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.linhaDoTempoInvestimento.update,
+      ).toHaveBeenCalledWith({
         where: { id: linha_do_tempo_id, investimento_id, soft_delete: null },
         data: { soft_delete: expect.any(Date) },
       });

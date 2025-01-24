@@ -166,14 +166,16 @@ describe("GastosFixosController (v1) (E2E)", () => {
       const newCategoria: CategoriaGastoCreateDto = {
         nome: faker.string.alphanumeric(6).toUpperCase(),
       };
-      
+
       const categoriaResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)
         .send(newCategoria)
         .expect(201);
-      
+
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/categorias-gastos/${categoriaResponse.body.id}`)
+        .delete(
+          `${apiGlobalPrefix}/categorias-gastos/${categoriaResponse.body.id}`,
+        )
         .expect(200);
 
       const createGastoDto: GastoFixoCreateDto = {
@@ -216,18 +218,20 @@ describe("GastosFixosController (v1) (E2E)", () => {
     it("should return 404 when orcamento was soft deleted", async () => {
       const createOrcamentoDto: OrcamentoCreateDto = {
         nome: faker.string.alphanumeric(5),
-        valor_inicial: formatValue(faker.number.float({ min: 1000, max: 5000, fractionDigits: 2 })),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1000, max: 5000, fractionDigits: 2 }),
+        ),
       };
-      
+
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
         .send(createOrcamentoDto)
         .expect(201);
-      
+
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
         .expect(200);
-      
+
       const createGastoDto: GastoFixoCreateDto = {
         descricao: faker.string.alphanumeric(5),
         previsto: faker.number
@@ -237,7 +241,9 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(createGastoDto)
         .expect(404);
 
@@ -333,16 +339,22 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const gastoFixoResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(gastoFixoOrcamento)
         .expect(201);
 
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoFixoResponse.body.id}`)
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoFixoResponse.body.id}`,
+        )
         .expect(200);
-      
+
       const response = await request(app.getHttpServer())
-        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .expect(200);
 
       expect(response.body.length).toBe(0);
@@ -371,16 +383,20 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(gastoFixoOrcamento)
         .expect(201);
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
         .expect(200);
-      
+
       const response = await request(app.getHttpServer())
-        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .expect(404);
 
       expect(response.body.message).toBe(
@@ -486,14 +502,18 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(createGastoDto)
         .expect(201);
 
       const gastoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`)
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
         .expect(200);
 
       const response = await request(app.getHttpServer())
@@ -527,7 +547,9 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(createGastoDto)
         .expect(201);
 
@@ -883,7 +905,9 @@ describe("GastosFixosController (v1) (E2E)", () => {
       const gastoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${createResponse.body.id}`)
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${createResponse.body.id}`,
+        )
         .expect(200);
 
       const updateGastoDto: GastoFixoUpdateDto = {
@@ -912,7 +936,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(`${apiGlobalPrefix}/orcamentos`)
         .send(orcamentoMock)
         .expect(201);
-      
+
       const createGastoDto: GastoFixoCreateDto = {
         descricao: "Descrição antiga",
         previsto: faker.number
@@ -922,7 +946,9 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(createGastoDto)
         .expect(201);
 
@@ -945,9 +971,9 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .send(updateGastoDto)
         .expect(404);
 
-        expect(response.body.message).toBe(
-          "O orçamento informado não foi encontrado.",
-        );
+      expect(response.body.message).toBe(
+        "O orçamento informado não foi encontrado.",
+      );
     });
   });
 
@@ -1042,7 +1068,9 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(createGastoDto)
         .expect(201);
 
@@ -1083,16 +1111,16 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
         .send(createGastoDto)
         .expect(201);
 
       const gastoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`,
-        )
+        .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())

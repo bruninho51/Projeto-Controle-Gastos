@@ -29,8 +29,12 @@ describe("LinhaDoTempoInvestimentosController", () => {
       ],
     }).compile();
 
-    controller = module.get<LinhaDoTempoInvestimentosController>(LinhaDoTempoInvestimentosController);
-    service = module.get<LinhaDoTempoInvestimentosService>(LinhaDoTempoInvestimentosService);
+    controller = module.get<LinhaDoTempoInvestimentosController>(
+      LinhaDoTempoInvestimentosController,
+    );
+    service = module.get<LinhaDoTempoInvestimentosService>(
+      LinhaDoTempoInvestimentosService,
+    );
   });
 
   it("should be defined", () => {
@@ -57,7 +61,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       mockLinhaDoTempoService.create.mockResolvedValue(createdLinhaDoTempo);
 
-      const result = await controller.create(investimento_id, createLinhaDoTempoDto);
+      const result = await controller.create(
+        investimento_id,
+        createLinhaDoTempoDto,
+      );
 
       expect(result).toEqual(createdLinhaDoTempo);
       expect(service.create).toHaveBeenCalledWith(
@@ -75,8 +82,8 @@ describe("LinhaDoTempoInvestimentosController", () => {
         {
           id: 1,
           valor: faker.number
-          .float({ min: 100, max: 9999, fractionDigits: 2 })
-          .toString(),
+            .float({ min: 100, max: 9999, fractionDigits: 2 })
+            .toString(),
           data_registro: new Date(),
           data_criacao: new Date(),
           data_atualizacao: new Date(),
@@ -84,8 +91,8 @@ describe("LinhaDoTempoInvestimentosController", () => {
         {
           id: 2,
           valor: faker.number
-          .float({ min: 100, max: 9999, fractionDigits: 2 })
-          .toString(),
+            .float({ min: 100, max: 9999, fractionDigits: 2 })
+            .toString(),
           data_registro: new Date(),
           data_criacao: new Date(),
           data_atualizacao: new Date(),
@@ -118,7 +125,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       mockLinhaDoTempoService.findOne.mockResolvedValue(linhaDoTempo);
 
-      const result = await controller.findOne(investimento_id, linha_do_tempo_id);
+      const result = await controller.findOne(
+        investimento_id,
+        linha_do_tempo_id,
+      );
 
       expect(result).toEqual(linhaDoTempo);
       expect(service.findOne).toHaveBeenCalledWith(
@@ -133,7 +143,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       mockLinhaDoTempoService.findOne.mockResolvedValue(null);
 
-      const result = await controller.findOne(investimento_id, linha_do_tempo_id);
+      const result = await controller.findOne(
+        investimento_id,
+        linha_do_tempo_id,
+      );
 
       expect(result).toBeNull();
       expect(service.findOne).toHaveBeenCalledWith(
@@ -187,9 +200,14 @@ describe("LinhaDoTempoInvestimentosController", () => {
         data_registro: new Date(),
       };
 
-      mockLinhaDoTempoService.softDelete.mockResolvedValue(linhaDoTempoToDelete);
+      mockLinhaDoTempoService.softDelete.mockResolvedValue(
+        linhaDoTempoToDelete,
+      );
 
-      const result = await controller.remove(investimento_id, linha_do_tempo_id);
+      const result = await controller.remove(
+        investimento_id,
+        linha_do_tempo_id,
+      );
 
       expect(result).toEqual(linhaDoTempoToDelete);
       expect(service.softDelete).toHaveBeenCalledWith(

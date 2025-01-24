@@ -46,7 +46,10 @@ export class LinhaDoTempoInvestimentosService {
     });
   }
 
-  async softDelete(investimento_id: number, id: number): Promise<LinhaDoTempoInvestimento> {
+  async softDelete(
+    investimento_id: number,
+    id: number,
+  ): Promise<LinhaDoTempoInvestimento> {
     return this.prisma.linhaDoTempoInvestimento.update({
       where: { id, investimento_id, soft_delete: null },
       data: {

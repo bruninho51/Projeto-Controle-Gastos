@@ -60,8 +60,6 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
           .toString(),
       },
     });
-
-    
   });
 
   afterAll(async () => {
@@ -227,15 +225,18 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         .send(investimentoMock2)
         .expect(201);
 
-      const linhaDoTempoInvestimento2: RegistroInvestimentoLinhaDoTempoCreateDto = {
-        valor: faker.number
-          .float({ min: 100, max: 999, fractionDigits: 2 })
-          .toString(),
-        data_registro: mockDataRegistro,
-      };
+      const linhaDoTempoInvestimento2: RegistroInvestimentoLinhaDoTempoCreateDto =
+        {
+          valor: faker.number
+            .float({ min: 100, max: 999, fractionDigits: 2 })
+            .toString(),
+          data_registro: mockDataRegistro,
+        };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/${investimentoMock2}/linha-do-tempo`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock2}/linha-do-tempo`,
+        )
         .send(linhaDoTempoInvestimento2)
         .expect(201);
 
@@ -450,7 +451,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
 
       const updateDto: Required<RegistroInvestimentoLinhaDoTempoUpdateDto> = {
         valor: faker.string.alpha(5),
-        data_registro: faker.number.int({ min: 100, max: 999 }) as unknown as Date,
+        data_registro: faker.number.int({
+          min: 100,
+          max: 999,
+        }) as unknown as Date,
         data_inatividade: faker.number.int({
           min: 100,
           max: 999,
@@ -494,8 +498,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
 
       const updateDto: RegistroInvestimentoLinhaDoTempoUpdateDto = {
         valor: faker.number
-        .float({ min: 1, max: 50, fractionDigits: 2 })
-        .toString(),
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
       };
 
       const response = await request(app.getHttpServer())
