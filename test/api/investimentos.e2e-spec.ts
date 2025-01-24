@@ -250,6 +250,34 @@ describe("InvestimentosController (v1) (E2E)", () => {
 
       expect(response.body.message).toBe("Not Found");
     });
+
+    it("should return 404 if investimento was soft deleted", async () => {
+      const createInvestimentoDto: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
+        categoria_id: 1,
+      };
+
+      const responseInvestimento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(createInvestimentoDto)
+        .expect(201);
+
+      const investimentoId = responseInvestimento.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .expect(404);
+
+      expect(response.body.message).toBe("Not Found");
+    });
   });
 
   describe(`PATCH ${apiGlobalPrefix}/investimentos/:id`, () => {
@@ -283,9 +311,6 @@ describe("InvestimentosController (v1) (E2E)", () => {
       expect(response.body.nome).toBe(updateInvestimentoDto.nome);
       expect(response.body.valor_inicial).toBe("850");
     });
-
-    // TODO criar aqui um teste que cadastra na linha do tempo e depois atualiza o valor_inicial e verifica
-    // se o valor_atual é igual ao valor da linha do tempo
 
     it("should return 200 when inactivate an investimento", async () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
@@ -680,7 +705,7 @@ describe("InvestimentosController (v1) (E2E)", () => {
       expect(investimento.body.valor_atual).toBe(valor_atual);
     });
 
-    it("should correctly update valor_inicial and valor_atual when creating a new investimento linha do tempo and update valor_inicial of investimento linha do tempo", async () => {
+    it("should correctly update valor_inicial and valor_atual when creating a new investimento linha do tempo and update valor_inicial of investimento", async () => {
       const createInvestimentoDto: InvestimentoCreateDto = {
         nome: faker.string.alphanumeric(5),
         descricao: faker.string.alphanumeric(5),
