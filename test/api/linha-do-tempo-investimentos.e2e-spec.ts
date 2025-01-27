@@ -13,6 +13,7 @@ import { RegistroInvestimentoLinhaDoTempoCreateDto } from "../../src/modules/api
 import { InvestimentoCreateDto } from "../../src/modules/api/investimentos/dtos/InvestimentoCreate.dto";
 import { RegistroInvestimentoLinhaDoTempoUpdateDto } from "../../src/modules/api/linha-do-tempo-investimentos/dtos/RegistroInvestimentoLinhaDoTempoUpdate.dto";
 import { InvestimentosModule } from "../../src/modules/api/investimentos/investimentos.module";
+import { formatValue } from "../utils/format-value";
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -185,6 +186,49 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       );
     });
 
+    it("should return 404 when investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const createInvestimentoDto: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
+        categoria_id: 1,
+      };
+
+      const responseInvestimento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(createInvestimentoDto)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}`,
+        )
+        .expect(200);
+
+      const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
+        valor: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_registro: mockDataRegistro,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}/linha-do-tempo`,
+        )
+        .send(createDto)
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O investimento informado não foi encontrado.",
+      );
+    });
+
     it("should return 400 on passing an invalid field on create a new linha do tempo investimento", async () => {
       const mockDataRegistro = new Date();
       mockDataRegistro.setUTCHours(0, 0, 0, 0);
@@ -261,6 +305,120 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
 
       expect(investimento1Ok).toBeTruthy();
       expect(investimento2Ok).toBeTruthy();
+    });
+
+    it("should not return soft deleted linha do tempo investimento", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const investimentoMock: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const investimento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(investimentoMock)
+        .expect(201);
+
+      const linhaDoTempoInvestimento: RegistroInvestimentoLinhaDoTempoCreateDto =
+        {
+          valor: faker.number
+            .float({ min: 100, max: 999, fractionDigits: 2 })
+            .toString(),
+          data_registro: mockDataRegistro,
+        };
+
+      const linhaDoTempo = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+        )
+        .send(linhaDoTempoInvestimento)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempo.body.id}`,
+        )
+        .expect(200);
+
+      const responseInvestimento = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+        )
+        .expect(200);
+
+      expect(responseInvestimento.body.length).toBe(0);
+    });
+
+    it("should return 404 if investimento does not exists", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const linhaDoTempoInvestimento: RegistroInvestimentoLinhaDoTempoCreateDto =
+        {
+          valor: faker.number
+            .float({ min: 100, max: 999, fractionDigits: 2 })
+            .toString(),
+          data_registro: mockDataRegistro,
+        };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos/9999/linha-do-tempo`)
+        .send(linhaDoTempoInvestimento)
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O investimento informado não foi encontrado.",
+      );
+    });
+
+    it("should return 404 if investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const createInvestimentoDto: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: formatValue(
+          faker.number.float({ min: 1000, max: 9999, fractionDigits: 2 }),
+        ),
+        categoria_id: 1,
+      };
+
+      const responseInvestimento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(createInvestimentoDto)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}`,
+        )
+        .expect(200);
+
+      const linhaDoTempoInvestimento: RegistroInvestimentoLinhaDoTempoCreateDto =
+        {
+          valor: faker.number
+            .float({ min: 100, max: 999, fractionDigits: 2 })
+            .toString(),
+          data_registro: mockDataRegistro,
+        };
+
+      const response = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}/linha-do-tempo`,
+        )
+        .send(linhaDoTempoInvestimento)
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O investimento informado não foi encontrado.",
+      );
     });
   });
 
@@ -346,6 +504,88 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         .expect(404);
 
       expect(response.body.message).toBe("Not Found");
+    });
+
+    it("should return 404 if linha do tempo investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
+        valor: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_registro: mockDataRegistro,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+        )
+        .send(createDto)
+        .expect(201);
+
+      const linhaDoTempoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .expect(404);
+    });
+
+    it("should return 404 if investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const investimentoMock: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const investimento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(investimentoMock)
+        .expect(201);
+
+      const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
+        valor: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_registro: mockDataRegistro,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+        )
+        .send(createDto)
+        .expect(201);
+
+      const linhaDoTempoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O investimento informado não foi encontrado.",
+      );
     });
   });
 
@@ -571,6 +811,98 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         .send(updateDto)
         .expect(404);
     });
+
+    it("should return 404 if investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const investimentoMock: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const investimento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(investimentoMock)
+        .expect(201);
+
+      const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
+        valor: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_registro: mockDataRegistro,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+        )
+        .send(createDto)
+        .expect(201);
+
+      const linhaDoTempoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+        .expect(200);
+
+      const updateDto: RegistroInvestimentoLinhaDoTempoUpdateDto = {
+        valor: "600.00",
+      };
+
+      const response = await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .send(updateDto)
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O investimento informado não foi encontrado.",
+      );
+    });
+
+    it("should return 404 if linha do tempo investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
+        valor: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_registro: mockDataRegistro,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+        )
+        .send(createDto)
+        .expect(201);
+
+      const linhaDoTempoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${createResponse.body.id}`,
+        )
+        .expect(200);
+
+      const updateDto: RegistroInvestimentoLinhaDoTempoUpdateDto = {
+        valor: "600.00",
+      };
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .send(updateDto)
+        .expect(404);
+    });
   });
 
   describe(`DELETE ${apiGlobalPrefix}/investimentos/:investimento_id/linha-do-tempo/:id`, () => {
@@ -609,6 +941,89 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
           `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/9999`,
         )
         .expect(404);
+    });
+
+    it("should return 404 if linha do tempo investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
+        valor: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_registro: mockDataRegistro,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+        )
+        .send(createDto)
+        .expect(201);
+
+      const linhaDoTempoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .expect(404);
+    });
+
+    // aaa
+    it("should return 404 if investimento was soft deleted", async () => {
+      const mockDataRegistro = new Date();
+      mockDataRegistro.setUTCHours(0, 0, 0, 0);
+
+      const investimentoMock: InvestimentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        descricao: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 100, max: 999, fractionDigits: 2 })
+          .toString(),
+        categoria_id: categoriaMock.id,
+      };
+
+      const investimento = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .send(investimentoMock)
+        .expect(201);
+
+      const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
+        valor: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_registro: mockDataRegistro,
+      };
+
+      const createResponse = await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+        )
+        .send(createDto)
+        .expect(201);
+
+      const linhaDoTempoId = createResponse.body.id;
+
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+        )
+        .expect(404);
+
+      expect(response.body.message).toBe(
+        "O investimento informado não foi encontrado.",
+      );
     });
 
     it("should return a 404 error if the linha do tempo investimento exists but does not belong to the specified investimento", async () => {
