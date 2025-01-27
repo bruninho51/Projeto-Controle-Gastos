@@ -540,9 +540,9 @@ describe("InvestimentosController (v1) (E2E)", () => {
 
       const investimentoId = createResponse.body.id;
 
-      await request(app.getHttpServer()).delete(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}`,
-      );
+      await request(app.getHttpServer())
+        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .expect(200);
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
