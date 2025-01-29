@@ -177,12 +177,15 @@ describe("LinhaDoTempoInvestimentosController", () => {
         },
       ];
 
+      const investimentoDto = { id: faker.number.int() };
+
+      mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findAll.mockResolvedValue(linhaDoTempo);
 
       const result = await controller.findAll(investimento_id);
 
       expect(result).toEqual(linhaDoTempo);
-      expect(service.findAll).toHaveBeenCalledWith(+investimento_id);
+      expect(service.findAll).toHaveBeenCalledWith(investimentoDto.id);
     });
 
     it("should call investimento service with correct values", async () => {
