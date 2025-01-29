@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -17,12 +18,14 @@ import {
 import { LinhaDoTempoInvestimentosService } from "./linha-do-tempo-investimentos.service";
 import { RegistroInvestimentoLinhaDoTempoCreateDto } from "./dtos/RegistroInvestimentoLinhaDoTempoCreate.dto";
 import { RegistroInvestimentoLinhaDoTempoUpdateDto } from "./dtos/RegistroInvestimentoLinhaDoTempoUpdate.dto";
+import { InvestimentosService } from "../investimentos/investimentos.service";
 
 @ApiTags("Linha do Tempo Investimentos")
 @Controller("investimentos/:investimento_id/linha-do-tempo")
 export class LinhaDoTempoInvestimentosController {
   constructor(
     private readonly linhaDoTempoService: LinhaDoTempoInvestimentosService,
+    private readonly investimentoService: InvestimentosService,
   ) {}
 
   @Post()
@@ -33,13 +36,22 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo criado com sucesso.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  create(
+  async create(
     @Param("investimento_id") investimento_id: String,
     @Body()
     createRegistroLinhaDoTempoDto: RegistroInvestimentoLinhaDoTempoCreateDto,
   ) {
+    const investimento =
+      await this.investimentoService.findOne(+investimento_id);
+
+    if (!investimento) {
+      throw new NotFoundException(
+        "O investimento informado não foi encontrado.",
+      );
+    }
+
     return this.linhaDoTempoService.create(
-      +investimento_id,
+      investimento.id,
       createRegistroLinhaDoTempoDto,
     );
   }
@@ -53,8 +65,17 @@ export class LinhaDoTempoInvestimentosController {
     description: "Lista de lançamentos na linha do tempo.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  findAll(@Param("investimento_id") investimento_id: string) {
-    return this.linhaDoTempoService.findAll(+investimento_id);
+  async findAll(@Param("investimento_id") investimento_id: string) {
+    const investimento =
+      await this.investimentoService.findOne(+investimento_id);
+
+    if (!investimento) {
+      throw new NotFoundException(
+        "O investimento informado não foi encontrado.",
+      );
+    }
+
+    return this.linhaDoTempoService.findAll(investimento.id);
   }
 
   @Get(":id")
@@ -74,10 +95,19 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  findOne(
+  async findOne(
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
   ) {
+    const investimento =
+      await this.investimentoService.findOne(+investimento_id);
+
+    if (!investimento) {
+      throw new NotFoundException(
+        "O investimento informado não foi encontrado.",
+      );
+    }
+
     return this.linhaDoTempoService.findOne(+investimento_id, +id);
   }
 
@@ -99,14 +129,23 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  update(
+  async update(
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
     @Body()
     updateRegistroLinhaDoTempoDto: RegistroInvestimentoLinhaDoTempoUpdateDto,
   ) {
+    const investimento =
+      await this.investimentoService.findOne(+investimento_id);
+
+    if (!investimento) {
+      throw new NotFoundException(
+        "O investimento informado não foi encontrado.",
+      );
+    }
+
     return this.linhaDoTempoService.update(
-      +investimento_id,
+      investimento.id,
       +id,
       updateRegistroLinhaDoTempoDto,
     );
@@ -129,10 +168,19 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  remove(
+  async remove(
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
   ) {
-    return this.linhaDoTempoService.softDelete(+investimento_id, +id);
+    const investimento =
+      await this.investimentoService.findOne(+investimento_id);
+
+    if (!investimento) {
+      throw new NotFoundException(
+        "O investimento informado não foi encontrado.",
+      );
+    }
+
+    return this.linhaDoTempoService.softDelete(investimento.id, +id);
   }
 }

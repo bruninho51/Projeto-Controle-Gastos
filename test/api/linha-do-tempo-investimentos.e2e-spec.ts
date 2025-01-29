@@ -279,7 +279,7 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
 
       await request(app.getHttpServer())
         .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock2}/linha-do-tempo`,
+          `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo`,
         )
         .send(linhaDoTempoInvestimento2)
         .expect(201);

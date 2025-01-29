@@ -23,7 +23,7 @@ export class InvestimentosService {
     });
   }
 
-  async findOne(id: number): Promise<Investimento | null> {
+  async findOne(id: number): Promise<Investimento> {
     return this.prisma.investimento.findUnique({
       where: { id, soft_delete: null },
     });
