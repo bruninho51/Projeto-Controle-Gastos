@@ -214,12 +214,14 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const investimentoDto = { id: faker.number.int() };
 
-      mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto)
+      mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findAll.mockResolvedValueOnce(linhaDoTempo);
 
       await controller.findAll(investimento_id);
 
-      expect(investimentosService.findOne).toHaveBeenCalledWith(+investimento_id);
+      expect(investimentosService.findOne).toHaveBeenCalledWith(
+        +investimento_id,
+      );
     });
 
     it("should throw exception if investimento service returns null", async () => {
@@ -248,12 +250,14 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const investimentoDto = null;
 
-      mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto)
+      mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findAll.mockResolvedValueOnce(linhaDoTempo);
 
       const promise = controller.findAll(investimento_id);
 
-      await expect(promise).rejects.toThrow(new NotFoundException('O investimento informado não foi encontrado.'));
+      await expect(promise).rejects.toThrow(
+        new NotFoundException("O investimento informado não foi encontrado."),
+      );
     });
   });
 
@@ -329,12 +333,11 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findOne.mockResolvedValue(linhaDoTempo);
 
-      const promise = controller.findOne(
-        investimento_id,
-        linha_do_tempo_id,
-      );
+      const promise = controller.findOne(investimento_id, linha_do_tempo_id);
 
-      await expect(promise).rejects.toThrow(new NotFoundException('O investimento informado não foi encontrado.'));
+      await expect(promise).rejects.toThrow(
+        new NotFoundException("O investimento informado não foi encontrado."),
+      );
     });
   });
 
@@ -430,8 +433,7 @@ describe("LinhaDoTempoInvestimentosController", () => {
         updateLinhaDoTempoDto,
       );
 
-      await expect(promise).rejects.toThrow('');
-      
+      await expect(promise).rejects.toThrow("");
     });
   });
 
@@ -482,14 +484,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
         linhaDoTempoToDelete,
       );
 
-      await controller.remove(
-        investimento_id,
-        linha_do_tempo_id,
-      );
+      await controller.remove(investimento_id, linha_do_tempo_id);
 
       expect(investimentosService.findOne).toHaveBeenCalledWith(
         +investimento_id,
-        
       );
     });
 
@@ -510,12 +508,11 @@ describe("LinhaDoTempoInvestimentosController", () => {
         linhaDoTempoToDelete,
       );
 
-      const promise = controller.remove(
-        investimento_id,
-        linha_do_tempo_id,
-      );
+      const promise = controller.remove(investimento_id, linha_do_tempo_id);
 
-      await expect(promise).rejects.toThrow(new NotFoundException('O investimento informado não foi encontrado.'));
+      await expect(promise).rejects.toThrow(
+        new NotFoundException("O investimento informado não foi encontrado."),
+      );
     });
   });
 });

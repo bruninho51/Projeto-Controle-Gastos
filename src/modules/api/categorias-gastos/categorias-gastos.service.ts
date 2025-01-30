@@ -16,6 +16,12 @@ export class CategoriasGastosService {
     });
   }
 
+  async findOne(id: number): Promise<CategoriaGasto | null> {
+    return this.prisma.categoriaGasto.findUnique({
+      where: { id, soft_delete: null },
+    });
+  }
+
   async create(
     createCategoriaDto: CategoriaGastoCreateDto,
   ): Promise<CategoriaGasto> {

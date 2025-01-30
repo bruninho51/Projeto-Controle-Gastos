@@ -7,5 +7,6 @@ import { PrismaModule } from "../../prisma/prisma.module";
   imports: [PrismaModule],
   controllers: [CategoriasGastosController],
   providers: [CategoriasGastosService],
+  exports: [CategoriasGastosService],
 })
 export class CategoriasGastosModule {}

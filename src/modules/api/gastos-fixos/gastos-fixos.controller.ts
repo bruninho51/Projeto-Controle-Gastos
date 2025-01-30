@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Delete,
+  NotFoundException,
 } from "@nestjs/common";
 import { GastosFixosService } from "./gastos-fixos.service";
 import { GastoFixoCreateDto } from "./dtos/GastoFixoCreate.dto";
@@ -17,30 +18,55 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { OrcamentosService } from "../orcamentos/orcamentos.service";
+import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
 
 @ApiTags("Gastos Fixos")
 @Controller("orcamentos/:orcamento_id/gastos-fixos")
 export class GastosFixosController {
-  constructor(private readonly gastosFixosService: GastosFixosService) {}
+  constructor(
+    private readonly gastosFixosService: GastosFixosService,
+    private readonly orcamentosService: OrcamentosService,
+    private readonly categoriaGastosService: CategoriasGastosService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: "Criar um novo gasto fixo" })
   @ApiBody({ type: GastoFixoCreateDto })
   @ApiResponse({ status: 201, description: "Gasto fixo criado com sucesso." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  create(
+  async create(
     @Param("orcamento_id") orcamento_id: String,
     @Body() createGastoDto: GastoFixoCreateDto,
   ) {
-    return this.gastosFixosService.create(+orcamento_id, createGastoDto);
+    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+    const categoriaGasto = await this.categoriaGastosService.findOne(
+      createGastoDto.categoria_id,
+    );
+
+    if (!categoriaGasto) {
+      throw new NotFoundException("A categoria informada não foi encontrada.");
+    }
+
+    if (!orcamento) {
+      throw new NotFoundException("O orçamento informado não foi encontrado.");
+    }
+
+    return this.gastosFixosService.create(orcamento.id, createGastoDto);
   }
 
   @Get()
   @ApiOperation({ summary: "Buscar todos os gastos fixos" })
   @ApiResponse({ status: 200, description: "Lista de gastos fixos." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  findAll(@Param("orcamento_id") orcamento_id: string) {
-    return this.gastosFixosService.findAll(+orcamento_id);
+  async findAll(@Param("orcamento_id") orcamento_id: string) {
+    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+
+    if (!orcamento) {
+      throw new NotFoundException("O orçamento informado não foi encontrado.");
+    }
+
+    return this.gastosFixosService.findAll(orcamento.id);
   }
 
   @Get(":id")
@@ -54,11 +80,17 @@ export class GastosFixosController {
   @ApiResponse({ status: 200, description: "Gasto fixo encontrado." })
   @ApiResponse({ status: 404, description: "Gasto fixo não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  findOne(
+  async findOne(
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
   ) {
-    return this.gastosFixosService.findOne(+orcamento_id, +id);
+    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+
+    if (!orcamento) {
+      throw new NotFoundException("O orçamento informado não foi encontrado.");
+    }
+
+    return this.gastosFixosService.findOne(orcamento.id, +id);
   }
 
   @Patch(":id")
@@ -76,12 +108,18 @@ export class GastosFixosController {
   })
   @ApiResponse({ status: 404, description: "Gasto fixo não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  update(
+  async update(
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
     @Body() updateGastoDto: GastoFixoUpdateDto,
   ) {
-    return this.gastosFixosService.update(+orcamento_id, +id, updateGastoDto);
+    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+
+    if (!orcamento) {
+      throw new NotFoundException("O orçamento informado não foi encontrado.");
+    }
+
+    return this.gastosFixosService.update(orcamento.id, +id, updateGastoDto);
   }
 
   @Delete(":id")
@@ -95,7 +133,16 @@ export class GastosFixosController {
   @ApiResponse({ status: 200, description: "Gasto fixo removido com sucesso." })
   @ApiResponse({ status: 404, description: "Gasto fixo não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  remove(@Param("orcamento_id") orcamento_id: string, @Param("id") id: string) {
-    return this.gastosFixosService.softDelete(+orcamento_id, +id);
+  async remove(
+    @Param("orcamento_id") orcamento_id: string,
+    @Param("id") id: string,
+  ) {
+    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+
+    if (!orcamento) {
+      throw new NotFoundException("O orçamento informado não foi encontrado.");
+    }
+
+    return this.gastosFixosService.softDelete(orcamento.id, +id);
   }
 }

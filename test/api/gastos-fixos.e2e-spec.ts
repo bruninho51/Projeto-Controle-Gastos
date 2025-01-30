@@ -293,7 +293,9 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock2}/gastos-fixos`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos`,
+        )
         .send(gastoFixoOrcamento2)
         .expect(201);
 

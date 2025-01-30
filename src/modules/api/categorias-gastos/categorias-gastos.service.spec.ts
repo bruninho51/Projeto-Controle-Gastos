@@ -2,6 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { CategoriasGastosService } from "./categorias-gastos.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CategoriaGasto } from "@prisma/client";
+import { faker } from "@faker-js/faker/.";
 
 describe("CategoriasGastosService", () => {
   let service: CategoriasGastosService;
@@ -10,6 +11,7 @@ describe("CategoriasGastosService", () => {
   const prismaServiceMock = {
     categoriaGasto: {
       findMany: jest.fn(),
+      findUnique: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
     },
@@ -40,6 +42,31 @@ describe("CategoriasGastosService", () => {
       expect(prismaServiceMock.categoriaGasto.findMany).toHaveBeenCalledWith({
         where: { soft_delete: null },
       });
+    });
+  });
+
+  describe("findOne", () => {
+    it("should return a single categoria gasto by id", async () => {
+      const result = { id: 1, nome: "Alimentação" } as CategoriaGasto;
+      prismaServiceMock.categoriaGasto.findUnique.mockResolvedValue(result);
+
+      const id = faker.number.int();
+
+      const category = await service.findOne(id);
+      expect(category).toEqual(result);
+      expect(prismaServiceMock.categoriaGasto.findUnique).toHaveBeenCalledWith({
+        where: { id, soft_delete: null },
+      });
+    });
+
+    it("should return null if categoria gastos not found", async () => {
+      const result = null;
+      prismaServiceMock.categoriaGasto.findUnique.mockResolvedValue(result);
+
+      const id = faker.number.int();
+
+      const category = await service.findOne(id);
+      expect(category).toBeNull();
     });
   });
 
