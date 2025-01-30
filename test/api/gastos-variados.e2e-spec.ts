@@ -371,7 +371,9 @@ describe("GastosVariadosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-variados`)
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-variados`,
+        )
         .send(gastoVariadoOrcamento2)
         .expect(201);
 
