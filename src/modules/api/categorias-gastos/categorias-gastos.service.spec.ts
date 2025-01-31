@@ -2,7 +2,7 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { CategoriasGastosService } from "./categorias-gastos.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CategoriaGasto } from "@prisma/client";
-import { faker } from "@faker-js/faker/.";
+import { faker } from "@faker-js/faker";
 
 describe("CategoriasGastosService", () => {
   let service: CategoriasGastosService;

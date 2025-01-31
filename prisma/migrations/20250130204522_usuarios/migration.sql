@@ -4,6 +4,7 @@ CREATE TABLE usuarios (
   email VARCHAR(255) UNIQUE NOT NULL,
   nome VARCHAR(255) NOT NULL,
   google_id VARCHAR(255) UNIQUE NOT NULL,
+  imagem TEXT,
   data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   data_inatividade TIMESTAMP,  -- Coluna de inatividade
