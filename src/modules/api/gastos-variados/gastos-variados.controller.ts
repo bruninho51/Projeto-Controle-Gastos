@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
   NotFoundException,
+  Req,
 } from "@nestjs/common";
 import { GastosVariadosService } from "./gastos-variados.service";
 import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
@@ -39,11 +40,13 @@ export class GastosVariadosController {
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async create(
+    @Req() { user }, 
     @Param("orcamento_id") orcamento_id: String,
     @Body() createGastoDto: GastoVariadoCreateDto,
   ) {
-    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
     const categoriaGasto = await this.categoriaGastosService.findOne(
+      user.id,
       createGastoDto.categoria_id,
     );
 
@@ -62,8 +65,8 @@ export class GastosVariadosController {
   @ApiOperation({ summary: "Buscar todos os gastos variados" })
   @ApiResponse({ status: 200, description: "Lista de gastos variados." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async findAll(@Param("orcamento_id") orcamento_id: string) {
-    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+  async findAll(@Req() { user }, @Param("orcamento_id") orcamento_id: string) {
+    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
@@ -84,10 +87,11 @@ export class GastosVariadosController {
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async findOne(
+    @Req() { user }, 
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
   ) {
-    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
@@ -112,11 +116,12 @@ export class GastosVariadosController {
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async update(
+    @Req() { user }, 
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
     @Body() updateGastoDto: GastoVariadoUpdateDto,
   ) {
-    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
@@ -140,10 +145,11 @@ export class GastosVariadosController {
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async remove(
+    @Req() { user }, 
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
   ) {
-    const orcamento = await this.orcamentosService.findOne(+orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
