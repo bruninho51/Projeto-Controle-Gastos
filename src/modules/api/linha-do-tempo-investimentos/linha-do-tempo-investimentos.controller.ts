@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
 } from "@nestjs/common";
 import {
   ApiBody,
@@ -37,12 +38,13 @@ export class LinhaDoTempoInvestimentosController {
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async create(
+    @Req() { user }, 
     @Param("investimento_id") investimento_id: String,
     @Body()
     createRegistroLinhaDoTempoDto: RegistroInvestimentoLinhaDoTempoCreateDto,
   ) {
     const investimento =
-      await this.investimentoService.findOne(+investimento_id);
+      await this.investimentoService.findOne(user.id, +investimento_id);
 
     if (!investimento) {
       throw new NotFoundException(
@@ -65,9 +67,9 @@ export class LinhaDoTempoInvestimentosController {
     description: "Lista de lançamentos na linha do tempo.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async findAll(@Param("investimento_id") investimento_id: string) {
+  async findAll(@Req() { user }, @Param("investimento_id") investimento_id: string) {
     const investimento =
-      await this.investimentoService.findOne(+investimento_id);
+      await this.investimentoService.findOne(user.id, +investimento_id);
 
     if (!investimento) {
       throw new NotFoundException(
@@ -96,11 +98,12 @@ export class LinhaDoTempoInvestimentosController {
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async findOne(
+    @Req() { user }, 
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
   ) {
     const investimento =
-      await this.investimentoService.findOne(+investimento_id);
+      await this.investimentoService.findOne(user.id, +investimento_id);
 
     if (!investimento) {
       throw new NotFoundException(
@@ -130,13 +133,14 @@ export class LinhaDoTempoInvestimentosController {
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async update(
+    @Req() { user }, 
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
     @Body()
     updateRegistroLinhaDoTempoDto: RegistroInvestimentoLinhaDoTempoUpdateDto,
   ) {
     const investimento =
-      await this.investimentoService.findOne(+investimento_id);
+      await this.investimentoService.findOne(user.id, +investimento_id);
 
     if (!investimento) {
       throw new NotFoundException(
@@ -169,11 +173,12 @@ export class LinhaDoTempoInvestimentosController {
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async remove(
+    @Req() { user }, 
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
   ) {
     const investimento =
-      await this.investimentoService.findOne(+investimento_id);
+      await this.investimentoService.findOne(user.id, +investimento_id);
 
     if (!investimento) {
       throw new NotFoundException(

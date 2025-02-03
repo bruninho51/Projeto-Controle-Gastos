@@ -81,7 +81,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockReturnValueOnce(investimentoDto);
       mockLinhaDoTempoService.create.mockResolvedValueOnce(createdLinhaDoTempo);
 
+      const usuarioId = faker.number.int();
+
       const result = await controller.create(
+        { user: { id: usuarioId } },
         investimento_id,
         createLinhaDoTempoDto,
       );
@@ -115,9 +118,12 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockReturnValueOnce(investimentoDto);
       mockLinhaDoTempoService.create.mockResolvedValueOnce(createdLinhaDoTempo);
 
-      await controller.create(investimento_id, createLinhaDoTempoDto);
+      const usuarioId = faker.number.int();
+
+      await controller.create({ user: { id: usuarioId } }, investimento_id, createLinhaDoTempoDto);
 
       expect(investimentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
         +investimento_id,
       );
     });
@@ -144,7 +150,9 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockReturnValueOnce(investimentoDto);
       mockLinhaDoTempoService.create.mockResolvedValueOnce(createdLinhaDoTempo);
 
-      const promise = controller.create(investimento_id, createLinhaDoTempoDto);
+      const usuarioId = faker.number.int();
+
+      const promise = controller.create({ user: { id: usuarioId } }, investimento_id, createLinhaDoTempoDto);
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),
@@ -182,7 +190,9 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findAll.mockResolvedValue(linhaDoTempo);
 
-      const result = await controller.findAll(investimento_id);
+      const usuarioId = faker.number.int();
+
+      const result = await controller.findAll({ user: { id: usuarioId } }, investimento_id);
 
       expect(result).toEqual(linhaDoTempo);
       expect(service.findAll).toHaveBeenCalledWith(investimentoDto.id);
@@ -217,9 +227,12 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findAll.mockResolvedValueOnce(linhaDoTempo);
 
-      await controller.findAll(investimento_id);
+      const usuarioId = faker.number.int();
+
+      await controller.findAll({ user: { id: usuarioId } }, investimento_id);
 
       expect(investimentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
         +investimento_id,
       );
     });
@@ -253,7 +266,9 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findAll.mockResolvedValueOnce(linhaDoTempo);
 
-      const promise = controller.findAll(investimento_id);
+      const usuarioId = faker.number.int();
+
+      const promise = controller.findAll({ user: { id: usuarioId } }, investimento_id);
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),
@@ -281,7 +296,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findOne.mockResolvedValueOnce(linhaDoTempo);
 
+      const usuarioId = faker.number.int();
+
       const result = await controller.findOne(
+        { user: { id: usuarioId } },
         investimento_id,
         linha_do_tempo_id,
       );
@@ -302,7 +320,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findOne.mockResolvedValue(null);
 
+      const usuarioId = faker.number.int();
+
       const result = await controller.findOne(
+        { user: { id: usuarioId } },
         investimento_id,
         linha_do_tempo_id,
       );
@@ -333,7 +354,9 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.findOne.mockResolvedValue(linhaDoTempo);
 
-      const promise = controller.findOne(investimento_id, linha_do_tempo_id);
+      const usuarioId = faker.number.int();
+
+      const promise = controller.findOne({ user: { id: usuarioId } }, investimento_id, linha_do_tempo_id);
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),
@@ -362,7 +385,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.update.mockResolvedValueOnce(updatedLinhaDoTempo);
 
+      const usuarioId = faker.number.int();
+
       const result = await controller.update(
+        { user: { id: usuarioId } },
         investimento_id,
         linha_do_tempo_id,
         updateLinhaDoTempoDto,
@@ -396,13 +422,17 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.update.mockResolvedValueOnce(updatedLinhaDoTempo);
 
+      const usuarioId = faker.number.int();
+
       await controller.update(
+        { user: { id: usuarioId } },
         investimento_id,
         linha_do_tempo_id,
         updateLinhaDoTempoDto,
       );
 
       expect(investimentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
         +investimento_id,
       );
     });
@@ -427,13 +457,16 @@ describe("LinhaDoTempoInvestimentosController", () => {
       mockInvestimentosService.findOne.mockResolvedValueOnce(investimentoDto);
       mockLinhaDoTempoService.update.mockResolvedValueOnce(updatedLinhaDoTempo);
 
+      const usuarioId = faker.number.int();
+
       const promise = controller.update(
+        { user: { id: usuarioId } },
         investimento_id,
         linha_do_tempo_id,
         updateLinhaDoTempoDto,
       );
 
-      await expect(promise).rejects.toThrow("");
+      await expect(promise).rejects.toThrow(new NotFoundException("O investimento informado não foi encontrado."));
     });
   });
 
@@ -455,7 +488,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
         linhaDoTempoToDelete,
       );
 
+      const usuarioId = faker.number.int();
+
       const result = await controller.remove(
+        { user: { id: usuarioId } },
         investimento_id,
         linha_do_tempo_id,
       );
@@ -484,9 +520,12 @@ describe("LinhaDoTempoInvestimentosController", () => {
         linhaDoTempoToDelete,
       );
 
-      await controller.remove(investimento_id, linha_do_tempo_id);
+      const usuarioId = faker.number.int();
+
+      await controller.remove({ user: { id: usuarioId } }, investimento_id, linha_do_tempo_id);
 
       expect(investimentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
         +investimento_id,
       );
     });
@@ -508,7 +547,9 @@ describe("LinhaDoTempoInvestimentosController", () => {
         linhaDoTempoToDelete,
       );
 
-      const promise = controller.remove(investimento_id, linha_do_tempo_id);
+      const usuarioId = faker.number.int();
+
+      const promise = controller.remove({ user: { id: usuarioId } }, investimento_id, linha_do_tempo_id);
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),
