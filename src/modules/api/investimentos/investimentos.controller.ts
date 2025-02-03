@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
 } from "@nestjs/common";
 import {
   ApiBody,
@@ -28,16 +29,16 @@ export class InvestimentosController {
   @ApiBody({ type: InvestimentoCreateDto })
   @ApiResponse({ status: 201, description: "Investimento criado com sucesso." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  create(@Body() createInvestimentoDto: InvestimentoCreateDto) {
-    return this.investimentosService.create(createInvestimentoDto);
+  create(@Req() { user }, @Body() createInvestimentoDto: InvestimentoCreateDto) {
+    return this.investimentosService.create(user.id, createInvestimentoDto);
   }
 
   @Get()
   @ApiOperation({ summary: "Buscar todos os investimentos" })
   @ApiResponse({ status: 200, description: "Lista de investimentos." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  findAll() {
-    return this.investimentosService.findAll();
+  findAll(@Req() { user }) {
+    return this.investimentosService.findAll(user.id);
   }
 
   @Get(":id")
@@ -51,8 +52,8 @@ export class InvestimentosController {
   @ApiResponse({ status: 200, description: "Investimento encontrado." })
   @ApiResponse({ status: 404, description: "Investimento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async findOne(@Param("id") id: string) {
-    return this.investimentosService.findOne(+id);
+  async findOne(@Req() { user }, @Param("id") id: string) {
+    return this.investimentosService.findOne(user.id, +id);
   }
 
   @Patch(":id")
@@ -71,10 +72,11 @@ export class InvestimentosController {
   @ApiResponse({ status: 404, description: "Investimento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   update(
+    @Req() { user }, 
     @Param("id") id: string,
     @Body() updateInvestimentoDto: InvestimentoUpdateDto,
   ) {
-    return this.investimentosService.update(+id, updateInvestimentoDto);
+    return this.investimentosService.update(user.id, +id, updateInvestimentoDto);
   }
 
   @Delete(":id")
@@ -91,7 +93,7 @@ export class InvestimentosController {
   })
   @ApiResponse({ status: 404, description: "Investimento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  remove(@Param("id") id: string) {
-    return this.investimentosService.softDelete(+id);
+  remove(@Req() { user }, @Param("id") id: string) {
+    return this.investimentosService.softDelete(user.id, +id);
   }
 }

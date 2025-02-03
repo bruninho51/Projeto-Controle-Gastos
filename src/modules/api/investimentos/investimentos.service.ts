@@ -9,39 +9,40 @@ export class InvestimentosService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(
+    usuarioId: number,
     createInvestimentoDto: InvestimentoCreateDto,
   ): Promise<Investimento> {
-    const categoria_id = createInvestimentoDto.categoria_id;
     return await this.prisma.investimento.create({
-      data: createInvestimentoDto,
+      data: { ...createInvestimentoDto, usuario_id: usuarioId },
     });
   }
 
-  async findAll(): Promise<Investimento[]> {
+  async findAll(usuarioId: number): Promise<Investimento[]> {
     return this.prisma.investimento.findMany({
-      where: { soft_delete: null },
+      where: { usuario_id: usuarioId, soft_delete: null },
     });
   }
 
-  async findOne(id: number): Promise<Investimento> {
+  async findOne(usuarioId: number, id: number): Promise<Investimento> {
     return this.prisma.investimento.findUnique({
-      where: { id, soft_delete: null },
+      where: { usuario_id: usuarioId, id, soft_delete: null },
     });
   }
 
   async update(
+    usuarioId: number,
     id: number,
     updateInvestimentoDto: InvestimentoUpdateDto,
   ): Promise<Investimento> {
     return this.prisma.investimento.update({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
       data: updateInvestimentoDto,
     });
   }
 
-  async softDelete(id: number): Promise<Investimento> {
+  async softDelete(usuarioId: number, id: number): Promise<Investimento> {
     return this.prisma.investimento.update({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
       data: {
         soft_delete: new Date(),
       },

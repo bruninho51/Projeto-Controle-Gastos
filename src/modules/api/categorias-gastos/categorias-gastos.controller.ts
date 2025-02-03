@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Patch,
+  Req,
 } from "@nestjs/common";
 import { CategoriasGastosService } from "./categorias-gastos.service";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
@@ -23,8 +24,8 @@ export class CategoriasGastosController {
   @ApiOperation({ summary: "Listar todas as categorias de gastos" })
   @ApiResponse({ status: 200, description: "Lista de categorias de gastos" })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async findAll() {
-    return this.categoriasGastosService.findAll();
+  async findAll(@Req() { user }) {
+    return this.categoriasGastosService.findAll(user.id);
   }
 
   @Post()
@@ -35,8 +36,8 @@ export class CategoriasGastosController {
   })
   @ApiResponse({ status: 409, description: "Categoria de gasto já existe." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async create(@Body() createCategoriaDto: CategoriaGastoCreateDto) {
-    return this.categoriasGastosService.create(createCategoriaDto);
+  async create(@Req() { user }, @Body() createCategoriaDto: CategoriaGastoCreateDto) {
+    return this.categoriasGastosService.create(user.id, createCategoriaDto);
   }
 
   @Patch(":id")
@@ -49,10 +50,11 @@ export class CategoriasGastosController {
   @ApiResponse({ status: 404, description: "Categoria de gasto não existe." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async update(
+    @Req() { user },
     @Param("id") id: number,
     @Body() updateCategoriaDto: CategoriaGastoUpdateDto,
   ) {
-    return this.categoriasGastosService.update(id, updateCategoriaDto);
+    return this.categoriasGastosService.update(user.id, id, updateCategoriaDto);
   }
 
   @Delete(":id")
@@ -63,7 +65,7 @@ export class CategoriasGastosController {
   })
   @ApiResponse({ status: 404, description: "Categoria de gasto não existe." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async remove(@Param("id") id: number) {
-    return this.categoriasGastosService.softDelete(id);
+  async remove(@Req() { user }, @Param("id") id: number) {
+    return this.categoriasGastosService.softDelete(user.id, id);
   }
 }

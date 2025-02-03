@@ -4,6 +4,7 @@ import { CategoriasGastosService } from "./categorias-gastos.service";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
 import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
 import { CategoriaGasto } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 
 describe("CategoriasGastosController", () => {
   let controller: CategoriasGastosController;
@@ -36,7 +37,10 @@ describe("CategoriasGastosController", () => {
       const result = [{ id: 1, nome: "Alimentação" }] as CategoriaGasto[];
       jest.spyOn(service, "findAll").mockResolvedValue(result);
 
-      expect(await controller.findAll()).toBe(result);
+      const usuarioId = faker.number.int();
+
+      expect(await controller.findAll({ user: { id: usuarioId } })).toBe(result);
+      expect(service.findAll).toHaveBeenCalledWith(usuarioId);
     });
   });
 
@@ -47,9 +51,12 @@ describe("CategoriasGastosController", () => {
       };
       const result = { id: 1, ...createCategoriaDto } as CategoriaGasto;
 
+      const usuarioId = faker.number.int();
+
       jest.spyOn(service, "create").mockResolvedValue(result);
 
-      expect(await controller.create(createCategoriaDto)).toBe(result);
+      expect(await controller.create({ user: { id: usuarioId } }, createCategoriaDto)).toBe(result);
+      expect(service.create).toHaveBeenCalledWith(usuarioId, createCategoriaDto);
     });
   });
 
@@ -59,9 +66,12 @@ describe("CategoriasGastosController", () => {
       const updateCategoriaDto: CategoriaGastoUpdateDto = { nome: "Saúde" };
       const result = { id, ...updateCategoriaDto } as CategoriaGasto;
 
+      const usuarioId = faker.number.int();
+
       jest.spyOn(service, "update").mockResolvedValue(result);
 
-      expect(await controller.update(id, updateCategoriaDto)).toBe(result);
+      expect(await controller.update({ user: { id: usuarioId } }, id, updateCategoriaDto)).toBe(result);
+      expect(service.update).toHaveBeenCalledWith(usuarioId, id, updateCategoriaDto);
     });
   });
 
@@ -70,9 +80,12 @@ describe("CategoriasGastosController", () => {
       const id = 1;
       const result = { id, soft_delete: new Date() } as CategoriaGasto;
 
+      const usuarioId = faker.number.int();
+
       jest.spyOn(service, "softDelete").mockResolvedValue(result);
 
-      expect(await controller.remove(id)).toBe(result);
+      expect(await controller.remove({ user: { id: usuarioId } }, id)).toBe(result);
+      expect(service.softDelete).toHaveBeenCalledWith(usuarioId, id);
     });
   });
 });

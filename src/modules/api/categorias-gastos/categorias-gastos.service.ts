@@ -8,41 +8,44 @@ import { CategoriaGasto } from "@prisma/client";
 export class CategoriasGastosService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(): Promise<CategoriaGasto[]> {
+  async findAll(usuarioId: number): Promise<CategoriaGasto[]> {
     return this.prisma.categoriaGasto.findMany({
       where: {
+        usuario_id: usuarioId,
         soft_delete: null,
       },
     });
   }
 
-  async findOne(id: number): Promise<CategoriaGasto | null> {
+  async findOne(usuarioId: number, id: number): Promise<CategoriaGasto | null> {
     return this.prisma.categoriaGasto.findUnique({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
     });
   }
 
   async create(
+    usuarioId: number,
     createCategoriaDto: CategoriaGastoCreateDto,
   ): Promise<CategoriaGasto> {
     return this.prisma.categoriaGasto.create({
-      data: createCategoriaDto,
+      data: { ...createCategoriaDto, usuario_id: usuarioId },
     });
   }
 
   async update(
+    usuarioId: number,
     id: number,
     updateCategoriaDto: CategoriaGastoUpdateDto,
   ): Promise<CategoriaGasto> {
     return this.prisma.categoriaGasto.update({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
       data: updateCategoriaDto,
     });
   }
 
-  async softDelete(id: number): Promise<CategoriaGasto> {
+  async softDelete(usuarioId: number, id: number): Promise<CategoriaGasto> {
     return this.prisma.categoriaGasto.update({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
       data: {
         soft_delete: new Date(),
       },

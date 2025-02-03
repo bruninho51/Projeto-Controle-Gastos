@@ -12,7 +12,7 @@ CREATE TABLE categorias_gastos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Inserindo categorias
-INSERT INTO categorias_gastos (nome) VALUES
+/*INSERT INTO categorias_gastos (nome) VALUES
     ('Transporte Público'),
     ('Transporte Uber'),
     ('Alimentação e Bebidas Fora de Casa e Delivery'),
@@ -28,4 +28,4 @@ INSERT INTO categorias_gastos (nome) VALUES
     ('Despesas com Animais de Estimação'),
     ('Váquinas e Objetivos'),
     ('Evolução de Obra Apartamento'),
-    ('Outros');
+    ('Outros');*/

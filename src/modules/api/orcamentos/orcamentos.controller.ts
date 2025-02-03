@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Patch,
+  Req,
 } from "@nestjs/common";
 import { OrcamentosService } from "./orcamentos.service";
 import {
@@ -28,16 +29,17 @@ export class OrcamentosController {
   @ApiBody({ type: OrcamentoCreateDto })
   @ApiResponse({ status: 201, description: "Orçamento criado com sucesso." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  create(@Body() createOrcamentoDto: OrcamentoCreateDto) {
-    return this.orcamentoService.create(createOrcamentoDto);
+  create(@Req() { user }, @Body() createOrcamentoDto: OrcamentoCreateDto) {
+
+    return this.orcamentoService.create(user.id, createOrcamentoDto);
   }
 
   @Get()
   @ApiOperation({ summary: "Buscar todos os orçamentos" })
   @ApiResponse({ status: 200, description: "Lista de orçamentos." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  findAll() {
-    return this.orcamentoService.findAll();
+  findAll(@Req() { user }) {
+    return this.orcamentoService.findAll(user.id);
   }
 
   @Get(":id")
@@ -51,8 +53,8 @@ export class OrcamentosController {
   @ApiResponse({ status: 200, description: "Orçamento encontrado." })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async findOne(@Param("id") id: string) {
-    return this.orcamentoService.findOne(+id);
+  async findOne(@Req() { user }, @Param("id") id: string) {
+    return this.orcamentoService.findOne(user.id, +id);
   }
 
   @Patch(":id")
@@ -71,10 +73,11 @@ export class OrcamentosController {
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   update(
+    @Req() { user },
     @Param("id") id: string,
     @Body() updateOrcamentoDto: OrcamentoUpdateDto,
   ) {
-    return this.orcamentoService.update(+id, updateOrcamentoDto);
+    return this.orcamentoService.update(user.id, +id, updateOrcamentoDto);
   }
 
   @Delete(":id")
@@ -88,7 +91,7 @@ export class OrcamentosController {
   @ApiResponse({ status: 200, description: "Orçamento removido com sucesso." })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  remove(@Param("id") id: string) {
-    return this.orcamentoService.softDelete(+id);
+  remove(@Req() { user }, @Param("id") id: string) {
+    return this.orcamentoService.softDelete(user.id, +id);
   }
 }

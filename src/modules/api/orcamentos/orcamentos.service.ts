@@ -8,37 +8,38 @@ import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 export class OrcamentosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createOrcamentoDto: OrcamentoCreateDto): Promise<Orcamento> {
+  async create(usuarioId: number, createOrcamentoDto: OrcamentoCreateDto): Promise<Orcamento> {
     return await this.prisma.orcamento.create({
-      data: createOrcamentoDto,
+      data: { ...createOrcamentoDto, usuario_id: usuarioId },
     });
   }
 
-  async findAll(): Promise<Orcamento[]> {
+  async findAll(usuarioId: number): Promise<Orcamento[]> {
     return this.prisma.orcamento.findMany({
-      where: { soft_delete: null },
+      where: { usuario_id: usuarioId, soft_delete: null },
     });
   }
 
-  async findOne(id: number): Promise<Orcamento | null> {
+  async findOne(usuarioId: number, id: number): Promise<Orcamento | null> {
     return this.prisma.orcamento.findUnique({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
     });
   }
 
   async update(
+    usuarioId: number,
     id: number,
     updateOrcamentoDto: OrcamentoUpdateDto,
   ): Promise<Orcamento> {
     return this.prisma.orcamento.update({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
       data: updateOrcamentoDto,
     });
   }
 
-  async softDelete(id: number): Promise<Orcamento> {
+  async softDelete(usuarioId: number, id: number): Promise<Orcamento> {
     return this.prisma.orcamento.update({
-      where: { id, soft_delete: null },
+      where: { id, usuario_id: usuarioId, soft_delete: null },
       data: {
         soft_delete: new Date(),
       },

@@ -58,11 +58,13 @@ describe("InvestimentosService", () => {
         createdInvestimento,
       );
 
-      const result = await service.create(createInvestimentoDto);
+      const usuarioId = faker.number.int();
+
+      const result = await service.create(usuarioId, createInvestimentoDto);
 
       expect(result).toEqual(createdInvestimento);
       expect(mockPrismaService.investimento.create).toHaveBeenCalledWith({
-        data: createInvestimentoDto,
+        data: { ...createInvestimentoDto, usuario_id: usuarioId },
       });
     });
   });
@@ -96,10 +98,14 @@ describe("InvestimentosService", () => {
 
       mockPrismaService.investimento.findMany.mockResolvedValue(investimentos);
 
-      const result = await service.findAll();
+      const usuarioId = faker.number.int();
+
+      const result = await service.findAll(usuarioId);
 
       expect(result).toEqual(investimentos);
-      expect(mockPrismaService.investimento.findMany).toHaveBeenCalled();
+      expect(mockPrismaService.investimento.findMany).toHaveBeenCalledWith({
+        where: { usuario_id: usuarioId, soft_delete: null },
+      });
     });
   });
 
@@ -119,22 +125,26 @@ describe("InvestimentosService", () => {
 
       mockPrismaService.investimento.findUnique.mockResolvedValue(investimento);
 
-      const result = await service.findOne(1);
+      const usuarioId = faker.number.int();
+
+      const result = await service.findOne(usuarioId, 1);
 
       expect(result).toEqual(investimento);
       expect(mockPrismaService.investimento.findUnique).toHaveBeenCalledWith({
-        where: { id: 1, soft_delete: null },
+        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
       });
     });
 
     it("should return null if investimento not found", async () => {
       mockPrismaService.investimento.findUnique.mockResolvedValue(null);
 
-      const result = await service.findOne(999);
+      const usuarioId = faker.number.int();
+
+      const result = await service.findOne(usuarioId, 999);
 
       expect(result).toBeNull();
       expect(mockPrismaService.investimento.findUnique).toHaveBeenCalledWith({
-        where: { id: 999, soft_delete: null },
+        where: { id: 999, usuario_id: usuarioId, soft_delete: null },
       });
     });
   });
@@ -162,11 +172,13 @@ describe("InvestimentosService", () => {
         updatedInvestimento,
       );
 
-      const result = await service.update(1, updateInvestimentoDto);
+      const usuarioId = faker.number.int();
+
+      const result = await service.update(usuarioId, 1, updateInvestimentoDto);
 
       expect(result).toEqual(updatedInvestimento);
       expect(mockPrismaService.investimento.update).toHaveBeenCalledWith({
-        where: { id: 1, soft_delete: null },
+        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
         data: updateInvestimentoDto,
       });
     });
@@ -191,11 +203,13 @@ describe("InvestimentosService", () => {
         softDeletedInvestimento,
       );
 
-      const result = await service.softDelete(1);
+      const usuarioId = faker.number.int();
+
+      const result = await service.softDelete(usuarioId, 1);
 
       expect(result).toEqual(softDeletedInvestimento);
       expect(mockPrismaService.investimento.update).toHaveBeenCalledWith({
-        where: { id: 1, soft_delete: null },
+        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
         data: { soft_delete: expect.any(Date) },
       });
     });

@@ -57,10 +57,12 @@ describe("InvestimentosController", () => {
 
       mockInvestimentosService.create.mockResolvedValue(createdInvestimento);
 
-      const result = await controller.create(createInvestimentoDto);
+      const usuarioId = faker.number.int();
+
+      const result = await controller.create({ user: { id: usuarioId } }, createInvestimentoDto);
 
       expect(result).toEqual(createdInvestimento);
-      expect(service.create).toHaveBeenCalledWith(createInvestimentoDto);
+      expect(service.create).toHaveBeenCalledWith(usuarioId, createInvestimentoDto);
     });
   });
 
@@ -87,12 +89,14 @@ describe("InvestimentosController", () => {
         },
       ];
 
+      const usuarioId = faker.number.int();
+
       mockInvestimentosService.findAll.mockResolvedValue(investimentos);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll({ user: { id: usuarioId } });
 
       expect(result).toEqual(investimentos);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(service.findAll).toHaveBeenCalledWith(usuarioId);
     });
   });
 
@@ -110,19 +114,23 @@ describe("InvestimentosController", () => {
 
       mockInvestimentosService.findOne.mockResolvedValue(investimento);
 
-      const result = await controller.findOne("1");
+      const usuarioId = faker.number.int();
+
+      const result = await controller.findOne({ user: { id: usuarioId } }, "1");
 
       expect(result).toEqual(investimento);
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(service.findOne).toHaveBeenCalledWith(usuarioId, 1);
     });
 
     it("should return null if investimento not found", async () => {
       mockInvestimentosService.findOne.mockResolvedValue(null);
 
-      const result = await controller.findOne("999");
+      const usuarioId = faker.number.int();
+
+      const result = await controller.findOne({ user: { id: usuarioId } }, "999");
 
       expect(result).toBeNull();
-      expect(service.findOne).toHaveBeenCalledWith(999);
+      expect(service.findOne).toHaveBeenCalledWith(usuarioId, 999);
     });
   });
 
@@ -143,12 +151,14 @@ describe("InvestimentosController", () => {
         categoria_id: 1,
       };
 
+      const usuarioId = faker.number.int();
+
       mockInvestimentosService.update.mockResolvedValue(updatedInvestimento);
 
-      const result = await controller.update("1", updateInvestimentoDto);
+      const result = await controller.update({ user: { id: usuarioId } }, "1", updateInvestimentoDto);
 
       expect(result).toEqual(updatedInvestimento);
-      expect(service.update).toHaveBeenCalledWith(1, updateInvestimentoDto);
+      expect(service.update).toHaveBeenCalledWith(usuarioId, 1, updateInvestimentoDto);
     });
   });
 
@@ -169,10 +179,12 @@ describe("InvestimentosController", () => {
         investimentoToDelete,
       );
 
-      const result = await controller.remove("1");
+      const usuarioId = faker.number.int();
+
+      const result = await controller.remove({ user: { id: usuarioId } }, "1");
 
       expect(result).toEqual(investimentoToDelete);
-      expect(service.softDelete).toHaveBeenCalledWith(1);
+      expect(service.softDelete).toHaveBeenCalledWith(usuarioId, 1);
     });
   });
 });

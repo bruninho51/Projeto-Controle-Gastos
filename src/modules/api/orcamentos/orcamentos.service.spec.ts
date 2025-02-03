@@ -3,6 +3,7 @@ import { OrcamentosService } from "./orcamentos.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
+import { faker } from "@faker-js/faker";
 
 const mockPrismaService = {
   orcamento: {
@@ -51,13 +52,15 @@ describe("OrcamentosService", () => {
         data_atualizacao: new Date(),
       };
 
+      const usuarioId = faker.number.int();
+
       mockPrismaService.orcamento.create.mockResolvedValue(createdOrcamento);
 
-      const result = await service.create(createOrcamentoDto);
+      const result = await service.create(usuarioId, createOrcamentoDto);
 
       expect(result).toEqual(createdOrcamento);
       expect(mockPrismaService.orcamento.create).toHaveBeenCalledWith({
-        data: createOrcamentoDto,
+        data: { ...createOrcamentoDto, usuario_id: usuarioId },
       });
     });
   });
@@ -83,10 +86,14 @@ describe("OrcamentosService", () => {
 
       mockPrismaService.orcamento.findMany.mockResolvedValue(orcamentos);
 
-      const result = await service.findAll();
+      const usuarioId = faker.number.int();
+
+      const result = await service.findAll(usuarioId);
 
       expect(result).toEqual(orcamentos);
-      expect(mockPrismaService.orcamento.findMany).toHaveBeenCalled();
+      expect(mockPrismaService.orcamento.findMany).toHaveBeenCalledWith({
+        where: { usuario_id: usuarioId, soft_delete: null },
+      });
     });
   });
 
@@ -105,22 +112,26 @@ describe("OrcamentosService", () => {
 
       mockPrismaService.orcamento.findUnique.mockResolvedValue(orcamento);
 
-      const result = await service.findOne(1);
+      const usuarioId = faker.number.int();
+
+      const result = await service.findOne(usuarioId, 1);
 
       expect(result).toEqual(orcamento);
       expect(mockPrismaService.orcamento.findUnique).toHaveBeenCalledWith({
-        where: { id: 1, soft_delete: null },
+        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
       });
     });
 
     it("should return null if orcamento not found", async () => {
       mockPrismaService.orcamento.findUnique.mockResolvedValue(null);
 
-      const result = await service.findOne(999);
+      const usuarioId = faker.number.int();
+
+      const result = await service.findOne(usuarioId, 999);
 
       expect(result).toBeNull();
       expect(mockPrismaService.orcamento.findUnique).toHaveBeenCalledWith({
-        where: { id: 999, soft_delete: null },
+        where: { id: 999, usuario_id: usuarioId, soft_delete: null },
       });
     });
   });
@@ -145,11 +156,13 @@ describe("OrcamentosService", () => {
 
       mockPrismaService.orcamento.update.mockResolvedValue(updatedOrcamento);
 
-      const result = await service.update(1, updateOrcamentoDto);
+      const usuarioId = faker.number.int();
+
+      const result = await service.update(usuarioId, 1, updateOrcamentoDto);
 
       expect(result).toEqual(updatedOrcamento);
       expect(mockPrismaService.orcamento.update).toHaveBeenCalledWith({
-        where: { id: 1, soft_delete: null },
+        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
         data: updateOrcamentoDto,
       });
     });
@@ -174,11 +187,13 @@ describe("OrcamentosService", () => {
         softDeletedOrcamento,
       );
 
-      const result = await service.softDelete(1);
+      const usuarioId = faker.number.int();
+
+      const result = await service.softDelete(usuarioId, 1);
 
       expect(result).toEqual(softDeletedOrcamento);
       expect(mockPrismaService.orcamento.update).toHaveBeenCalledWith({
-        where: { id: 1, soft_delete: null },
+        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
         data: { soft_delete: expect.any(Date) },
       });
     });

@@ -3,6 +3,7 @@ import { OrcamentosController } from "./orcamentos.controller";
 import { OrcamentosService } from "./orcamentos.service";
 import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
+import { faker } from "@faker-js/faker";
 
 const mockOrcamentosService = {
   create: jest.fn(),
@@ -52,10 +53,12 @@ describe("OrcamentoController", () => {
 
       mockOrcamentosService.create.mockResolvedValue(createdOrcamento);
 
-      const result = await controller.create(createOrcamentoDto);
+      const userId = faker.number.int();
+
+      const result = await controller.create({ user: { id: userId } }, createOrcamentoDto);
 
       expect(result).toEqual(createdOrcamento);
-      expect(service.create).toHaveBeenCalledWith(createOrcamentoDto);
+      expect(service.create).toHaveBeenCalledWith(userId, createOrcamentoDto);
     });
   });
 
@@ -80,7 +83,9 @@ describe("OrcamentoController", () => {
 
       mockOrcamentosService.findAll.mockResolvedValue(orcamentos);
 
-      const result = await controller.findAll();
+      const userId = faker.number.int();
+
+      const result = await controller.findAll({ user: { id: userId } });
 
       expect(result).toEqual(orcamentos);
       expect(service.findAll).toHaveBeenCalled();
@@ -99,19 +104,23 @@ describe("OrcamentoController", () => {
 
       mockOrcamentosService.findOne.mockResolvedValue(orcamento);
 
-      const result = await controller.findOne("1");
+      const userId = faker.number.int();
+
+      const result = await controller.findOne({ user: { id: userId } }, "1");
 
       expect(result).toEqual(orcamento);
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(service.findOne).toHaveBeenCalledWith(userId, 1);
     });
 
     it("should return null if orcamento not found", async () => {
       mockOrcamentosService.findOne.mockResolvedValue(null);
 
-      const result = await controller.findOne("999");
+      const userId = faker.number.int();
+
+      const result = await controller.findOne({ user: { id: userId } }, "999");
 
       expect(result).toBeNull();
-      expect(service.findOne).toHaveBeenCalledWith(999);
+      expect(service.findOne).toHaveBeenCalledWith(userId, 999);
     });
   });
 
@@ -129,10 +138,12 @@ describe("OrcamentoController", () => {
 
       mockOrcamentosService.update.mockResolvedValue(updatedOrcamento);
 
-      const result = await controller.update("1", updateOrcamentoDto);
+      const userId = faker.number.int();
+
+      const result = await controller.update({ user: { id: userId } }, "1", updateOrcamentoDto);
 
       expect(result).toEqual(updatedOrcamento);
-      expect(service.update).toHaveBeenCalledWith(1, updateOrcamentoDto);
+      expect(service.update).toHaveBeenCalledWith(userId, 1, updateOrcamentoDto);
     });
   });
 
@@ -146,10 +157,12 @@ describe("OrcamentoController", () => {
 
       mockOrcamentosService.softDelete.mockResolvedValue(orcamentoToDelete);
 
-      const result = await controller.remove("1");
+      const userId = faker.number.int();
+
+      const result = await controller.remove({ user: { id: userId } }, "1");
 
       expect(result).toEqual(orcamentoToDelete);
-      expect(service.softDelete).toHaveBeenCalledWith(1);
+      expect(service.softDelete).toHaveBeenCalledWith(userId, 1);
     });
   });
 });

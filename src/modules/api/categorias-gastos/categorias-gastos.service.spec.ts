@@ -37,10 +37,12 @@ describe("CategoriasGastosService", () => {
       const result = [{ id: 1, nome: "Alimentação" }] as CategoriaGasto[];
       prismaServiceMock.categoriaGasto.findMany.mockResolvedValue(result);
 
-      const categories = await service.findAll();
+      const usuarioId = faker.number.int();
+
+      const categories = await service.findAll(usuarioId);
       expect(categories).toEqual(result);
       expect(prismaServiceMock.categoriaGasto.findMany).toHaveBeenCalledWith({
-        where: { soft_delete: null },
+        where: { usuario_id: usuarioId, soft_delete: null },
       });
     });
   });
@@ -51,11 +53,12 @@ describe("CategoriasGastosService", () => {
       prismaServiceMock.categoriaGasto.findUnique.mockResolvedValue(result);
 
       const id = faker.number.int();
+      const usuarioId = faker.number.int();
 
-      const category = await service.findOne(id);
+      const category = await service.findOne(usuarioId, id);
       expect(category).toEqual(result);
       expect(prismaServiceMock.categoriaGasto.findUnique).toHaveBeenCalledWith({
-        where: { id, soft_delete: null },
+        where: { id, usuario_id: usuarioId, soft_delete: null },
       });
     });
 
@@ -64,8 +67,9 @@ describe("CategoriasGastosService", () => {
       prismaServiceMock.categoriaGasto.findUnique.mockResolvedValue(result);
 
       const id = faker.number.int();
+      const usuarioId = faker.number.int();
 
-      const category = await service.findOne(id);
+      const category = await service.findOne(usuarioId, id);
       expect(category).toBeNull();
     });
   });
@@ -76,10 +80,12 @@ describe("CategoriasGastosService", () => {
       const result = { id: 1, ...createCategoriaDto } as CategoriaGasto;
       prismaServiceMock.categoriaGasto.create.mockResolvedValue(result);
 
-      const category = await service.create(createCategoriaDto);
+      const usuarioId = faker.number.int();
+
+      const category = await service.create(usuarioId, createCategoriaDto);
       expect(category).toEqual(result);
       expect(prismaServiceMock.categoriaGasto.create).toHaveBeenCalledWith({
-        data: createCategoriaDto,
+        data: { ...createCategoriaDto, usuario_id: usuarioId },
       });
     });
   });
@@ -91,10 +97,12 @@ describe("CategoriasGastosService", () => {
       const result = { id, ...updateCategoriaDto } as CategoriaGasto;
       prismaServiceMock.categoriaGasto.update.mockResolvedValue(result);
 
-      const category = await service.update(id, updateCategoriaDto);
+      const usuarioId = faker.number.int();
+
+      const category = await service.update(usuarioId, id, updateCategoriaDto);
       expect(category).toEqual(result);
       expect(prismaServiceMock.categoriaGasto.update).toHaveBeenCalledWith({
-        where: { id, soft_delete: null },
+        where: { id, usuario_id: usuarioId, soft_delete: null },
         data: updateCategoriaDto,
       });
     });
@@ -110,10 +118,12 @@ describe("CategoriasGastosService", () => {
       } as CategoriaGasto;
       prismaServiceMock.categoriaGasto.update.mockResolvedValue(result);
 
-      const category = await service.softDelete(id);
+      const usuarioId = faker.number.int();
+
+      const category = await service.softDelete(usuarioId, id);
       expect(category).toEqual(result);
       expect(prismaServiceMock.categoriaGasto.update).toHaveBeenCalledWith({
-        where: { id, soft_delete: null },
+        where: { id, usuario_id: usuarioId, soft_delete: null },
         data: { soft_delete: expect.any(Date) },
       });
     });
