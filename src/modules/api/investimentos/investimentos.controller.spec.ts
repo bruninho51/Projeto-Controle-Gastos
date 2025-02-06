@@ -59,10 +59,16 @@ describe("InvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const result = await controller.create({ user: { id: usuarioId } }, createInvestimentoDto);
+      const result = await controller.create(
+        { user: { id: usuarioId } },
+        createInvestimentoDto,
+      );
 
       expect(result).toEqual(createdInvestimento);
-      expect(service.create).toHaveBeenCalledWith(usuarioId, createInvestimentoDto);
+      expect(service.create).toHaveBeenCalledWith(
+        usuarioId,
+        createInvestimentoDto,
+      );
     });
   });
 
@@ -127,7 +133,10 @@ describe("InvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const result = await controller.findOne({ user: { id: usuarioId } }, "999");
+      const result = await controller.findOne(
+        { user: { id: usuarioId } },
+        "999",
+      );
 
       expect(result).toBeNull();
       expect(service.findOne).toHaveBeenCalledWith(usuarioId, 999);
@@ -155,10 +164,18 @@ describe("InvestimentosController", () => {
 
       mockInvestimentosService.update.mockResolvedValue(updatedInvestimento);
 
-      const result = await controller.update({ user: { id: usuarioId } }, "1", updateInvestimentoDto);
+      const result = await controller.update(
+        { user: { id: usuarioId } },
+        "1",
+        updateInvestimentoDto,
+      );
 
       expect(result).toEqual(updatedInvestimento);
-      expect(service.update).toHaveBeenCalledWith(usuarioId, 1, updateInvestimentoDto);
+      expect(service.update).toHaveBeenCalledWith(
+        usuarioId,
+        1,
+        updateInvestimentoDto,
+      );
     });
   });
 

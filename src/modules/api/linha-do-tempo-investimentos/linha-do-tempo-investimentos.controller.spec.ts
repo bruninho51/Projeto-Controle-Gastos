@@ -120,7 +120,11 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      await controller.create({ user: { id: usuarioId } }, investimento_id, createLinhaDoTempoDto);
+      await controller.create(
+        { user: { id: usuarioId } },
+        investimento_id,
+        createLinhaDoTempoDto,
+      );
 
       expect(investimentosService.findOne).toHaveBeenCalledWith(
         usuarioId,
@@ -152,7 +156,11 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const promise = controller.create({ user: { id: usuarioId } }, investimento_id, createLinhaDoTempoDto);
+      const promise = controller.create(
+        { user: { id: usuarioId } },
+        investimento_id,
+        createLinhaDoTempoDto,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),
@@ -192,7 +200,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const result = await controller.findAll({ user: { id: usuarioId } }, investimento_id);
+      const result = await controller.findAll(
+        { user: { id: usuarioId } },
+        investimento_id,
+      );
 
       expect(result).toEqual(linhaDoTempo);
       expect(service.findAll).toHaveBeenCalledWith(investimentoDto.id);
@@ -268,7 +279,10 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const promise = controller.findAll({ user: { id: usuarioId } }, investimento_id);
+      const promise = controller.findAll(
+        { user: { id: usuarioId } },
+        investimento_id,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),
@@ -356,7 +370,11 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const promise = controller.findOne({ user: { id: usuarioId } }, investimento_id, linha_do_tempo_id);
+      const promise = controller.findOne(
+        { user: { id: usuarioId } },
+        investimento_id,
+        linha_do_tempo_id,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),
@@ -466,7 +484,9 @@ describe("LinhaDoTempoInvestimentosController", () => {
         updateLinhaDoTempoDto,
       );
 
-      await expect(promise).rejects.toThrow(new NotFoundException("O investimento informado não foi encontrado."));
+      await expect(promise).rejects.toThrow(
+        new NotFoundException("O investimento informado não foi encontrado."),
+      );
     });
   });
 
@@ -522,7 +542,11 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      await controller.remove({ user: { id: usuarioId } }, investimento_id, linha_do_tempo_id);
+      await controller.remove(
+        { user: { id: usuarioId } },
+        investimento_id,
+        linha_do_tempo_id,
+      );
 
       expect(investimentosService.findOne).toHaveBeenCalledWith(
         usuarioId,
@@ -549,7 +573,11 @@ describe("LinhaDoTempoInvestimentosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const promise = controller.remove({ user: { id: usuarioId } }, investimento_id, linha_do_tempo_id);
+      const promise = controller.remove(
+        { user: { id: usuarioId } },
+        investimento_id,
+        linha_do_tempo_id,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O investimento informado não foi encontrado."),

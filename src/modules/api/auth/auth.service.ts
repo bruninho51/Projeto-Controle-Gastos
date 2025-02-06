@@ -10,10 +10,14 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async findOrCreateUser(firebaseUser: any) {
-    let user = await this.prisma.usuario.findUnique({
-      where: { email: firebaseUser.email },
+  async findUser(email: string) {
+    return await this.prisma.usuario.findUnique({
+      where: { email },
     });
+  }
+
+  async findOrCreateUser(firebaseUser) {
+    let user = await this.findUser(firebaseUser.email);
 
     if (!user) {
       user = await this.prisma.usuario.create({
@@ -30,7 +34,7 @@ export class AuthService {
   }
 
   async generateJwt(user: Usuario) {
-    const payload = { email: user.email, sub: user.id };
+    const payload = { id: user.id, email: user.email, sub: user.id };
     return this.jwtService.sign(payload);
   }
 }

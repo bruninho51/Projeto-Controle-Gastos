@@ -55,7 +55,10 @@ describe("OrcamentoController", () => {
 
       const userId = faker.number.int();
 
-      const result = await controller.create({ user: { id: userId } }, createOrcamentoDto);
+      const result = await controller.create(
+        { user: { id: userId } },
+        createOrcamentoDto,
+      );
 
       expect(result).toEqual(createdOrcamento);
       expect(service.create).toHaveBeenCalledWith(userId, createOrcamentoDto);
@@ -140,10 +143,18 @@ describe("OrcamentoController", () => {
 
       const userId = faker.number.int();
 
-      const result = await controller.update({ user: { id: userId } }, "1", updateOrcamentoDto);
+      const result = await controller.update(
+        { user: { id: userId } },
+        "1",
+        updateOrcamentoDto,
+      );
 
       expect(result).toEqual(updatedOrcamento);
-      expect(service.update).toHaveBeenCalledWith(userId, 1, updateOrcamentoDto);
+      expect(service.update).toHaveBeenCalledWith(
+        userId,
+        1,
+        updateOrcamentoDto,
+      );
     });
   });
 

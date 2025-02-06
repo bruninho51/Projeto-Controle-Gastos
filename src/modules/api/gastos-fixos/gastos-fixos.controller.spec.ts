@@ -99,7 +99,11 @@ describe("GastosFixosController", () => {
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.create.mockResolvedValue(createdGasto);
 
-      const result = await controller.create({ user: { id: usuarioId } }, orcamento_id, createGastoDto);
+      const result = await controller.create(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        createGastoDto,
+      );
 
       expect(result).toEqual(createdGasto);
       expect(service.create).toHaveBeenCalledWith(
@@ -136,9 +140,16 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      await controller.create({ user: { id: usuarioId } }, orcamento_id, createGastoDto);
+      await controller.create(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        createGastoDto,
+      );
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(usuarioId, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
+        +orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
@@ -168,7 +179,11 @@ describe("GastosFixosController", () => {
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.create.mockResolvedValue(createdGasto);
 
-      const promise = controller.create({ user: { id: usuarioId } }, orcamento_id, createGastoDto);
+      const promise = controller.create(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        createGastoDto,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O orçamento informado não foi encontrado."),
@@ -202,7 +217,11 @@ describe("GastosFixosController", () => {
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.create.mockResolvedValue(createdGasto);
 
-      await controller.create({ user: { id: usuarioId } }, orcamento_id, createGastoDto);
+      await controller.create(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        createGastoDto,
+      );
 
       expect(categoriaGastosService.findOne).toHaveBeenCalledWith(
         usuarioId,
@@ -237,7 +256,11 @@ describe("GastosFixosController", () => {
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.create.mockResolvedValue(createdGasto);
 
-      const promise = controller.create({ user: { id: usuarioId } }, orcamento_id, createGastoDto);
+      const promise = controller.create(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        createGastoDto,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("A categoria informada não foi encontrada."),
@@ -261,7 +284,10 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const result = await controller.findAll({ user: { id: usuarioId } }, orcamento_id);
+      const result = await controller.findAll(
+        { user: { id: usuarioId } },
+        orcamento_id,
+      );
 
       expect(result).toEqual(gastos);
       expect(service.findAll).toHaveBeenCalledWith(orcamentoDto.id);
@@ -284,7 +310,10 @@ describe("GastosFixosController", () => {
 
       await controller.findAll({ user: { id: usuarioId } }, orcamento_id);
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(usuarioId, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
+        +orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
@@ -302,7 +331,10 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const promise = controller.findAll({ user: { id: usuarioId } }, orcamento_id);
+      const promise = controller.findAll(
+        { user: { id: usuarioId } },
+        orcamento_id,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O orçamento informado não foi encontrado."),
@@ -328,7 +360,11 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const result = await controller.findOne({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id);
+      const result = await controller.findOne(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+      );
 
       expect(result).toEqual(gasto);
     });
@@ -344,7 +380,11 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const result = await controller.findOne({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id);
+      const result = await controller.findOne(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+      );
 
       expect(result).toBeNull();
     });
@@ -366,9 +406,16 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      await controller.findOne({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id);
+      await controller.findOne(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+      );
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(usuarioId, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
+        +orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
@@ -388,7 +435,11 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const promise = controller.findOne({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id);
+      const promise = controller.findOne(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O orçamento informado não foi encontrado."),
@@ -456,9 +507,17 @@ describe("GastosFixosController", () => {
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.update.mockResolvedValue(updatedGasto);
 
-      await controller.update({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id, updateGastoDto);
+      await controller.update(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+        updateGastoDto,
+      );
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(usuarioId, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
+        +orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
@@ -514,7 +573,11 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      const result = await controller.remove({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id);
+      const result = await controller.remove(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+      );
 
       expect(result).toEqual(gastoToDelete);
       expect(service.softDelete).toHaveBeenCalledWith(
@@ -540,9 +603,16 @@ describe("GastosFixosController", () => {
 
       const usuarioId = faker.number.int();
 
-      await controller.remove({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id);
+      await controller.remove(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+      );
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(usuarioId, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        usuarioId,
+        +orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
@@ -562,7 +632,11 @@ describe("GastosFixosController", () => {
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.softDelete.mockResolvedValue(gastoToDelete);
 
-      const promise = controller.remove({ user: { id: usuarioId } }, orcamento_id, gasto_fixo_id);
+      const promise = controller.remove(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        gasto_fixo_id,
+      );
 
       await expect(promise).rejects.toThrow(
         new NotFoundException("O orçamento informado não foi encontrado."),

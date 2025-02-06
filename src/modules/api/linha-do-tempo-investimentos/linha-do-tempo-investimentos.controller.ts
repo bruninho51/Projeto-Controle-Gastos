@@ -8,8 +8,10 @@ import {
   Patch,
   Post,
   Req,
+  UseGuards,
 } from "@nestjs/common";
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -20,6 +22,7 @@ import { LinhaDoTempoInvestimentosService } from "./linha-do-tempo-investimentos
 import { RegistroInvestimentoLinhaDoTempoCreateDto } from "./dtos/RegistroInvestimentoLinhaDoTempoCreate.dto";
 import { RegistroInvestimentoLinhaDoTempoUpdateDto } from "./dtos/RegistroInvestimentoLinhaDoTempoUpdate.dto";
 import { InvestimentosService } from "../investimentos/investimentos.service";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
 @ApiTags("Linha do Tempo Investimentos")
 @Controller("investimentos/:investimento_id/linha-do-tempo")
@@ -37,14 +40,18 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo criado com sucesso.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+    @UseGuards(JwtAuthGuard)
   async create(
-    @Req() { user }, 
+    @Req() { user },
     @Param("investimento_id") investimento_id: String,
     @Body()
     createRegistroLinhaDoTempoDto: RegistroInvestimentoLinhaDoTempoCreateDto,
   ) {
-    const investimento =
-      await this.investimentoService.findOne(user.id, +investimento_id);
+    const investimento = await this.investimentoService.findOne(
+      user.id,
+      +investimento_id,
+    );
 
     if (!investimento) {
       throw new NotFoundException(
@@ -67,9 +74,16 @@ export class LinhaDoTempoInvestimentosController {
     description: "Lista de lançamentos na linha do tempo.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async findAll(@Req() { user }, @Param("investimento_id") investimento_id: string) {
-    const investimento =
-      await this.investimentoService.findOne(user.id, +investimento_id);
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  async findAll(
+    @Req() { user },
+    @Param("investimento_id") investimento_id: string,
+  ) {
+    const investimento = await this.investimentoService.findOne(
+      user.id,
+      +investimento_id,
+    );
 
     if (!investimento) {
       throw new NotFoundException(
@@ -97,13 +111,17 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   async findOne(
-    @Req() { user }, 
+    @Req() { user },
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
   ) {
-    const investimento =
-      await this.investimentoService.findOne(user.id, +investimento_id);
+    const investimento = await this.investimentoService.findOne(
+      user.id,
+      +investimento_id,
+    );
 
     if (!investimento) {
       throw new NotFoundException(
@@ -132,15 +150,19 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   async update(
-    @Req() { user }, 
+    @Req() { user },
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
     @Body()
     updateRegistroLinhaDoTempoDto: RegistroInvestimentoLinhaDoTempoUpdateDto,
   ) {
-    const investimento =
-      await this.investimentoService.findOne(user.id, +investimento_id);
+    const investimento = await this.investimentoService.findOne(
+      user.id,
+      +investimento_id,
+    );
 
     if (!investimento) {
       throw new NotFoundException(
@@ -172,13 +194,17 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   async remove(
-    @Req() { user }, 
+    @Req() { user },
     @Param("investimento_id") investimento_id: string,
     @Param("id") id: string,
   ) {
-    const investimento =
-      await this.investimentoService.findOne(user.id, +investimento_id);
+    const investimento = await this.investimentoService.findOne(
+      user.id,
+      +investimento_id,
+    );
 
     if (!investimento) {
       throw new NotFoundException(

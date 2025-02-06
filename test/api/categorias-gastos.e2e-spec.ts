@@ -10,6 +10,9 @@ import { globalInterceptors } from "../../src/interceptors/globalInterceptors";
 import { runPrismaMigrations } from "../utils/run-prisma-migrations";
 import { faker } from "@faker-js/faker";
 import { CategoriaGastoUpdateDto } from "../../src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdate.dto";
+import { Usuario } from "@prisma/client";
+import { AuthService } from "../../src/modules/api/auth/auth.service";
+import { AuthModule } from "../../src/modules/api/auth/auth.module";
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -18,12 +21,15 @@ const apiGlobalPrefix = "/api/v1";
 describe("CategoriasGastosController (e2e)", () => {
   let app: INestApplication;
   let prisma: PrismaService;
+  let authService: AuthService;
+  let user: Usuario;
+  let userJwt: string;
 
   beforeAll(async () => {
     await runPrismaMigrations();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [CategoriasGastosModule],
+      imports: [CategoriasGastosModule, AuthModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -31,6 +37,16 @@ describe("CategoriasGastosController (e2e)", () => {
     app.setGlobalPrefix(apiGlobalPrefix);
 
     prisma = moduleFixture.get<PrismaService>(PrismaService);
+    authService = moduleFixture.get<AuthService>(AuthService);
+
+    user = await authService.findOrCreateUser({
+      email: faker.internet.email(),
+      name: faker.person.fullName(),
+      picture: faker.internet.url(),
+      uid: faker.string.uuid(),
+    });
+
+    userJwt = await authService.generateJwt(user);
 
     globalPipes.forEach((gp) => app.useGlobalPipes(gp));
     globalFilters.forEach((gf) => app.useGlobalFilters(gf));
@@ -45,8 +61,16 @@ describe("CategoriasGastosController (e2e)", () => {
 
   describe(`GET ${apiGlobalPrefix}/categorias-gastos`, () => {
     it("should return an array of categorias de gastos", async () => {
+      const categoria = await prisma.categoriaGasto.create({
+        data: {
+          nome: faker.string.alpha(5),
+          usuario_id: user.id,
+        },
+      });
+
       const response = await request(app.getHttpServer())
-        .get(`${apiGlobalPrefix}/categorias-gastos`)
+      .get(`${apiGlobalPrefix}/categorias-gastos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
@@ -59,12 +83,15 @@ describe("CategoriasGastosController (e2e)", () => {
         data: {
           nome: "Teste",
           soft_delete: new Date(),
+          usuario_id: user.id,
         },
       });
 
-      const response = await request(app.getHttpServer()).get(
+      const response = await request(app.getHttpServer())
+      .get(
         `${apiGlobalPrefix}/categorias-gastos`,
-      );
+      )
+      .set('Authorization', `Bearer ${userJwt}`);
 
       const result = response.body.filter((c) => c.id === categoria.id);
 
@@ -79,7 +106,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(201);
 
@@ -93,7 +121,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(400);
 
@@ -112,7 +141,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(400);
 
@@ -128,11 +158,13 @@ describe("CategoriasGastosController (e2e)", () => {
         data: {
           nome,
           soft_delete: new Date(),
+          usuario_id: user.id,
         },
       });
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send({ nome })
         .expect(201);
 
@@ -146,6 +178,7 @@ describe("CategoriasGastosController (e2e)", () => {
       await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id,
         },
       });
 
@@ -154,7 +187,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(409);
 
@@ -173,6 +207,7 @@ describe("CategoriasGastosController (e2e)", () => {
 
       await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(400);
     });
@@ -181,7 +216,8 @@ describe("CategoriasGastosController (e2e)", () => {
       const invalidCategoria = {};
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .post(`${apiGlobalPrefix}/categorias-gastos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(invalidCategoria)
         .expect(400);
 
@@ -196,6 +232,7 @@ describe("CategoriasGastosController (e2e)", () => {
         data: {
           nome,
           soft_delete: new Date(),
+          usuario_id: user.id,
         },
       });
 
@@ -205,6 +242,7 @@ describe("CategoriasGastosController (e2e)", () => {
 
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(404);
     });
@@ -214,6 +252,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id,
         },
       });
 
@@ -222,7 +261,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(200);
 
@@ -235,6 +275,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id
         },
       });
 
@@ -243,7 +284,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(200);
 
@@ -255,6 +297,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id,
         },
       });
 
@@ -263,7 +306,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(200);
 
@@ -275,6 +319,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id,
         },
       });
 
@@ -284,7 +329,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(400);
 
@@ -302,6 +348,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id,
         },
       });
 
@@ -311,7 +358,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(400);
 
@@ -328,6 +376,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/999`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .send({ nome })
         .expect(404);
     });
@@ -337,15 +386,16 @@ describe("CategoriasGastosController (e2e)", () => {
       const nome2 = faker.string.alphanumeric(6).toUpperCase();
 
       const categoriaGasto1 = await prisma.categoriaGasto.create({
-        data: { nome: nome1 },
+        data: { nome: nome1, usuario_id: user.id },
       });
 
       await prisma.categoriaGasto.create({
-        data: { nome: nome2 },
+        data: { nome: nome2, usuario_id: user.id },
       });
 
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoriaGasto1.id}`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .send({ nome: nome2 })
         .expect(409);
     });
@@ -357,11 +407,13 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id,
         },
       });
 
       const response = await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("soft_delete");
@@ -372,21 +424,25 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
+          usuario_id: user.id,
         },
       });
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
     });
 
     it("should return 404 if categoria de gasto does not exist", async () => {
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/999`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
     });
   });

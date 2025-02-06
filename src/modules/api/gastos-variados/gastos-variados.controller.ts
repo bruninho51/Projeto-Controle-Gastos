@@ -8,11 +8,13 @@ import {
   Delete,
   NotFoundException,
   Req,
+  UseGuards,
 } from "@nestjs/common";
 import { GastosVariadosService } from "./gastos-variados.service";
 import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
 import { GastoVariadoUpdateDto } from "./dtos/GastoVariadoUpdate.dto";
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiParam,
@@ -21,6 +23,7 @@ import {
 } from "@nestjs/swagger";
 import { OrcamentosService } from "../orcamentos/orcamentos.service";
 import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
 @ApiTags("Gastos Variados")
 @Controller("orcamentos/:orcamento_id/gastos-variados")
@@ -39,12 +42,17 @@ export class GastosVariadosController {
     description: "Gasto variado criado com sucesso.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+    @UseGuards(JwtAuthGuard)
   async create(
-    @Req() { user }, 
+    @Req() { user },
     @Param("orcamento_id") orcamento_id: String,
     @Body() createGastoDto: GastoVariadoCreateDto,
   ) {
-    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(
+      user.id,
+      +orcamento_id,
+    );
     const categoriaGasto = await this.categoriaGastosService.findOne(
       user.id,
       createGastoDto.categoria_id,
@@ -65,8 +73,13 @@ export class GastosVariadosController {
   @ApiOperation({ summary: "Buscar todos os gastos variados" })
   @ApiResponse({ status: 200, description: "Lista de gastos variados." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   async findAll(@Req() { user }, @Param("orcamento_id") orcamento_id: string) {
-    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(
+      user.id,
+      +orcamento_id,
+    );
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
@@ -86,12 +99,17 @@ export class GastosVariadosController {
   @ApiResponse({ status: 200, description: "Gasto variado encontrado." })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   async findOne(
-    @Req() { user }, 
+    @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
   ) {
-    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(
+      user.id,
+      +orcamento_id,
+    );
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
@@ -115,13 +133,18 @@ export class GastosVariadosController {
   })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   async update(
-    @Req() { user }, 
+    @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
     @Body() updateGastoDto: GastoVariadoUpdateDto,
   ) {
-    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(
+      user.id,
+      +orcamento_id,
+    );
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
@@ -144,12 +167,17 @@ export class GastosVariadosController {
   })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
   async remove(
-    @Req() { user }, 
+    @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
   ) {
-    const orcamento = await this.orcamentosService.findOne(user.id, +orcamento_id);
+    const orcamento = await this.orcamentosService.findOne(
+      user.id,
+      +orcamento_id,
+    );
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");

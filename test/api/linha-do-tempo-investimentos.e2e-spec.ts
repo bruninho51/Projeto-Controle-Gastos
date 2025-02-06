@@ -7,13 +7,15 @@ import { globalFilters } from "../../src/filters/global-filters";
 import { globalInterceptors } from "../../src/interceptors/globalInterceptors";
 import { runPrismaMigrations } from "../utils/run-prisma-migrations";
 import { faker } from "@faker-js/faker";
-import { CategoriaInvestimento, Investimento } from "@prisma/client";
+import { CategoriaInvestimento, Investimento, Usuario } from "@prisma/client";
 import { LinhaDoTempoInvestimentosModule } from "../../src/modules/api/linha-do-tempo-investimentos/linha-do-tempo-investimentos.module";
 import { RegistroInvestimentoLinhaDoTempoCreateDto } from "../../src/modules/api/linha-do-tempo-investimentos/dtos/RegistroInvestimentoLinhaDoTempoCreate.dto";
 import { InvestimentoCreateDto } from "../../src/modules/api/investimentos/dtos/InvestimentoCreate.dto";
 import { RegistroInvestimentoLinhaDoTempoUpdateDto } from "../../src/modules/api/linha-do-tempo-investimentos/dtos/RegistroInvestimentoLinhaDoTempoUpdate.dto";
 import { InvestimentosModule } from "../../src/modules/api/investimentos/investimentos.module";
 import { formatValue } from "../utils/format-value";
+import { AuthService } from "../../src/modules/api/auth/auth.service";
+import { AuthModule } from "../../src/modules/api/auth/auth.module";
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -22,6 +24,9 @@ const apiGlobalPrefix = "/api/v1";
 describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
   let app: INestApplication;
   let prismaService: PrismaService;
+  let authService: AuthService;
+  let user: Usuario;
+  let userJwt: string;
 
   let categoriaMock: CategoriaInvestimento;
   let investimentoMock: Investimento;
@@ -30,7 +35,7 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
     await runPrismaMigrations();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [LinhaDoTempoInvestimentosModule, InvestimentosModule],
+      imports: [LinhaDoTempoInvestimentosModule, InvestimentosModule, AuthModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -38,6 +43,16 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
     app.setGlobalPrefix(apiGlobalPrefix);
 
     prismaService = moduleFixture.get<PrismaService>(PrismaService);
+    authService = moduleFixture.get<AuthService>(AuthService);
+
+    user = await authService.findOrCreateUser({
+      email: faker.internet.email(),
+      name: faker.person.fullName(),
+      picture: faker.internet.url(),
+      uid: faker.string.uuid(),
+    });
+
+    userJwt = await authService.generateJwt(user);
 
     globalPipes.forEach((gp) => app.useGlobalPipes(gp));
     globalFilters.forEach((gf) => app.useGlobalFilters(gf));
@@ -59,6 +74,7 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         valor_inicial: faker.number
           .float({ min: 1000, max: 10000, fractionDigits: 2 })
           .toString(),
+        usuario_id: user.id,
       },
     });
   });
@@ -81,9 +97,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
@@ -102,9 +119,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(400);
 
@@ -129,9 +147,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(400);
 
@@ -153,9 +172,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(400);
 
@@ -177,7 +197,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/999/linha-do-tempo`)
+      .post(`${apiGlobalPrefix}/investimentos/999/linha-do-tempo`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(404);
 
@@ -200,14 +221,16 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const responseInvestimento = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
@@ -218,9 +241,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(404);
 
@@ -242,9 +266,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       } as RegistroInvestimentoLinhaDoTempoCreateDto;
 
       await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(400);
     });
@@ -265,7 +290,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento2 = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(investimentoMock2)
         .expect(201);
 
@@ -278,22 +304,25 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         };
 
       await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(linhaDoTempoInvestimento2)
         .expect(201);
 
       const responseInvestimentoMock = await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const responseInvestimentoMock2 = await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const investimento1Ok = responseInvestimentoMock.body.every(
@@ -321,7 +350,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(investimentoMock)
         .expect(201);
 
@@ -334,22 +364,25 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         };
 
       const linhaDoTempo = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(linhaDoTempoInvestimento)
         .expect(201);
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempo.body.id}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempo.body.id}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const responseInvestimento = await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       expect(responseInvestimento.body.length).toBe(0);
@@ -368,7 +401,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         };
 
       const response = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos/9999/linha-do-tempo`)
+      .post(`${apiGlobalPrefix}/investimentos/9999/linha-do-tempo`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(linhaDoTempoInvestimento)
         .expect(404);
 
@@ -391,14 +425,16 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const responseInvestimento = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const linhaDoTempoInvestimento: RegistroInvestimentoLinhaDoTempoCreateDto =
@@ -410,9 +446,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
         };
 
       const response = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${responseInvestimento.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(linhaDoTempoInvestimento)
         .expect(404);
 
@@ -435,18 +472,20 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body.id).toBe(linhaDoTempoId);
@@ -469,7 +508,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento2 = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(investimentoMock2)
         .expect(201);
 
@@ -481,26 +521,29 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
     });
 
     it("should return 404 if linha do tempo investimento not found", async () => {
       const response = await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/9999`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/9999`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe("Not Found");
@@ -518,24 +561,27 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
     });
 
@@ -553,7 +599,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(investimentoMock)
         .expect(201);
 
@@ -565,22 +612,25 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+      .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
-        .get(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .get(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe(
@@ -602,9 +652,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
@@ -616,9 +667,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(200);
 
@@ -638,9 +690,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
@@ -653,9 +706,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(400);
 
@@ -681,9 +735,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
@@ -702,9 +757,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(400);
 
@@ -728,9 +784,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
@@ -743,9 +800,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(200);
 
@@ -766,7 +824,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento2 = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(investimentoMock2)
         .expect(201);
 
@@ -778,9 +837,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
@@ -792,9 +852,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(404);
     });
@@ -805,9 +866,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/9999`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/9999`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(404);
     });
@@ -826,7 +888,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(investimentoMock)
         .expect(201);
 
@@ -838,16 +901,18 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+      .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const updateDto: RegistroInvestimentoLinhaDoTempoUpdateDto = {
@@ -855,9 +920,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(404);
 
@@ -878,18 +944,20 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${createResponse.body.id}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${createResponse.body.id}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const updateDto: RegistroInvestimentoLinhaDoTempoUpdateDto = {
@@ -897,9 +965,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-        .patch(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .patch(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(updateDto)
         .expect(404);
     });
@@ -918,18 +987,20 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body.soft_delete).toBeTruthy();
@@ -937,9 +1008,10 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
 
     it("should return 404 if linha do tempo not found for delete", async () => {
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/9999`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/9999`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
     });
 
@@ -955,24 +1027,27 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
     });
 
@@ -991,7 +1066,8 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(investimentoMock)
         .expect(201);
 
@@ -1003,22 +1079,25 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+      .delete(`${apiGlobalPrefix}/investimentos/${investimento.body.id}`)
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimento.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe(
@@ -1040,8 +1119,9 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const investimento2 = await request(app.getHttpServer())
-        .post(`${apiGlobalPrefix}/investimentos`)
-        .send(investimentoMock2)
+      .post(`${apiGlobalPrefix}/investimentos`)
+      .set('Authorization', `Bearer ${userJwt}`)
+      .send(investimentoMock2)
         .expect(201);
 
       const createDto: RegistroInvestimentoLinhaDoTempoCreateDto = {
@@ -1052,18 +1132,20 @@ describe("LinhaDoTempoInvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-        .post(
-          `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
-        )
+      .post(
+        `${apiGlobalPrefix}/investimentos/${investimentoMock.id}/linha-do-tempo`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .send(createDto)
         .expect(201);
 
       const linhaDoTempoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-        .delete(
-          `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo/${linhaDoTempoId}`,
-        )
+      .delete(
+        `${apiGlobalPrefix}/investimentos/${investimento2.body.id}/linha-do-tempo/${linhaDoTempoId}`,
+      )
+      .set('Authorization', `Bearer ${userJwt}`)
         .expect(404);
     });
   });

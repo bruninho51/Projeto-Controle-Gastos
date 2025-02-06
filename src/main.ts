@@ -26,6 +26,15 @@ async function bootstrap() {
     .setTitle("API de Orçamentos")
     .setDescription("A API para gerenciamento de orçamentos")
     .setVersion("1.0")
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

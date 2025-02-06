@@ -8,7 +8,10 @@ import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 export class OrcamentosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(usuarioId: number, createOrcamentoDto: OrcamentoCreateDto): Promise<Orcamento> {
+  async create(
+    usuarioId: number,
+    createOrcamentoDto: OrcamentoCreateDto,
+  ): Promise<Orcamento> {
     return await this.prisma.orcamento.create({
       data: { ...createOrcamentoDto, usuario_id: usuarioId },
     });

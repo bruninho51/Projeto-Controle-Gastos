@@ -39,7 +39,9 @@ describe("CategoriasGastosController", () => {
 
       const usuarioId = faker.number.int();
 
-      expect(await controller.findAll({ user: { id: usuarioId } })).toBe(result);
+      expect(await controller.findAll({ user: { id: usuarioId } })).toBe(
+        result,
+      );
       expect(service.findAll).toHaveBeenCalledWith(usuarioId);
     });
   });
@@ -55,8 +57,16 @@ describe("CategoriasGastosController", () => {
 
       jest.spyOn(service, "create").mockResolvedValue(result);
 
-      expect(await controller.create({ user: { id: usuarioId } }, createCategoriaDto)).toBe(result);
-      expect(service.create).toHaveBeenCalledWith(usuarioId, createCategoriaDto);
+      expect(
+        await controller.create(
+          { user: { id: usuarioId } },
+          createCategoriaDto,
+        ),
+      ).toBe(result);
+      expect(service.create).toHaveBeenCalledWith(
+        usuarioId,
+        createCategoriaDto,
+      );
     });
   });
 
@@ -70,8 +80,18 @@ describe("CategoriasGastosController", () => {
 
       jest.spyOn(service, "update").mockResolvedValue(result);
 
-      expect(await controller.update({ user: { id: usuarioId } }, id, updateCategoriaDto)).toBe(result);
-      expect(service.update).toHaveBeenCalledWith(usuarioId, id, updateCategoriaDto);
+      expect(
+        await controller.update(
+          { user: { id: usuarioId } },
+          id,
+          updateCategoriaDto,
+        ),
+      ).toBe(result);
+      expect(service.update).toHaveBeenCalledWith(
+        usuarioId,
+        id,
+        updateCategoriaDto,
+      );
     });
   });
 
@@ -84,7 +104,9 @@ describe("CategoriasGastosController", () => {
 
       jest.spyOn(service, "softDelete").mockResolvedValue(result);
 
-      expect(await controller.remove({ user: { id: usuarioId } }, id)).toBe(result);
+      expect(await controller.remove({ user: { id: usuarioId } }, id)).toBe(
+        result,
+      );
       expect(service.softDelete).toHaveBeenCalledWith(usuarioId, id);
     });
   });
