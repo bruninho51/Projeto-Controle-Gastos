@@ -13,6 +13,9 @@ export class GastosFixosService {
     createGastoDto: GastoFixoCreateDto,
   ): Promise<GastoFixo> {
     return await this.prisma.gastoFixo.create({
+      include: {
+        categoriaGasto: true,
+      },
       data: {
         ...createGastoDto,
         orcamento_id,
@@ -22,12 +25,18 @@ export class GastosFixosService {
 
   async findAll(orcamento_id: number): Promise<GastoFixo[]> {
     return this.prisma.gastoFixo.findMany({
+      include: {
+        categoriaGasto: true,
+      },
       where: { soft_delete: null, orcamento_id },
     });
   }
 
   async findOne(orcamento_id: number, id: number): Promise<GastoFixo | null> {
     return this.prisma.gastoFixo.findUnique({
+      include: {
+        categoriaGasto: true,
+      },
       where: { id, orcamento_id, soft_delete: null },
     });
   }
@@ -38,6 +47,9 @@ export class GastosFixosService {
     updateGastoDto: GastoFixoUpdateDto,
   ): Promise<GastoFixo> {
     return this.prisma.gastoFixo.update({
+      include: {
+        categoriaGasto: true,
+      },
       where: { id, orcamento_id, soft_delete: null },
       data: updateGastoDto,
     });
@@ -45,6 +57,9 @@ export class GastosFixosService {
 
   async softDelete(orcamento_id: number, id: number): Promise<GastoFixo> {
     return this.prisma.gastoFixo.update({
+      include: {
+        categoriaGasto: true,
+      },
       where: { id, orcamento_id, soft_delete: null },
       data: {
         soft_delete: new Date(),

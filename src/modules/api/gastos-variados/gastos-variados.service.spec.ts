@@ -66,6 +66,9 @@ describe("GastosVariadosService", () => {
 
       expect(result).toEqual(createdGastoVariado);
       expect(mockPrismaService.gastoVariado.create).toHaveBeenCalledWith({
+        include: {
+          categoriaGasto: true,
+        },
         data: { ...createGastoDto, orcamento_id },
       });
     });
@@ -98,6 +101,9 @@ describe("GastosVariadosService", () => {
 
       expect(result).toEqual(gastosVariados);
       expect(mockPrismaService.gastoVariado.findMany).toHaveBeenCalledWith({
+        include: {
+          categoriaGasto: true,
+        },
         where: { orcamento_id, soft_delete: null },
       });
     });
@@ -124,6 +130,9 @@ describe("GastosVariadosService", () => {
 
       expect(result).toEqual(gastoVariado);
       expect(mockPrismaService.gastoVariado.findUnique).toHaveBeenCalledWith({
+        include: {
+          categoriaGasto: true,
+        },
         where: { id: gasto_variado_id, orcamento_id, soft_delete: null },
       });
     });
@@ -138,6 +147,9 @@ describe("GastosVariadosService", () => {
 
       expect(result).toBeNull();
       expect(mockPrismaService.gastoVariado.findUnique).toHaveBeenCalledWith({
+        include: {
+          categoriaGasto: true,
+        },
         where: { id: 999, orcamento_id, soft_delete: null },
       });
     });
@@ -174,6 +186,9 @@ describe("GastosVariadosService", () => {
 
       expect(result).toEqual(updatedGastoVariado);
       expect(mockPrismaService.gastoVariado.update).toHaveBeenCalledWith({
+        include: {
+          categoriaGasto: true,
+        },
         where: { id: gasto_variado_id, orcamento_id, soft_delete: null },
         data: updateGastoDto,
       });
@@ -206,6 +221,9 @@ describe("GastosVariadosService", () => {
 
       expect(result).toEqual(softDeletedGastoVariado);
       expect(mockPrismaService.gastoVariado.update).toHaveBeenCalledWith({
+        include: {
+          categoriaGasto: true,
+        },
         where: { id: gasto_variado_id, orcamento_id, soft_delete: null },
         data: { soft_delete: expect.any(Date) },
       });

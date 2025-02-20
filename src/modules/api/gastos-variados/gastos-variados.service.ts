@@ -13,6 +13,9 @@ export class GastosVariadosService {
     createGastoDto: GastoVariadoCreateDto,
   ): Promise<GastoVariado> {
     return await this.prisma.gastoVariado.create({
+      include: {
+        categoriaGasto: true,
+      },
       data: {
         ...createGastoDto,
         orcamento_id,
@@ -22,6 +25,9 @@ export class GastosVariadosService {
 
   async findAll(orcamento_id: number): Promise<GastoVariado[]> {
     return this.prisma.gastoVariado.findMany({
+      include: {
+        categoriaGasto: true,
+      },
       where: { soft_delete: null, orcamento_id },
     });
   }
@@ -31,6 +37,9 @@ export class GastosVariadosService {
     id: number,
   ): Promise<GastoVariado | null> {
     return this.prisma.gastoVariado.findUnique({
+      include: {
+        categoriaGasto: true,
+      },
       where: { id, orcamento_id, soft_delete: null },
     });
   }
@@ -41,6 +50,9 @@ export class GastosVariadosService {
     updateGastoDto: GastoVariadoUpdateDto,
   ): Promise<GastoVariado> {
     return this.prisma.gastoVariado.update({
+      include: {
+        categoriaGasto: true,
+      },
       where: { id, orcamento_id, soft_delete: null },
       data: updateGastoDto,
     });
@@ -48,6 +60,9 @@ export class GastosVariadosService {
 
   async softDelete(orcamento_id: number, id: number): Promise<GastoVariado> {
     return this.prisma.gastoVariado.update({
+      include: {
+        categoriaGasto: true,
+      },
       where: { id, orcamento_id, soft_delete: null },
       data: {
         soft_delete: new Date(),
