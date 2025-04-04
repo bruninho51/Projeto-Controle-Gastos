@@ -7,6 +7,7 @@ import { GastosVariadosModule } from "./api/gastos-variados/gastos-variados.modu
 import { InvestimentosModule } from "./api/investimentos/investimentos.module";
 import { LinhaDoTempoInvestimentosModule } from "./api/linha-do-tempo-investimentos/linha-do-tempo-investimentos.module";
 import { AuthModule } from "./api/auth/auth.module";
+import { WebModule } from "./web/web.module";
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AuthModule } from "./api/auth/auth.module";
     InvestimentosModule,
     LinhaDoTempoInvestimentosModule,
     AuthModule,
+    WebModule,
   ],
 })
 export class AppModule {}
