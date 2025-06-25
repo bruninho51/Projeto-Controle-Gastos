@@ -2,9 +2,15 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: prisma-migrate-job
+  namespace: orcamentos-app
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
+  backoffLimit: 2
   template:
     spec:
+      restartPolicy: Never
       containers:
         - name: prisma-migrate
           image: orcamentos-app:latest
@@ -14,6 +20,5 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: app-secret
+                  name: orcamentos-api-secrets
                   key: DATABASE_URL
-      restartPolicy: Never
