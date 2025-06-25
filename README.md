@@ -103,3 +103,15 @@ Você pode rodar o seguinte comando para iniciar o servidor:
 ```bash
 npm run start:dev
 ```
+## Fluxo Kubernetes
+```
+[Traefik]
+    ↓
+[Ingress: nest-app-ingress]
+    ↓
+[Service: nest-app-service]
+    ↓
+[Pod: nest-app-xxx]
+    ↓
+[App: NestJS]
+```

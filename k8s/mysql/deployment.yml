@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mysql
+  name: mysql-deployment
+  namespace: orcamentos-app
 spec:
   replicas: 1
   selector:
