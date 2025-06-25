@@ -29,4 +29,5 @@ spec:
               mountPath: /var/lib/mysql
       volumes:
         - name: mysql-data
-          emptyDir: {}  # ⚠️ Para testes apenas. Perde os dados ao reiniciar o pod.
+          persistentVolumeClaim:
+            claimName: mysql-pvc
