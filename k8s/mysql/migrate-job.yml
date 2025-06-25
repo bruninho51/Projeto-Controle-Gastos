@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: prisma-migrate-job
+  name: migrate-job
   namespace: orcamentos-app
   annotations:
     argocd.argoproj.io/hook: PostSync
@@ -12,7 +12,7 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-        - name: prisma-migrate
+        - name: migrate-job
           image: orcamentos-app:latest
           imagePullPolicy: Never
           command: ["sh", "-c", "npx prisma migrate deploy"]
