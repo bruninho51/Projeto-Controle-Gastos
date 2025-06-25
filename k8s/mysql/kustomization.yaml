@@ -2,3 +2,4 @@ resources:
   - secrets.yml
   - deployment.yml
   - service.yml
+  - pvc.yml
