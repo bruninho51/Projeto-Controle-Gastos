@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minha-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'git@gitlab.com:bruninho51/projeto-controle-gastos.git'   # substitua pelo seu repo
+    targetRevision: HEAD
+    path: 'k8s/app'       # caminho dentro do repo para a app (exemplo)
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default   # ajuste conforme seu namespace real
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

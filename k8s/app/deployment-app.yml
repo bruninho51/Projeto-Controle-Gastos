@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nest-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nest-app
+  template:
+    metadata:
+      labels:
+        app: nest-app
+    spec:
+      containers:
+        - name: nest-app
+          image: orcamentos-app:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DATABASE_URL
