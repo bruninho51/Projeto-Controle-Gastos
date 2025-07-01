@@ -25,3 +25,15 @@ spec:
                 secretKeyRef:
                   name: orcamentos-api-secrets
                   key: DATABASE_URL
+          volumeMounts:
+            - name: firebase-cert-volume
+              mountPath: /app/firebase-cert.json
+              subPath: firebase-cert.json
+              readOnly: true
+      volumes:
+        - name: firebase-cert-volume
+          secret:
+            secretName: firebase-cert
+            items:
+              - key: firebase-cert.json
+                path: firebase-cert.json

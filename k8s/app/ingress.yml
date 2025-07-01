@@ -3,15 +3,22 @@ kind: Ingress
 metadata:
   name: orcamentos-api-ingress
   namespace: orcamentos-app
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
-  ingressClassName: traefik
+  tls:
+    - hosts:
+        - api.orcamentos.app
+      secretName: orcamentos-api-tls
   rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: orcamentos-api-service
-            port:
-              number: 80
+    - host: api.orcamentos.app
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: orcamentos-api-service
+                port:
+                  number: 80
