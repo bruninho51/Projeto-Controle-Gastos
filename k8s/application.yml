@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: 'git@gitlab.com:bruninho51/projeto-controle-gastos.git'
-    targetRevision: HEAD
+    targetRevision: main
     path: 'k8s'
     kustomize: {}
   destination:
