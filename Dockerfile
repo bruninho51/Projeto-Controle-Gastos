@@ -35,8 +35,6 @@ COPY --from=builder /app/dist ./dist
 
 RUN npx prisma generate
 
-COPY firebase-cert.json ./
-
 # Expõe a porta da aplicação
 EXPOSE 3000
 
