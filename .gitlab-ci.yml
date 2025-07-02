@@ -36,6 +36,9 @@ deploy:
     - apk add --no-cache nodejs npm git
     - npm install
     - chmod +x ./ci_cd/build.sh
+    - cd ./ci_cd
+    - ls -la
+    . cd ..
     # Torna o script executável
   script:
     # Executa semantic-release que chama automaticamente o build-and-update.sh
