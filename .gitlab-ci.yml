@@ -1,0 +1,48 @@
+image: node:20
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+stages:
+  - test
+  - deploy
+
+test:
+  stage: test
+  environment:
+    name: production
+  before_script:
+    - npm install
+  script:
+    - npm run test:cov
+  artifacts:
+    expire_in: 120 mins
+    paths:
+      - coverage/
+  only:
+    refs:
+      - main
+
+deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  environment:
+    name: production
+  before_script:
+    # Instala Node.js no container Docker
+    - apk add --no-cache nodejs npm git
+    - npm install
+    # Torna o script executável
+    - chmod +x ci_cd/build-and-update.sh
+  script:
+    # Executa semantic-release que chama automaticamente o build-and-update.sh
+    - npm run release
+  needs:
+    - job: test
+      artifacts: false
+  only:
+    refs:
+      - main

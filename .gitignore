@@ -4,3 +4,4 @@ node_modules
 dist
 firebase-cert.json
 /web
+coverage
