@@ -35,7 +35,7 @@ deploy:
     # Instala Node.js no container Docker
     - apk add --no-cache nodejs npm git
     - npm install
-    - ls -la
+    - chmod +x ./ci_cd/build.sh
     # Torna o script executável
   script:
     # Executa semantic-release que chama automaticamente o build-and-update.sh
