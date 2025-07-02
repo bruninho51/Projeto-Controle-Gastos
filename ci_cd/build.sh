@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script para: 
 # 1. Atualizar deployment.yml
@@ -24,6 +24,8 @@ if [ ! -f "$deployment_file" ]; then
     exit 1
 fi
 
+# Substituição da imagem com sed compatível com POSIX
+# Se estiver usando Alpine no CI, o sed já é compatível com -i sem sufixo
 sed -i "s|image: registry\.gitlab\.com/bruninho51/projeto-controle-gastos:.*|image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v$new_version|" "$deployment_file"
 
 if grep -q "registry\.gitlab\.com/bruninho51/projeto-controle-gastos:v$new_version" "$deployment_file"; then
@@ -38,7 +40,6 @@ echo "🐳 Fazendo build da imagem Docker..."
 image_name="registry.gitlab.com/bruninho51/projeto-controle-gastos"
 new_tag="v$new_version"
 
-# Build da imagem com a nova tag
 docker build -t "$image_name:$new_tag" .
 
 if [ $? -eq 0 ]; then
@@ -51,18 +52,16 @@ fi
 # Passo 3: Push da imagem para o registry
 echo "📤 Enviando imagem para o registry..."
 
-# Login no GitLab Container Registry (usando variáveis de ambiente do CI)
+# Login no GitLab Container Registry
 if [ -n "$CI_REGISTRY_USER" ] && [ -n "$CI_REGISTRY_PASSWORD" ]; then
     echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
 elif [ -n "$GL_TOKEN" ]; then
-    # Para teste local
     echo "$GL_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin registry.gitlab.com
 else
     echo "⚠️ Aviso: Variáveis de autenticação não encontradas. Pulando push da imagem."
     echo "ℹ️ Certifique-se de que as variáveis CI_REGISTRY_USER e CI_REGISTRY_PASSWORD estão configuradas"
 fi
 
-# Push da imagem
 docker push "$image_name:$new_tag"
 
 if [ $? -eq 0 ]; then
