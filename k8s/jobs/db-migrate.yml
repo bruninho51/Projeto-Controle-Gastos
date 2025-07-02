@@ -13,8 +13,8 @@ spec:
       restartPolicy: Never
       containers:
         - name: migrate-job
-          image: orcamentos-app:latest
-          imagePullPolicy: Never
+          image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.0.0
+          imagePullPolicy: Always
           command: ["sh", "-c", "npx prisma migrate deploy"]
           env:
             - name: DATABASE_URL
@@ -22,3 +22,5 @@ spec:
                 secretKeyRef:
                   name: orcamentos-api-secrets
                   key: DATABASE_URL
+      imagePullSecrets:
+        - name: gitlab-registry-secret
