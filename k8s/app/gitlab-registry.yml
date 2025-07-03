@@ -1,0 +1,15 @@
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: gitlab-registry-secret
+  namespace: orcamentos-app
+spec:
+  encryptedData:
+    .dockerconfigjson: AgB9aL6hANBaSxbZLi6q/TjYrVRbzfrQrNC54sXBb1rbNyxFTCbHebShSY+mkS9xOUfhLfBy3VNoZh6rxdgYMz0l+SRvCRiY9ikD5bCsYpr2e4vW/GnDmdoeCOvlJthYLsMpYTeuZ/GJNJjEn/ENw48JdG1O3Zb9PfNJF7iSnI5sm63noN/XAbTstzxgmsNzm5p25CMl6Vy/KvshJhERXVk8IVfNDHmYqT2bAMclBy7Bpz9NGesNBqJmFVhfdBqdJskN4GwwN7+hM+b4Etu04/L4LkSiTTA+XdKiwQjsH6fqR82DOJYfAavxdylWeuF83cE1tSBImavS785ECucOKXXs9wXgNcbBBBf5pzGdJZPcF3xtmKLignrLmm5AdhS4F4H3H7uHQSJuQJkgcZB0kLMvp8oDlrqXc23I8A1rC0s2xvg9MND/gNGr7v1iBVHUVPreNjr1S+Sr5jxw7vekpmGQvQruWG5jgLk2LG6vKNvmeNSJD4LR+cofPW4IuHyPqZrXN6VIGfxqerldC03kzoZcpR82C8BGL01fzy2V15PkMaXxg5bvRByRMftTB7XDsu7ne44IkhpHlb4d0+pRA/5P5PrWg36nucBdrfGHUTMruc19Zfd+EycrmYDgBM/EpKCxFabrofHJWpt5lFZohKbSKpwYcW9bxY8/ooC4OjPrk2vFoN7jJ7xHQexfVf/wmPImcPLAJMPqMIMLs9TjP2l+j/oYkU4VPozmRJKdlB4eqq7bkd1AqyKTDJ32cx5xMeGO2B26/9RZxCV/lu/Dmn3moTOCMmo8Gn7rvNavL/wnJUhDjwCWpC047DwHe9hUEEBSBKe/QYy0pPVcLgO6qUjZMX5Upj/U+yte3ThHorSsGNQWZ2+gSIeXMMcV0fep7UJ9vohsOntt8/g/60FiXfxabDOtAx10zyNPsZSaVQibkEK2s7kgBH0UuOg7+ImBPzdeADRh+EY=
+  template:
+    metadata:
+      creationTimestamp: null
+      name: gitlab-registry-secret
+      namespace: orcamentos-app
+    type: kubernetes.io/dockerconfigjson

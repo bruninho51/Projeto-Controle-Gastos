@@ -1,7 +1,8 @@
 resources:
   - namespace.yml
-  - secrets.yml
+  - env-vars.yml
   - deployment.yml
   - service.yml
   - ingress.yml
   - firebase.yml
+  - gitlab-registry.yml
