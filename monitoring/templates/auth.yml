@@ -6,9 +6,9 @@ metadata:
   namespace: monitoring
 spec:
   encryptedData:
-    grafana-password: AgCvH++D/9NDGhWA8neaX9u/Sqf/0BD5aw2wwG4IxveqX2Ozf9vhZ4Y1dDSTg1t+g7NMN2QYAiIBYxwKbuS2idAtmbbJgGSTzXlB951dPD7j4l2EChkKDKhR/yH1p9g9t8x/IcjB8hgq9Ultgvxrz3kCOWi49n0JfC99DjNnIoDviMZNRnsea>
-    prometheus-password: AgDDcGTI3/Kha/Ml0so+1fVQpsW1bpCPeSr9ZYUjk6Np/JlpupkqVRRqRjRgDAWhlYG5hox1dUKXJjnd9usEliczJ8gqqax4q3Kl9qmMZsQ7XmRs8uuz7B/xBoaAgXqstwXbgkHykz9OBDnvvsfkE3Age9C5m+yx6f56bgTWqmfvvlW0xu>
-    users: AgAr/L8q0sLrMeReXRERPOGtJmodQNeIa9F/h9qoAWTG4vwGdDtz+VbsfIX9SNq054evr/8pCS5J05dwJuAd5l8OBkkqVhR0Bmj6nQHHwLtKjT53G2RBxJp6oHCpQMtlZOeONqiSVgcgLhY2NoPtPUlMLHmfvj5x9YdQwMLr62c+RV8XEzfwdUebHc6bMFiV>
+    grafana-password: AgBI25lBluxiA/4P9AInXiBbch9WYPLulAfpQdsAszwTq7p8yicgsAgp6j2cRTILG1m3OGkg7msqUN+XZ8ws118H9pflephGi+vweeK0rLcFVknqWzameXb+jrhX30j8Hx9KiS4WqT1Ug97v/JUtHKSG63bwZwysMq+W8VW0FKwuwLtvZafwD>
+    prometheus-password: AgBJVYErCA+BNmzcy7ayKmzIKGpbB2i3nGR693+XlwxbvXUX1+DU2Jr9ic+XoD1Rp3hmdzKco+vfiucAjRNNP42v4jMJ7/SAEVLw1uOuREuezBGuLhwBBIDfS6xa5mLzpLKS6mCfahX52oXRDMAeZ79QdE5/l0lKOgjcbN/nqexVBfq3zX>
+    users: AgBQELuTq4XEJ5elDiR6Ey+UgG3+EHl9IYh4S/xy5U8EMkFNjXh5KqtqORqZAzmCOf/FFKgwFd/c7YaL+1p0zsPdB9p9tatgojqH9lJWsfWeGPBmH5OZnMhuNw9lQ5cqmZMZQ67/7ZRqIsknFeyIkfIXSDZobFaVuZ5tDVV5SGhLQlf6qn7qCzJA3LLtaRGu>
   template:
     metadata:
       creationTimestamp: null
