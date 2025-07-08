@@ -1,14 +1,25 @@
+server:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: traefik
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - prometheus.orcamentos.app
+    tls:
+      - secretName: prometheus-tls
+        hosts:
+          - prometheus.orcamentos.app
+
 alertmanager:
   enabled: true
   ingress:
     enabled: true
-    hosts:
-      - alertmanager.orcamentos.app
     annotations:
       kubernetes.io/ingress.class: traefik
-      traefik.ingress.kubernetes.io/auth-type: basic
-      traefik.ingress.kubernetes.io/auth-secret: monitoring-auth
       cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - alertmanager.orcamentos.app
     tls:
       - secretName: alertmanager-tls
         hosts:
@@ -18,32 +29,12 @@ grafana:
   enabled: true
   ingress:
     enabled: true
-    hosts:
-      - grafana.orcamentos.app
     annotations:
       kubernetes.io/ingress.class: traefik
       cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+      - grafana.orcamentos.app
     tls:
       - secretName: grafana-tls
         hosts:
           - grafana.orcamentos.app
-  admin:
-    existingSecret: monitoring-auth
-    existingSecretKey: grafana-password
-
-server:
-  ingress:
-    enabled: true
-    hosts:
-      - prometheus.orcamentos.app
-    annotations:
-      kubernetes.io/ingress.class: traefik
-      traefik.ingress.kubernetes.io/auth-type: basic
-      traefik.ingress.kubernetes.io/auth-secret: monitoring-auth
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-    tls:
-      - secretName: prometheus-tls
-        hosts:
-          - prometheus.orcamentos.app
-  service:
-    type: ClusterIP
