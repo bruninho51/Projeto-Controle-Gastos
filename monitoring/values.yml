@@ -1,0 +1,42 @@
+kube-prometheus-stack:
+  grafana:
+    enabled: true
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - grafana.orcamentos.app
+      tls:
+        - secretName: grafana-tls
+          hosts:
+            - grafana.orcamentos.app
+
+  prometheus:
+    prometheusSpec:
+      serviceMonitorSelectorNilUsesHelmValues: false
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - prometheus.orcamentos.app
+      tls:
+        - secretName: prometheus-tls
+          hosts:
+            - prometheus.orcamentos.app
+
+  alertmanager:
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - alertmanager.orcamentos.app
+      tls:
+        - secretName: alertmanager-tls
+          hosts:
+            - alertmanager.orcamentos.app
