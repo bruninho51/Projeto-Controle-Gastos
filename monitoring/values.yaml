@@ -1,6 +1,9 @@
 kube-prometheus-stack:
   grafana:
     enabled: true
+    adminUser: admin
+    existingSecret: monitoring-auth
+    existingSecretKey: grafana-password
     ingress:
       enabled: true
       annotations:
