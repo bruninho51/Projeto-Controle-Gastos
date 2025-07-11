@@ -5,5 +5,5 @@ metadata:
   namespace: monitoring
 spec:
   rateLimit:
-    average: 1
-    burst: 2
+    average: 3
+    burst: 5
