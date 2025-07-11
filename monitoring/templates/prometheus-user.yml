@@ -1,0 +1,16 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  creationTimestamp: null
+  name: prometheus-user
+  namespace: monitoring
+spec:
+  encryptedData:
+    users: AgDTSr3VArQLnkQl30T7tPG6c5J3w/+ZSAYhCDPMIa4bvMgh05/HiLCkS6dLt4P8y/yguIOZ7pUJBIVC+fessF/wAzY1aEtM6I9ommTldPeThF+nucx05IGbm543cpyLPpBtxpLacv/nZaeRh1qf+G1UycA1jn5nReSOKHR9IAeQhQjfm+JhOwTqj2QIB6f3CLkv+0Tc/Gq5+cUNynyVOJEkloPgT6p2X73VWY6jPh8eN5PLIK39Bpm3gje7b3DxKO1vHlATo5zTz3YjbKqJqKbpcEXeSx+cwUa7gxmYFrillBvhDVOrDptEh7BGJ5PPqsZA7DfJ4oWW8R2FeEF+Y4CV2d+Cp64QiDR+eodM1CoJh5MOvpNmrBrjSuEgRMhThJV6K1RdR3B/xbQgmLe9ESeLKbc1wy07f1g7VHkiym7nHTVye98NXmNj6XzLf+4HxI0zcUZHO3qnGshiTSwUNk3E4ZlIsq6jbQazXvO+79Ut91THhGcbRBiIrNpIbYjEH/TdPpGBg8Oa28pJmMBhZgUx60BcoCYUBN2JbTt+4EOaZQOg3dFvZQ2awn7pTIc4f1EjJstGioojyQEpAJ8JeqAr9qWPZIiDX1VTJS7W3M9XN6RTO9ML+vXAg1P+n4vHGVkybuM9a2pnnsWh/WjFwj6xl27V0VRSf/ztVD+p2bp08h9s6LEQFMzz7lN5KLCyjKmSGcY+vajQfxAznbMSw48wG5KP7xdYgFD1bQWza6Pfl0PoJ2j75ln5uEyV
+  template:
+    metadata:
+      creationTimestamp: null
+      name: prometheus-user
+      namespace: monitoring
+    type: Opaque
