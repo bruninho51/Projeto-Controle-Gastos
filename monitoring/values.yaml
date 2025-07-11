@@ -5,6 +5,7 @@ kube-prometheus-stack:
       existingSecret: grafana-user
       userKey: grafana-user
       passwordKey: grafana-password
+
     ingress:
       enabled: true
       annotations:
@@ -17,9 +18,20 @@ kube-prometheus-stack:
           hosts:
             - grafana.orcamentos.app
 
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: monitoring
+        label: grafana_dashboard
+        labelValue: "1"
+      datasources:
+        enabled: true
+        searchNamespace: monitoring
+
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: false
+
     ingress:
       enabled: true
       annotations:
@@ -46,3 +58,17 @@ kube-prometheus-stack:
         - secretName: alertmanager-tls
           hosts:
             - alertmanager.orcamentos.app
+
+  defaultRules:
+    create: true
+
+  dashboards:
+    enabled: true
+    default:
+      enabled: true
+
+  kubeStateMetrics:
+    enabled: true
+
+  nodeExporter:
+    enabled: true
