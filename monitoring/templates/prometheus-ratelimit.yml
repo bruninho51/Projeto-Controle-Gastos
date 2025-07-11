@@ -6,4 +6,4 @@ metadata:
 spec:
   rateLimit:
     average: 1
-    burst: 1
+    burst: 2
