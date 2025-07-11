@@ -5,5 +5,5 @@ metadata:
   namespace: monitoring
 spec:
   rateLimit:
-    average: 0.1   # 1 requisição a cada 10 segundos em média
-    burst: 1       # 1 requisição em pico
+    average: 1    # 1 requisição por segundo
+    burst: 1
