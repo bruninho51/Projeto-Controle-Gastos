@@ -5,7 +5,6 @@ kube-prometheus-stack:
       existingSecret: grafana-user
       userKey: grafana-user
       passwordKey: grafana-password
-
     ingress:
       enabled: true
       annotations:
@@ -17,21 +16,25 @@ kube-prometheus-stack:
         - secretName: grafana-tls
           hosts:
             - grafana.orcamentos.app
-
     sidecar:
       dashboards:
         enabled: true
-        searchNamespace: monitoring
+        searchNamespace: ALL  # Procurar em todos os namespaces
         label: grafana_dashboard
         labelValue: "1"
+        folder: /tmp/dashboards
+        folderAnnotation: grafana_folder
       datasources:
         enabled: true
-        searchNamespace: monitoring
+        searchNamespace: ALL  # Procurar em todos os namespaces
+
+  # Configurações importantes para dashboards padrões
+  grafana-dashboards:
+    enabled: true  # Habilitar dashboards padrões
 
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: false
-
     ingress:
       enabled: true
       annotations:
@@ -59,16 +62,16 @@ kube-prometheus-stack:
           hosts:
             - alertmanager.orcamentos.app
 
+  # Garantir que os dashboards padrões sejam criados
   defaultRules:
     create: true
-
-  dashboards:
-    enabled: true
-    default:
-      enabled: true
-
+  
+  # Esta é a seção correta para habilitar dashboards
+  grafana:
+    defaultDashboardsEnabled: true  # Adicionar esta linha
+    
   kubeStateMetrics:
     enabled: true
-
+    
   nodeExporter:
     enabled: true
