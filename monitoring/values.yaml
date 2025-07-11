@@ -1,6 +1,7 @@
 kube-prometheus-stack:
   grafana:
     enabled: true
+    defaultDashboardsEnabled: true  # Adicionar esta linha
     admin:
       existingSecret: grafana-user
       userKey: grafana-user
@@ -65,10 +66,6 @@ kube-prometheus-stack:
   # Garantir que os dashboards padrões sejam criados
   defaultRules:
     create: true
-  
-  # Esta é a seção correta para habilitar dashboards
-  grafana:
-    defaultDashboardsEnabled: true  # Adicionar esta linha
     
   kubeStateMetrics:
     enabled: true
