@@ -1,39 +1,11 @@
 kube-prometheus-stack:
-  # ===== CONFIGURAÇÕES ESPECÍFICAS PARA K3S =====
-  
-  # Desabilitar componentes que não funcionam com K3s
-  kubeEtcd:
-    enabled: false  # K3s usa SQLite, não etcd
-  
-  kubeControllerManager:
-    enabled: false  # Métricas duplicadas em K3s
-    
-  kubeScheduler:
-    enabled: false  # Métricas duplicadas em K3s
-    
-  kubeProxy:
-    enabled: false  # Métricas duplicadas em K3s
-    
-  # Desabilitar regras que não funcionam com K3s
-  defaultRules:
-    create: true
-    rules:
-      etcd: false
-      kubeControllerManager: false
-      kubeScheduler: false
-      kubeProxy: false
-      
-  # ===== CONFIGURAÇÃO DO GRAFANA =====
   grafana:
     enabled: true
+    defaultDashboardsEnabled: true  # Adicionar esta linha
     admin:
       existingSecret: grafana-user
       userKey: grafana-user
       passwordKey: grafana-password
-    
-    # Desabilitar dashboards padrões que não funcionam com K3s
-    defaultDashboardsEnabled: false
-    
     ingress:
       enabled: true
       annotations:
@@ -45,66 +17,25 @@ kube-prometheus-stack:
         - secretName: grafana-tls
           hosts:
             - grafana.orcamentos.app
-    
-    # CONFIGURAÇÃO OTIMIZADA DO SIDECAR PARA K3S
     sidecar:
       dashboards:
         enabled: true
-        searchNamespace: ALL
+        searchNamespace: ALL  # Procurar em todos os namespaces
         label: grafana_dashboard
         labelValue: "1"
-        # Configurações específicas para K3s
-        watchMethod: LIST  # LIST é mais estável que WATCH em K3s
-        resource: both
-        annotations: {}
-        reloadURL: "http://localhost:3000/api/admin/provisioning/dashboards/reload"
-        skipTlsVerify: true
-        env:
-          # Usar LIST method para evitar problemas de resource version
-          - name: METHOD
-            value: LIST
-          - name: LABEL
-            value: grafana_dashboard
-          - name: LABEL_VALUE
-            value: "1"
-          - name: FOLDER
-            value: /tmp/dashboards
-          - name: RESOURCE
-            value: both
-          # Configurações específicas para K3s SQLite backend
-          - name: LIST_INTERVAL
-            value: "60"  # Verificar a cada 60 segundos
-          - name: IGNORE_ALREADY_PROCESSED
-            value: "true"
-          - name: LOG_LEVEL
-            value: INFO
-          - name: SLEEP_TIME
-            value: "5"  # Pausa entre verificações
-            
+        folder: /tmp/dashboards
+        folderAnnotation: grafana_folder
       datasources:
         enabled: true
-        searchNamespace: ALL
-        env:
-          - name: METHOD
-            value: LIST  # Mesma configuração para datasources
+        searchNamespace: ALL  # Procurar em todos os namespaces
 
-  # ===== CONFIGURAÇÃO DO PROMETHEUS =====
+  # Configurações importantes para dashboards padrões
+  grafana-dashboards:
+    enabled: true  # Habilitar dashboards padrões
+
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: false
-      podMonitorSelectorNilUsesHelmValues: false
-      ruleSelectorNilUsesHelmValues: false
-      # Configurações para K3s
-      retention: 30d
-      storageSpec:
-        volumeClaimTemplate:
-          spec:
-            storageClassName: local-path  # K3s default storage class
-            accessModes: ["ReadWriteOnce"]
-            resources:
-              requests:
-                storage: 10Gi
-    
     ingress:
       enabled: true
       annotations:
@@ -118,18 +49,7 @@ kube-prometheus-stack:
           hosts:
             - prometheus.orcamentos.app
 
-  # ===== CONFIGURAÇÃO DO ALERTMANAGER =====
   alertmanager:
-    alertmanagerSpec:
-      storage:
-        volumeClaimTemplate:
-          spec:
-            storageClassName: local-path  # K3s default storage class
-            accessModes: ["ReadWriteOnce"]
-            resources:
-              requests:
-                storage: 2Gi
-    
     ingress:
       enabled: true
       annotations:
@@ -143,21 +63,12 @@ kube-prometheus-stack:
           hosts:
             - alertmanager.orcamentos.app
 
-  # ===== COMPONENTES HABILITADOS =====
+  # Garantir que os dashboards padrões sejam criados
+  defaultRules:
+    create: true
+    
   kubeStateMetrics:
     enabled: true
     
   nodeExporter:
     enabled: true
-    
-  # ===== CONFIGURAÇÕES ESPECÍFICAS PARA K3S =====
-  # Permitir que o Prometheus colete métricas do kubelet K3s
-  kubelet:
-    enabled: true
-    serviceMonitor:
-      # Configurações específicas para K3s
-      cAdvisorMetricRelabelings:
-        # Evitar métricas duplicadas em K3s
-        - sourceLabels: [__name__]
-          regex: '(container_cpu_usage_seconds_total|container_memory_working_set_bytes)'
-          action: keep

@@ -1,9 +1,10 @@
 apiVersion: v2
 name: monitoring
-description: Prometheus com kube-prometheus-stack (K3s compatible)
+description: Prometheus com kube-prometheus-stack
 type: application
-version: 0.2.0
+version: 0.1.0
+
 dependencies:
   - name: kube-prometheus-stack
-    version: 75.9.0
+    version: 57.0.2
     repository: https://prometheus-community.github.io/helm-charts
