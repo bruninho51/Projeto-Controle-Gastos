@@ -18,6 +18,12 @@ kube-prometheus-stack:
   
   grafana:
     enabled: true
+    persistence:
+      enabled: true
+      storageClassName: local-path
+      accessModes: 
+        - ReadWriteOnce
+      size: 1Gi
     grafana.ini:
       server:
         http_addr: 0.0.0.0
