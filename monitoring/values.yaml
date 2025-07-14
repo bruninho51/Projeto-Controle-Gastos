@@ -53,7 +53,7 @@ kube-prometheus-stack:
     sidecar:
       dashboards:
         enabled: true
-        searchNamespace: ALL
+        searchNamespace: monitoring
         label: grafana_dashboard
         labelValue: "1"
         # Configurações específicas para K3s
@@ -86,7 +86,7 @@ kube-prometheus-stack:
             
       datasources:
         enabled: true
-        searchNamespace: ALL
+        searchNamespace: monitoring
         env:
           - name: METHOD
             value: LIST  # Mesma configuração para datasources
