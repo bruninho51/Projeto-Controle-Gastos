@@ -26,6 +26,9 @@ kube-prometheus-stack:
   # ===== CONFIGURAÇÃO DO GRAFANA =====
   grafana:
     enabled: true
+    grafana.ini:
+      server:
+        http_addr: 0.0.0.0
     admin:
       existingSecret: grafana-user
       userKey: grafana-user
