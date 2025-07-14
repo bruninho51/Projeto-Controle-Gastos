@@ -1,20 +1,14 @@
 kube-prometheus-stack:
-  # ===== CONFIGURAÇÕES ESPECÍFICAS PARA K3S =====
-  
-  # Desabilitar componentes que não funcionam com K3s
+  # ===== K3S COMPONENTS DISABLED =====
   kubeEtcd:
-    enabled: false  # K3s usa SQLite, não etcd
-  
+    enabled: false
   kubeControllerManager:
-    enabled: false  # Métricas duplicadas em K3s
-    
+    enabled: false
   kubeScheduler:
-    enabled: false  # Métricas duplicadas em K3s
-    
+    enabled: false
   kubeProxy:
-    enabled: false  # Métricas duplicadas em K3s
-    
-  # Desabilitar regras que não funcionam com K3s
+    enabled: false
+  
   defaultRules:
     create: true
     rules:
@@ -22,8 +16,8 @@ kube-prometheus-stack:
       kubeControllerManager: false
       kubeScheduler: false
       kubeProxy: false
-      
-  # ===== CONFIGURAÇÃO DO GRAFANA =====
+  
+  # ===== GRAFANA CONFIGURATION =====
   grafana:
     enabled: true
     grafana.ini:
@@ -33,9 +27,18 @@ kube-prometheus-stack:
       existingSecret: grafana-user
       userKey: grafana-user
       passwordKey: grafana-password
-    
-    # Desabilitar dashboards padrões que não funcionam com K3s
     defaultDashboardsEnabled: true
+    
+    # ===== SIDECAR CONFIGURATION (CORRIGIDO) =====
+    sidecar:
+      dashboards:
+        enabled: false  # Desabilitado para evitar crashes em K3s
+      datasources:
+        enabled: true
+        searchNamespace: monitoring
+        env:
+          - name: METHOD
+            value: LIST
     
     ingress:
       enabled: true
@@ -48,72 +51,18 @@ kube-prometheus-stack:
         - secretName: grafana-tls
           hosts:
             - grafana.orcamentos.app
-
-  sidecar:
-    dashboards:
-      enabled: true
-      searchNamespace: monitoring
-      label: grafana_dashboard
-      labelValue: "1"
-      watchMethod: LIST
-      resource: configmap
-      # Recursos adequados
-      resources:
-        limits:
-          cpu: 200m
-          memory: 256Mi
-        requests:
-          cpu: 100m
-          memory: 128Mi
-      env:
-        - name: METHOD
-          value: LIST
-        - name: LABEL
-          value: grafana_dashboard
-        - name: LABEL_VALUE
-          value: "1"
-        - name: FOLDER
-          value: /tmp/dashboards
-        - name: RESOURCE
-          value: configmap
-        - name: LIST_INTERVAL
-          value: "600"  # 10 minutos - bem longo para evitar conflitos
-        - name: IGNORE_ALREADY_PROCESSED
-          value: "true"
-        - name: LOG_LEVEL
-          value: INFO
-        - name: SLEEP_TIME
-          value: "30"  # Pausa longa entre verificações
-        # CRUCIAL para K3s: desabilitar resource version tracking
-        - name: SKIP_TLS_VERIFY
-          value: "true"
-        - name: REQ_TIMEOUT
-          value: "60"
-        # Força reinício completo da lista a cada iteração
-        - name: REQ_RETRY_TOTAL
-          value: "3"
-        - name: REQ_RETRY_CONNECT
-          value: "3"
-            
-      datasources:
-        enabled: true
-        searchNamespace: monitoring
-        env:
-          - name: METHOD
-            value: LIST  # Mesma configuração para datasources
-
-  # ===== CONFIGURAÇÃO DO PROMETHEUS =====
+  
+  # ===== PROMETHEUS CONFIGURATION =====
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
       ruleSelectorNilUsesHelmValues: false
-      # Configurações para K3s
       retention: 30d
       storageSpec:
         volumeClaimTemplate:
           spec:
-            storageClassName: local-path  # K3s default storage class
+            storageClassName: local-path
             accessModes: ["ReadWriteOnce"]
             resources:
               requests:
@@ -131,14 +80,14 @@ kube-prometheus-stack:
         - secretName: prometheus-tls
           hosts:
             - prometheus.orcamentos.app
-
-  # ===== CONFIGURAÇÃO DO ALERTMANAGER =====
+  
+  # ===== ALERTMANAGER CONFIGURATION =====
   alertmanager:
     alertmanagerSpec:
       storage:
         volumeClaimTemplate:
           spec:
-            storageClassName: local-path  # K3s default storage class
+            storageClassName: local-path
             accessModes: ["ReadWriteOnce"]
             resources:
               requests:
@@ -156,11 +105,11 @@ kube-prometheus-stack:
         - secretName: alertmanager-tls
           hosts:
             - alertmanager.orcamentos.app
-
-  # ===== COMPONENTES HABILITADOS =====
+  
+  # ===== ADDITIONAL COMPONENTS =====
   kubeStateMetrics:
     enabled: true
-    
+  
   nodeExporter:
     enabled: true
     hostNetwork: true
@@ -171,15 +120,11 @@ kube-prometheus-stack:
     serviceMonitor:
       enabled: true
       jobLabel: jobLabel
-    
-  # ===== CONFIGURAÇÕES ESPECÍFICAS PARA K3S =====
-  # Permitir que o Prometheus colete métricas do kubelet K3s
+  
   kubelet:
     enabled: true
     serviceMonitor:
-      # Configurações específicas para K3s
       cAdvisorMetricRelabelings:
-        # Evitar métricas duplicadas em K3s
         - sourceLabels: [__name__]
           regex: '(container_cpu_usage_seconds_total|container_memory_working_set_bytes)'
           action: keep
