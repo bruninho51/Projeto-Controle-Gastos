@@ -163,6 +163,14 @@ kube-prometheus-stack:
     
   nodeExporter:
     enabled: true
+    hostNetwork: true
+    hostPID: true
+    securityContext:
+      runAsNonRoot: false
+      runAsUser: 0
+    serviceMonitor:
+      enabled: true
+      jobLabel: jobLabel
     
   # ===== CONFIGURAÇÕES ESPECÍFICAS PARA K3S =====
   # Permitir que o Prometheus colete métricas do kubelet K3s
