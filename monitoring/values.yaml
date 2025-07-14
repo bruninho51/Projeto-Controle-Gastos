@@ -1,5 +1,4 @@
 kube-prometheus-stack:
-  # ===== K3S COMPONENTS DISABLED =====
   kubeEtcd:
     enabled: false
   kubeControllerManager:
@@ -17,7 +16,6 @@ kube-prometheus-stack:
       kubeScheduler: false
       kubeProxy: false
   
-  # ===== GRAFANA CONFIGURATION =====
   grafana:
     enabled: true
     grafana.ini:
@@ -29,10 +27,9 @@ kube-prometheus-stack:
       passwordKey: grafana-password
     defaultDashboardsEnabled: true
     
-    # ===== SIDECAR CONFIGURATION (CORRIGIDO) =====
     sidecar:
       dashboards:
-        enabled: false  # Desabilitado para evitar crashes em K3s
+        enabled: false
       datasources:
         enabled: true
         searchNamespace: monitoring
@@ -52,7 +49,6 @@ kube-prometheus-stack:
           hosts:
             - grafana.orcamentos.app
   
-  # ===== PROMETHEUS CONFIGURATION =====
   prometheus:
     prometheusSpec:
       serviceMonitorSelectorNilUsesHelmValues: false
@@ -81,7 +77,6 @@ kube-prometheus-stack:
           hosts:
             - prometheus.orcamentos.app
   
-  # ===== ALERTMANAGER CONFIGURATION =====
   alertmanager:
     alertmanagerSpec:
       storage:
@@ -106,7 +101,6 @@ kube-prometheus-stack:
           hosts:
             - alertmanager.orcamentos.app
   
-  # ===== ADDITIONAL COMPONENTS =====
   kubeStateMetrics:
     enabled: true
   
