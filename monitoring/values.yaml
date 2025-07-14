@@ -35,7 +35,7 @@ kube-prometheus-stack:
       passwordKey: grafana-password
     
     # Desabilitar dashboards padrões que não funcionam com K3s
-    defaultDashboardsEnabled: false
+    defaultDashboardsEnabled: true
     
     ingress:
       enabled: true
