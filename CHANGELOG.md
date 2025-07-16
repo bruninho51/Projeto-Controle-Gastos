@@ -1,3 +1,10 @@
+## [1.0.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.0.0...v1.0.1) (2025-07-16)
+
+
+### Bug Fixes
+
+* abilita patch ([ada75f8](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/ada75f8d8cfd269a6fdd490b5eac3001c48f8530))
+
 # 1.0.0 (2025-07-02)
 
 
