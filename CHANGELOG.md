@@ -1,3 +1,10 @@
+# [1.2.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.1.0...v1.2.0) (2025-07-28)
+
+
+### Features
+
+* adiciona modulo de monitoração ([ac6e25e](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/ac6e25e80acfd71e294b1181ec20a4f4f49ed4b2))
+
 # [1.1.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.0.1...v1.1.0) (2025-07-28)
 
 
