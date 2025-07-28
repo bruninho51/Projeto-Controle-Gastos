@@ -6,7 +6,7 @@ import { join } from 'path';
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'web'),
-      exclude: ['/api*'],
+      exclude: ['/api*', '/metrics'],
     }),
   ],
   controllers: [],
