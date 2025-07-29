@@ -5,24 +5,24 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
 
 stages:
-#  - test
+  - test
   - deploy
 
-#test:
-#  stage: test
-#  environment:
-#    name: production
-#  before_script:
-#    - npm install
-#  script:
-#    - npm run test:cov
-#  artifacts:
-#    expire_in: 120 mins
-#    paths:
-#      - coverage/
-#  only:
-#    refs:
-#      - main
+test:
+  stage: test
+  environment:
+    name: production
+  before_script:
+    - npm install
+  script:
+    - npm run test:cov
+  artifacts:
+    expire_in: 120 mins
+    paths:
+      - coverage/
+  only:
+    refs:
+      - main
 
 deploy:
   stage: deploy
@@ -32,20 +32,18 @@ deploy:
   environment:
     name: production
   before_script:
-    # Instala Node.js no container Docker
     - apk add --no-cache nodejs npm git
     - npm install
     - chmod +x ./ci_cd/build.sh
     - cd ./ci_cd
     - ls -la
     - cd ..
-    # Torna o script executável
   script:
-    # Executa semantic-release que chama automaticamente o build-and-update.sh
+    # Executa semantic-release que chama automaticamente o build.sh
     - npm run release
-#  needs:
-#    - job: test
-#      artifacts: false
+  needs:
+    - job: test
+      artifacts: false
   only:
     refs:
       - main
