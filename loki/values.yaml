@@ -1,0 +1,33 @@
+loki:
+  auth_enabled: false
+
+  persistence:
+    enabled: true
+    storageClassName: local-path
+    accessModes: [ "ReadWriteOnce" ]
+    size: 5Gi
+
+  config:
+    table_manager:
+      retention_deletes_enabled: true
+      retention_period: 168h  # 7 dias
+
+promtail:
+  enabled: true
+  config:
+    clients:
+      - url: http://loki:3100/loki/api/v1/push
+    snippets:
+      pipelineStages:
+        - docker: {}
+        - cri: {}
+        - match:
+            selector: '{app!="", namespace!=""}'
+            stages:
+              - regex:
+                  expression: '.*'
+              - labeldrop:
+                  - filename
+
+grafana:
+  enabled: false
