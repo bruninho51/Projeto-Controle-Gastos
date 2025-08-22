@@ -15,7 +15,7 @@ server:
   service:
     type: ClusterIP         # ClusterIP é suficiente para Ingress
   extraEnvironmentVars:
-    VAULT_API_ADDR: "https://vault.meu-dominio.com"
+    VAULT_API_ADDR: "https://vault.orcamentos.app"
 
 # Ingress com TLS via cert-manager
 ingress:
@@ -24,13 +24,13 @@ ingress:
     kubernetes.io/ingress.class: traefik
     cert-manager.io/cluster-issuer: letsencrypt-prod
   hosts:
-    - host: vault.meu-dominio.com
+    - host: vault.orcamentos.app
       paths:
         - path: /
           pathType: Prefix
   tls:
     - hosts:
-        - vault.meu-dominio.com
+        - vault.orcamentos.app
       secretName: vault-tls
 
 # Desativando Vault Agent Injector
