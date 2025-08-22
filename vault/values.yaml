@@ -1,0 +1,38 @@
+# Vault Standalone Production
+server:
+  dev:
+    enabled: false          # modo dev desativado
+  ha:
+    enabled: false          # sem HA (1 instância)
+  standalone:
+    enabled: true           # instância única
+  ui:
+    enabled: true           # habilita Web UI
+  dataStorage:
+    enabled: true           # habilita PersistentVolume
+    size: 5Gi               # tamanho do volume
+    storageClass: "standard" # ajuste conforme seu cluster
+  service:
+    type: ClusterIP         # ClusterIP é suficiente para Ingress
+  extraEnvironmentVars:
+    VAULT_API_ADDR: "https://vault.meu-dominio.com"
+
+# Ingress com TLS via cert-manager
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: vault.meu-dominio.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - vault.meu-dominio.com
+      secretName: vault-tls
+
+# Desativando Vault Agent Injector
+injector:
+  enabled: false
