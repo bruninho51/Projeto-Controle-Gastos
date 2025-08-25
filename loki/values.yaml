@@ -7,12 +7,13 @@ loki:
     accessModes: [ "ReadWriteOnce" ]
     size: 5Gi
 
+  limits_config:
+    volume_enabled: true
+
   config:
     table_manager:
       retention_deletes_enabled: true
       retention_period: 168h  # 7 dias
-    limits_config:
-      volume_enabled: true
 
 promtail:
   enabled: true
