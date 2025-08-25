@@ -11,6 +11,8 @@ loki:
     table_manager:
       retention_deletes_enabled: true
       retention_period: 168h  # 7 dias
+    limits_config:
+      volume_enabled: true
 
 promtail:
   enabled: true
