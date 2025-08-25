@@ -1,3 +1,15 @@
+# [1.3.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.2.0...v1.3.0) (2025-08-25)
+
+
+### Bug Fixes
+
+* corrige nome de dominio ([2556866](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/2556866edfd1317bdfb3e12d3a3f7931fad4df90))
+
+
+### Features
+
+* adiciona vault ([690fb00](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/690fb003d7ffb2540532423b6a5433a88fbcdf23))
+
 # [1.2.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.1.0...v1.2.0) (2025-07-28)
 
 
