@@ -1,3 +1,10 @@
+# [1.7.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.6.0...v1.7.0) (2025-10-06)
+
+
+### Features
+
+* adiciona entrypoint no Dockerfile ([70439f7](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/70439f7ba59213f043723fcc47ef2b30ad1472e2))
+
 # [1.6.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.5.0...v1.6.0) (2025-10-06)
 
 
