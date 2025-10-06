@@ -22,11 +22,6 @@ spec:
           {{ $key }}={{ $value }}
           {{- end }}
           {{- end }}
-        vault.hashicorp.com/agent-inject-secret-firebase-cert.json: "secret/data/firebase-cert"
-        vault.hashicorp.com/agent-inject-template-firebase-cert.json: |
-          {{- with secret "secret/data/firebase-cert" -}}
-          {{ .Data.data.content }}
-          {{- end }}
         vault.hashicorp.com/agent-pre-populate-only: "true"
     spec:
       containers:
