@@ -5,8 +5,8 @@ import { globalFilters } from "./filters/global-filters";
 import { globalPipes } from "./pipes/globalPipes";
 import { globalInterceptors } from "./interceptors/globalInterceptors";
 import { Registry } from "prom-client";
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path';
+import * as fs from 'fs';
 
 // --------------------------
   // 🔹 Verificar .env
