@@ -22,7 +22,6 @@ spec:
           {{ $key }}={{ $value }}
           {{- end }}
           {{- end }}
-        vault.hashicorp.com/agent-pre-populate-only: "true"
     spec:
       containers:
         - name: orcamentos-api
