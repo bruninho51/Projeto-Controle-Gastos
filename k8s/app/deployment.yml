@@ -22,7 +22,7 @@ spec:
           {{ $key }}={{ $value }}
           {{- end }}
           {{- end }}
-        vault.hashicorp.com/agent-inject-file-.env: "/app/.env"
+        vault.hashicorp.com/agent-inject-file-.env: "/app/dist/.env"
     spec:
       containers:
         - name: orcamentos-api
