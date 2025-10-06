@@ -5,8 +5,20 @@ import { globalFilters } from "./filters/global-filters";
 import { globalPipes } from "./pipes/globalPipes";
 import { globalInterceptors } from "./interceptors/globalInterceptors";
 import { Registry } from "prom-client";
-import * as fs from 'fs';
-import * as path from 'path';
+import path from 'path';
+import fs from 'fs';
+
+// --------------------------
+  // 🔹 Verificar .env
+  const envPath = path.resolve('/app/.env'); // caminho onde Vault Agent deve injetar
+  if (fs.existsSync(envPath)) {
+    console.log('--- Arquivo .env encontrado ---');
+    const content = fs.readFileSync(envPath, 'utf-8');
+    console.log(content);
+  } else {
+    console.warn('.env não encontrado em /app/.env');
+  }
+  // --------------------------
 
 async function bootstrap() {
   const apiGlobalPrefix = "/api/v1";
@@ -56,18 +68,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(`${apiGlobalPrefix}/docs`, app, document);
-
-  // --------------------------
-  // 🔹 Verificar .env
-  const envPath = path.resolve('/app/.env'); // caminho onde Vault Agent deve injetar
-  if (fs.existsSync(envPath)) {
-    console.log('--- Arquivo .env encontrado ---');
-    const content = fs.readFileSync(envPath, 'utf-8');
-    console.log(content);
-  } else {
-    console.warn('.env não encontrado em /app/.env');
-  }
-  // --------------------------
 
   await app.listen(process.env.PORT ?? 3000);
 }
