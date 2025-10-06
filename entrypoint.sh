@@ -1,25 +1,11 @@
 #!/bin/sh
 set -e
 
-echo "🚀 Configurando ambiente..."
+# Carrega variáveis de ambiente do Vault se existir
+[ -f /vault/secrets/config ] && . /vault/secrets/config
 
-# Cria link simbólico se o arquivo existir
-create_link() {
-  SOURCE=$1
-  TARGET=$2
-  
-  if [ -f "$SOURCE" ]; then
-    ln -sf "$SOURCE" "$TARGET"
-    echo "✅ Link criado: $TARGET -> $SOURCE"
-  fi
-}
+# Link do Firebase
+[ -f /vault/secrets/firebase-cert.json ] && ln -sf /vault/secrets/firebase-cert.json /app/firebase-cert.json
 
-# Cria os links
-create_link "/vault/secrets/.env" "/app/.env"
-create_link "/vault/secrets/firebase-cert.json" "/app/firebase-cert.json"
-
-echo "🎯 Iniciando aplicação..."
-echo ""
-
-# Executa o comando original
+# Executa o comando do container
 exec "$@"
