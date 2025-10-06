@@ -8,7 +8,9 @@ import { Registry } from "prom-client";
 import path from 'path';
 import fs from 'fs';
 
-// --------------------------
+async function bootstrap() {
+
+  // --------------------------
   // 🔹 Verificar .env
   const envPath = path.resolve('/app/.env'); // caminho onde Vault Agent deve injetar
   if (fs.existsSync(envPath)) {
@@ -20,7 +22,6 @@ import fs from 'fs';
   }
   // --------------------------
 
-async function bootstrap() {
   const apiGlobalPrefix = "/api/v1";
 
   const app = await NestFactory.create(AppModule);
