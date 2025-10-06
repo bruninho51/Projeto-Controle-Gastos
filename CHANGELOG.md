@@ -1,3 +1,10 @@
+## [1.3.2](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.3.1...v1.3.2) (2025-10-06)
+
+
+### Bug Fixes
+
+* testa vault agent injector ([313ad93](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/313ad9322bc921d2c8c1165c7037ffda65dc3737))
+
 ## [1.3.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.3.0...v1.3.1) (2025-10-06)
 
 
