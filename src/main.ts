@@ -1,16 +1,14 @@
-import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./modules/app.module";
-import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
-import { globalFilters } from "./filters/global-filters";
-import { globalPipes } from "./pipes/globalPipes";
-import { globalInterceptors } from "./interceptors/globalInterceptors";
-import { Registry } from "prom-client";
+//import { NestFactory } from "@nestjs/core";
+//import { AppModule } from "./modules/app.module";
+//import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+//import { globalFilters } from "./filters/global-filters";
+//import { globalPipes } from "./pipes/globalPipes";
+//import { globalInterceptors } from "./interceptors/globalInterceptors";
+//import { Registry } from "prom-client";
 import path from 'path';
 import fs from 'fs';
 
-async function bootstrap() {
-
-  // --------------------------
+// --------------------------
   // 🔹 Verificar .env
   const envPath = path.resolve('/app/.env'); // caminho onde Vault Agent deve injetar
   if (fs.existsSync(envPath)) {
@@ -20,8 +18,10 @@ async function bootstrap() {
   } else {
     console.warn('.env não encontrado em /app/.env');
   }
+  process.exit(1);
   // --------------------------
 
+/*async function bootstrap() {
   const apiGlobalPrefix = "/api/v1";
 
   const app = await NestFactory.create(AppModule);
@@ -73,4 +73,4 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 
-bootstrap();
+bootstrap();*/
