@@ -1,6 +1,5 @@
 # Etapa 1 — build com Prisma + devDependencies
 FROM node:20-alpine AS builder
-
 WORKDIR /app
 
 # Copia arquivos de dependência
@@ -17,10 +16,8 @@ RUN npx prisma generate
 COPY . .
 RUN npm run build
 
-
 # Etapa 2 — imagem final com apenas dependências de produção
 FROM node:20-alpine
-
 WORKDIR /app
 
 # Copia apenas arquivos necessários
@@ -32,11 +29,17 @@ RUN npm install --production
 # Copia o Prisma Client já gerado e o build final
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
-
 RUN npx prisma generate
+
+# Copia o entrypoint
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Expõe a porta da aplicação
 EXPOSE 3000
 
-# Comando para iniciar
+# Define o entrypoint
+ENTRYPOINT ["entrypoint.sh"]
+
+# Comando padrão
 CMD ["node", "dist/src/main.js"]

@@ -15,41 +15,25 @@ spec:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "orcamentos-api-role"
-        vault.hashicorp.com/agent-inject-secret-config: "secret/data/orcamentos-api"
-        vault.hashicorp.com/agent-inject-template-config: |
+        vault.hashicorp.com/agent-inject-secret-.env: "secret/data/orcamentos-api"
+        vault.hashicorp.com/agent-inject-template-.env: |
           {{- with secret "secret/data/orcamentos-api" -}}
           {{- range $key, $value := .Data.data }}
-          export {{ $key }}="{{ $value }}"
+          {{ $key }}={{ $value }}
           {{- end }}
+          {{- end }}
+        vault.hashicorp.com/agent-inject-secret-firebase-cert.json: "secret/data/firebase-cert"
+        vault.hashicorp.com/agent-inject-template-firebase-cert.json: |
+          {{- with secret "secret/data/firebase-cert" -}}
+          {{ .Data.data.content }}
           {{- end }}
         vault.hashicorp.com/agent-pre-populate-only: "true"
     spec:
       containers:
         - name: orcamentos-api
-          image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.3.2
+          image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.3.3
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          # Alpine usa /bin/sh, não bash
-          command: ["/bin/sh"]
-          args:
-            - "-c"
-            - |
-              # Carrega variáveis do Vault (usa . ao invés de source)
-              . /vault/secrets/config
-              # Inicia a aplicação
-              exec node dist/src/main.js
-          volumeMounts:
-            - name: firebase-cert-volume
-              mountPath: /app/firebase-cert.json
-              subPath: firebase-cert.json
-              readOnly: true
       imagePullSecrets:
         - name: gitlab-registry-secret
-      volumes:
-        - name: firebase-cert-volume
-          secret:
-            secretName: firebase-cert
-            items:
-              - key: firebase-cert.json
-                path: firebase-cert.json
