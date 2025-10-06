@@ -13,7 +13,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: migrate-job
-          image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.5.0
+          image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.6.0
           imagePullPolicy: Always
           command: ["sh", "-c", "npx prisma migrate deploy"]
           env:
