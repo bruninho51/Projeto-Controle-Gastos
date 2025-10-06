@@ -3,6 +3,17 @@ kind: Deployment
 metadata:
   name: orcamentos-api-deployment
   namespace: orcamentos-app
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "orcamentos-api-role"
+    vault.hashicorp.com/agent-inject-secret-.env: "secret/data/orcamentos-api"
+    vault.hashicorp.com/agent-inject-template-.env: |
+      {{- with secret "secret/data/orcamentos-api" -}}
+      {{- range $key, $value := .Data.data }}
+      {{ $key }}={{ $value }}
+      {{- end }}
+      {{- end }}
+    vault.hashicorp.com/agent-inject-file-.env: "/app/.env"
 spec:
   replicas: 1
   selector:
@@ -19,12 +30,6 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: orcamentos-api-env-vars
-                  key: DATABASE_URL
           volumeMounts:
             - name: firebase-cert-volume
               mountPath: /app/firebase-cert.json
