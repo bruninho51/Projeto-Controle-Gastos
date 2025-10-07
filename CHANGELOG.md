@@ -1,3 +1,10 @@
+# [1.9.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.8.0...v1.9.0) (2025-10-07)
+
+
+### Features
+
+* adiciona o campo data_venc no gasto fixo ([c46980d](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/c46980da4f5ca5e87e75dcb967951605f96502c7))
+
 # [1.8.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.7.0...v1.8.0) (2025-10-06)
 
 
