@@ -78,6 +78,7 @@ describe("GastosFixosController", () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
+        data_venc: faker.date.future(),
         previsto: faker.number
           .float({ min: 100, max: 9999, fractionDigits: 2 })
           .toString(),
@@ -119,6 +120,7 @@ describe("GastosFixosController", () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
+        data_venc: faker.date.future(),
         previsto: faker.number
           .float({ min: 100, max: 9999, fractionDigits: 2 })
           .toString(),
@@ -159,6 +161,7 @@ describe("GastosFixosController", () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
+        data_venc: faker.date.future(),
         previsto: faker.number
           .float({ min: 100, max: 9999, fractionDigits: 2 })
           .toString(),
@@ -197,6 +200,7 @@ describe("GastosFixosController", () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
+        data_venc: faker.date.future(),
         previsto: faker.number
           .float({ min: 100, max: 9999, fractionDigits: 2 })
           .toString(),
@@ -236,6 +240,7 @@ describe("GastosFixosController", () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
+        data_venc: faker.date.future(),
         previsto: faker.number
           .float({ min: 100, max: 9999, fractionDigits: 2 })
           .toString(),
@@ -351,6 +356,7 @@ describe("GastosFixosController", () => {
         id: gasto_fixo_id,
         descricao: "Aluguel",
         previsto: "1200.00",
+        data_venc: faker.date.future(),
       };
 
       const orcamentoDto = { id: faker.number.int() };
@@ -527,6 +533,7 @@ describe("GastosFixosController", () => {
       const updateGastoDto: GastoFixoUpdateDto = {
         descricao: "Aluguel Atualizado",
         previsto: "1300.00",
+        data_venc: faker.date.future(),
       };
 
       const updatedGasto = {
@@ -564,6 +571,7 @@ describe("GastosFixosController", () => {
         id: gasto_fixo_id,
         descricao: "Aluguel",
         previsto: "1200.00",
+        data_venc: faker.date.future(),
       };
 
       const orcamentoDto = { id: faker.number.int() };
@@ -594,6 +602,7 @@ describe("GastosFixosController", () => {
         id: gasto_fixo_id,
         descricao: "Aluguel",
         previsto: "1200.00",
+        data_venc: faker.date.future(),
       };
 
       const orcamentoDto = { id: faker.number.int() };
@@ -623,6 +632,7 @@ describe("GastosFixosController", () => {
         id: gasto_fixo_id,
         descricao: "Aluguel",
         previsto: "1200.00",
+        data_venc: faker.date.future(),
       };
 
       const orcamentoDto = null;

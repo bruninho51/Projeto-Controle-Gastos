@@ -94,18 +94,59 @@ describe("GastosFixosController (v1) (E2E)", () => {
           .toString(),
         categoria_id: categoriaMock.id,
       };
-
+    
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .set('Authorization', `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
-
+    
       expect(response.body).toHaveProperty("id");
       expect(response.body.descricao).toBe(createGastoDto.descricao);
       expect(response.body.previsto).toBe(createGastoDto.previsto);
       expect(response.body.categoria_id).toBe(createGastoDto.categoria_id);
       expect(response.body.orcamento_id).toBe(orcamentoMock.id);
+    });
+
+    it("should create a new gasto fixo with data_venc hour set to 00:00:00", async () => {
+      // Cria uma data com hora qualquer
+      const dataVenc = faker.date.future();
+    
+      const createGastoDto: GastoFixoCreateDto = {
+        descricao: faker.string.alphanumeric(5),
+        previsto: faker.number
+          .float({ min: 1, max: 50, fractionDigits: 2 })
+          .toString(),
+        data_venc: dataVenc,
+        categoria_id: categoriaMock.id,
+      };
+    
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .set('Authorization', `Bearer ${userJwt}`)
+        .send(createGastoDto)
+        .expect(201);
+    
+      // Verifica campos básicos
+      expect(response.body).toHaveProperty("id");
+      expect(response.body.descricao).toBe(createGastoDto.descricao);
+      expect(response.body.previsto).toBe(createGastoDto.previsto);
+      expect(response.body.categoria_id).toBe(createGastoDto.categoria_id);
+      expect(response.body.orcamento_id).toBe(orcamentoMock.id);
+    
+      // Converte a data retornada para Date
+      const returnedDate = new Date(response.body.data_venc);
+    
+      // ✅ Compara apenas ano, mês e dia em UTC para ignorar fuso horário
+      expect(returnedDate.getUTCFullYear()).toBe(dataVenc.getUTCFullYear());
+      expect(returnedDate.getUTCMonth()).toBe(dataVenc.getUTCMonth());
+      expect(returnedDate.getUTCDate()).toBe(dataVenc.getUTCDate());
+    
+      // ✅ Verifica se a hora foi zerada
+      expect(returnedDate.getUTCHours()).toBe(0);
+      expect(returnedDate.getUTCMinutes()).toBe(0);
+      expect(returnedDate.getUTCSeconds()).toBe(0);
+      expect(returnedDate.getUTCMilliseconds()).toBe(0);
     });
 
     it("should return 400 with correct messages when create a new gasto fixo when all fields as null", async () => {
@@ -114,6 +155,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         previsto: null,
         categoria_id: null,
         observacoes: null,
+        data_venc: null,
       };
 
       const response = await request(app.getHttpServer())
@@ -142,6 +184,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
           max: 999,
         }) as unknown as string,
         previsto: faker.string.alpha(5),
+        data_venc: faker.string.alpha(5) as unknown as Date,
         categoria_id: faker.string.alpha(5) as unknown as number,
         observacoes: faker.number.int() as unknown as string,
       };
@@ -160,6 +203,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         "previsto is not a valid decimal number.",
         "categoria_id must be an integer number",
         "observacoes must be a string",
+        "data_venc must be a Date instance"
       ]);
     });
 
@@ -688,6 +732,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         categoria_id: null,
         data_pgto: null,
         data_inatividade: null,
+        data_venc: null,
         observacoes: null,
       };
 
@@ -739,6 +784,10 @@ describe("GastosFixosController (v1) (E2E)", () => {
         categoria_id: faker.string.alpha(5) as unknown as number,
         data_pgto: faker.number.int({ min: 100, max: 999 }) as unknown as Date,
         data_inatividade: faker.number.int({
+          min: 100,
+          max: 999,
+        }) as unknown as Date,
+        data_venc: faker.number.int({
           min: 100,
           max: 999,
         }) as unknown as Date,

@@ -46,6 +46,15 @@ export class GastoFixoUpdateDto {
   })
   data_pgto?: Date;
 
+  @IsOptional()
+  @IsDate()
+  @Transform(({ value }) => (value ? new Date(value) : null))
+  @ApiProperty({
+    description: "Data de vencimento do gasto fixo",
+    example: "2024-12-20",
+  })
+  data_venc?: Date;
+
   @IsInt()
   @IsNotEmpty()
   @ValidateIf((o) => o.categoria_id === null || !!o.categoria_id)

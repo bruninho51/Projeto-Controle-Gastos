@@ -4,8 +4,10 @@ import {
   IsDecimal,
   IsInt,
   IsNotEmpty,
+  IsDate,
 } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 
 export class GastoFixoCreateDto {
   @IsString()
@@ -39,4 +41,16 @@ export class GastoFixoCreateDto {
     example: "Pagar até o dia 20 desse mês.",
   })
   observacoes?: string;
+
+  @IsOptional()
+  @IsDate()
+  @Transform(({ value }) => (value ? new Date(value) : null))
+  @ApiProperty({
+    description: "Data de vencimento do gasto fixo",
+    example: "2025-10-20",
+    required: false,
+    type: "string",
+    format: "date",
+  })
+  data_venc?: Date;
 }

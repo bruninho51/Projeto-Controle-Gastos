@@ -44,6 +44,7 @@ describe("GastosFixosService", () => {
         descricao: faker.string.alphanumeric(5),
         observacoes: faker.string.alphanumeric(5),
         categoria_id: faker.number.int(),
+        data_venc: faker.date.future(),
         previsto: faker.number
           .float({ min: 100, max: 9999, fractionDigits: 2 })
           .toString(),
@@ -81,12 +82,14 @@ describe("GastosFixosService", () => {
           descricao: "Gasto Fixo A",
           previsto: "1000.00",
           observacoes: "Descrição A",
+          data_venc: faker.date.future(),
         },
         {
           id: 2,
           descricao: "Gasto Fixo B",
           previsto: "500.00",
           observacoes: "Descrição B",
+          data_venc: faker.date.future(),
         },
       ];
 
@@ -117,6 +120,7 @@ describe("GastosFixosService", () => {
         descricao: "Gasto Fixo A",
         previsto: 1000.0,
         observacoes: "Descrição A",
+        data_venc: faker.date.future(),
         data_criacao: new Date(),
         data_atualizacao: new Date(),
       };
@@ -166,6 +170,7 @@ describe("GastosFixosService", () => {
       const updatedGastoFixo = {
         id: gasto_fixo_id,
         ...updateGastoDto,
+        data_venc: faker.date.future(),
         data_criacao: new Date(),
         data_atualizacao: new Date(),
       };
@@ -199,6 +204,7 @@ describe("GastosFixosService", () => {
         descricao: "Gasto Fixo A",
         previsto: "1000.00",
         observacoes: "Descrição A",
+        data_venc: faker.date.future(),
       };
 
       const softDeletedGastoFixo = {

@@ -45,6 +45,7 @@ model GastoFixo {
   orcamento_id     Int?
   diferenca        Decimal?        @db.Decimal(10, 2)
   data_pgto        DateTime?       @db.Date
+  data_venc        DateTime?       @db.Date
   observacoes      String?         @db.Text
   data_criacao     DateTime?       @default(now()) @db.Timestamp(0)
   data_atualizacao DateTime?       @default(now()) @db.Timestamp(0)
