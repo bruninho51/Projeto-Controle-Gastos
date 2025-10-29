@@ -1,3 +1,10 @@
+# [1.10.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.9.0...v1.10.0) (2025-10-29)
+
+
+### Features
+
+* adiciona kafka connector ([d58ad6b](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/d58ad6b4783e02cef9e265208f4f4c19778c4564))
+
 # [1.9.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.8.0...v1.9.0) (2025-10-07)
 
 
