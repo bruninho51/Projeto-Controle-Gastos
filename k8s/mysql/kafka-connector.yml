@@ -1,0 +1,19 @@
+apiVersion: kafka.vectorized.io/v1alpha1
+kind: KafkaConnector
+metadata:
+  name: mysql-debezium
+  namespace: orcamentos-app
+spec:
+  class: io.debezium.connector.mysql.MySqlConnector
+  tasksMax: 1
+  config:
+    database.hostname: mysql.orcamentos-app.svc.cluster.local
+    database.port: "3306"
+    database.user: root
+    database.password: root
+    database.server.id: "184054"
+    database.server.name: orcamentos
+    database.include.list: orcamentos
+    database.history.kafka.bootstrap.servers: redpanda.redpanda.svc.cluster.local:9092
+    database.history.kafka.topic: dbhistory.orcamentos
+    include.schema.changes: "true"
