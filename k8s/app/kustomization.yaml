@@ -4,5 +4,4 @@ resources:
   - deployment.yml
   - service.yml
   - ingress.yml
-  - firebase.yml
   - gitlab-registry.yml
