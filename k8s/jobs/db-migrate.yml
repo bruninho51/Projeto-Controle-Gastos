@@ -20,6 +20,7 @@ spec:
           export {{ $key }}="{{ $value }}"
           {{- end }}
           {{- end }}
+        vault.hashicorp.com/agent-pre-populate-only: "true"
     spec:
       restartPolicy: Never
       containers:
