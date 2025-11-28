@@ -1,3 +1,10 @@
+## [1.12.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.12.0...v1.12.1) (2025-11-28)
+
+
+### Bug Fixes
+
+* remove valor padrão de JWT_SECRET ([70e0ce2](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/70e0ce277d5447178078cc119b63568c73ee36b7))
+
 # [1.12.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.11.0...v1.12.0) (2025-11-28)
 
 
