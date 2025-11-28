@@ -1,6 +1,5 @@
 resources:
   - namespace.yml
-  - env-vars.yml
   - deployment.yml
   - service.yml
   - ingress.yml

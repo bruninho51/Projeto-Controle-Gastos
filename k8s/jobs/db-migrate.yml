@@ -9,18 +9,28 @@ metadata:
 spec:
   backoffLimit: 2
   template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "orcamentos-api-role"
+        vault.hashicorp.com/agent-inject-secret-config: "secret/data/orcamentos-api"
+        vault.hashicorp.com/agent-inject-template-config: |
+          {{- with secret "secret/data/orcamentos-api" -}}
+          {{- range $key, $value := .Data.data }}
+          export {{ $key }}="{{ $value }}"
+          {{- end }}
+          {{- end }}
     spec:
       restartPolicy: Never
       containers:
         - name: migrate-job
           image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.11.0
           imagePullPolicy: Always
-          command: ["sh", "-c", "npx prisma migrate deploy"]
-          env:
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: orcamentos-api-env-vars
-                  key: DATABASE_URL
+          command:
+            - sh
+            - -c
+            - |
+              . /vault/secrets/config
+              npx prisma migrate deploy
       imagePullSecrets:
         - name: gitlab-registry-secret
