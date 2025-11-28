@@ -1,3 +1,10 @@
+# [1.11.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.10.0...v1.11.0) (2025-11-28)
+
+
+### Features
+
+* remove arquivo firebase.yml ([40b1e6d](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/40b1e6dd61c9a8541d0c83cc6be38d6f94692349))
+
 # [1.10.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.9.0...v1.10.0) (2025-10-29)
 
 
