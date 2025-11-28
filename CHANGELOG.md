@@ -1,3 +1,10 @@
+# [1.12.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.11.0...v1.12.0) (2025-11-28)
+
+
+### Features
+
+* remove arquivo env-vars.yml ([854dfd8](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/854dfd8a6bba0f8e0a8fefa076fff01c7f56e26d))
+
 # [1.11.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.10.0...v1.11.0) (2025-11-28)
 
 
