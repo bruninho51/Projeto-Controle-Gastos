@@ -46,7 +46,7 @@ export class InvestimentosController {
   @ApiResponse({ status: 200, description: "Lista de investimentos." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   @ApiBearerAuth('access-token')
-    @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   findAll(@Req() { user }) {
     return this.investimentosService.findAll(user.id);
   }

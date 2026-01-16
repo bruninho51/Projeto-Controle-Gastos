@@ -7,9 +7,8 @@ import { GastosVariadosModule } from "./api/gastos-variados/gastos-variados.modu
 import { InvestimentosModule } from "./api/investimentos/investimentos.module";
 import { LinhaDoTempoInvestimentosModule } from "./api/linha-do-tempo-investimentos/linha-do-tempo-investimentos.module";
 import { AuthModule } from "./api/auth/auth.module";
-import { WebModule } from "./web/web.module";
-import { PrometheusModule } from "@willsoto/nestjs-prometheus";
 import { MonitoringModule } from "./monitoring/monitoring.module";
+import { join } from "path";
 
 @Module({
   imports: [
@@ -21,11 +20,7 @@ import { MonitoringModule } from "./monitoring/monitoring.module";
     InvestimentosModule,
     LinhaDoTempoInvestimentosModule,
     AuthModule,
-    WebModule,
     MonitoringModule,
   ],
 })
 export class AppModule {}
-
-
-
