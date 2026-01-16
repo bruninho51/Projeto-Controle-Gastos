@@ -1,3 +1,15 @@
+# [1.13.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.12.1...v1.13.0) (2026-01-16)
+
+
+### Bug Fixes
+
+* adiciona db url no schema do prisma ([bfb9975](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/bfb997537e28559ee795a0ce978a5dc5068874c4))
+
+
+### Features
+
+* remove módulo web e atualiza dependências ([003ab86](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/003ab861a664055b4d40246247bad4e3433d7e8e))
+
 ## [1.12.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.12.0...v1.12.1) (2025-11-28)
 
 
