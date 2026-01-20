@@ -1,3 +1,11 @@
+# [1.15.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.14.0...v1.15.0) (2026-01-20)
+
+
+### Features
+
+* atualiza dockerfile ([29e5a38](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/29e5a382db34d77f69d7ac3c8741f1450f984651))
+* atualiza dockerfile ([9f3339e](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/9f3339e27d94275fb716e2bba52a568564f2a5f2))
+
 # [1.14.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.13.0...v1.14.0) (2026-01-20)
 
 
