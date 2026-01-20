@@ -1,3 +1,12 @@
+# [1.14.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.13.0...v1.14.0) (2026-01-20)
+
+
+### Features
+
+* atualiza o prisma ([7f322c7](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/7f322c71942856bfce81dd3bebff3c8980e45b8e))
+* atualiza prisma.config.ts ([3598062](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/3598062b4088ae9eaea9a4cddcff764e9083904f))
+* corrige .gitlab-ci.yaml ([1dc8554](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/1dc8554c70e76a218f43d7a8b280fc55034d9029))
+
 # [1.13.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.12.1...v1.13.0) (2026-01-16)
 
 
