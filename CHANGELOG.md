@@ -1,3 +1,10 @@
+## [1.16.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.16.0...v1.16.1) (2026-01-20)
+
+
+### Bug Fixes
+
+* corrige prisma.service.ts ([df5fdc8](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/df5fdc86c2a2a7bb55f8e1276fd506751e241f2a))
+
 # [1.16.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.15.0...v1.16.0) (2026-01-20)
 
 
