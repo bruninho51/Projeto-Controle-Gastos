@@ -29,6 +29,7 @@ RUN npm install --production
 # Copia o Prisma Client já gerado e o build final
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma.config.js .
 RUN npx prisma generate
 
 # Copia o entrypoint

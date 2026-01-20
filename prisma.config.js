@@ -1,7 +1,7 @@
 import { defineConfig } from 'prisma/config';
 import 'dotenv/config';
 
-const env = (key: string, fallback: string) => process.env[key] ?? fallback
+const env = (key, fallback) => process.env[key] ?? fallback
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
