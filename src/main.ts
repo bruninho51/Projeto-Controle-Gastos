@@ -5,6 +5,7 @@ import { globalFilters } from "./filters/global-filters";
 import { globalPipes } from "./pipes/globalPipes";
 import { globalInterceptors } from "./interceptors/globalInterceptors";
 import { Registry } from "prom-client";
+import 'dotenv/config';
 
 async function bootstrap() {
   const apiGlobalPrefix = "/api/v1";
