@@ -1,3 +1,10 @@
+# [1.16.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.15.0...v1.16.0) (2026-01-20)
+
+
+### Features
+
+* corrige prisma config ([7e62440](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/7e624406f23b351880b0e4fb817b0f6e064c0742))
+
 # [1.15.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.14.0...v1.15.0) (2026-01-20)
 
 
