@@ -1,3 +1,10 @@
+## [1.16.2](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.16.1...v1.16.2) (2026-01-22)
+
+
+### Bug Fixes
+
+* sub do jwt deve ser string ([5dbceaa](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/5dbceaab8fd4566eaecca490af6cb126d92a9472))
+
 ## [1.16.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.16.0...v1.16.1) (2026-01-20)
 
 
