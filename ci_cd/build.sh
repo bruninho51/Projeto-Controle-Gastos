@@ -59,6 +59,7 @@ fi
 # Passo 2: Build da imagem Docker
 echo "🐳 Fazendo build da imagem Docker..."
 docker build -t "$full_image" .
+docker tag "$full_image" "$latest_image"
 
 if [ $? -eq 0 ]; then
     echo "✅ Build da imagem concluído: $full_image"
@@ -66,6 +67,9 @@ else
     echo "❌ Erro: Falha no build da imagem Docker"
     exit 1
 fi
+
+echo "🐳 Imagens Geradas"
+docker images | grep "projeto-controle-gastos"
 
 # Passo 3: Push da imagem para o registry
 echo "📤 Enviando imagem para o registry..."
