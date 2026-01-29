@@ -18,6 +18,7 @@ echo "🚀 Iniciando build e atualização para versão: $new_version"
 image_name="registry.gitlab.com/bruninho51/projeto-controle-gastos"
 new_tag="v$new_version"
 full_image="$image_name:$new_tag"
+latest_image="$image_name:latest"
 
 # Passo 1: Atualizar deployment.yml
 deployment_file="k8s/app/deployment.yml"
@@ -81,6 +82,7 @@ else
 fi
 
 docker push "$full_image"
+docker push "$latest_image"
 
 if [ $? -eq 0 ]; then
     echo "✅ Imagem enviada com sucesso: $full_image"
