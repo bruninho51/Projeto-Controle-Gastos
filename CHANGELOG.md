@@ -1,3 +1,15 @@
+# [1.17.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.16.2...v1.17.0) (2026-01-29)
+
+
+### Bug Fixes
+
+* configura latest image ([0156777](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/01567771fe8a8aabb5563f043f6c11cd7e261f60))
+
+
+### Features
+
+* configura latest image ([41f9777](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/41f97773123c2d89194fb31cc983ccdd8570937b))
+
 ## [1.16.2](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.16.1...v1.16.2) (2026-01-22)
 
 
