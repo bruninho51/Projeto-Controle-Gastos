@@ -1,3 +1,10 @@
+## [1.18.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.18.0...v1.18.1) (2026-02-05)
+
+
+### Bug Fixes
+
+* corrige collation ([05d6469](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/05d64697b42aaf385aeba905da76b2da8e6ad8e8))
+
 # [1.18.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.17.0...v1.18.0) (2026-02-05)
 
 
