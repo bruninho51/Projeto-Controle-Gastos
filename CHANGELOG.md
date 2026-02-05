@@ -1,3 +1,10 @@
+# [1.18.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.17.0...v1.18.0) (2026-02-05)
+
+
+### Features
+
+* adiciona a vw_gastos_ativos em uma migration ([94122dc](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/94122dc275aeb98f8c163431748f00d428e8e8af))
+
 # [1.17.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.16.2...v1.17.0) (2026-01-29)
 
 
