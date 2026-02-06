@@ -19,7 +19,7 @@ CREATE OR REPLACE VIEW vw_gastos_ativos AS
         u.email AS usuario_email,
         -- Gasto Fixo
         gf.id AS gasto_id,
-        CAST('fixo' AS CHAR CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci) AS gasto_tipo,
+        'fixo' COLLATE utf8mb4_0900_ai_ci AS gasto_tipo,
         gf.descricao AS gasto_descricao,
         gf.previsto AS gasto_previsto,
         gf.valor AS gasto_valor,
@@ -54,7 +54,7 @@ CREATE OR REPLACE VIEW vw_gastos_ativos AS
         u.email AS usuario_email,
         -- Gasto Variado
         gv.id AS gasto_id,
-        CAST('variado' AS CHAR CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci) AS gasto_tipo,
+        'variado' COLLATE utf8mb4_0900_ai_ci AS gasto_tipo,
         gv.descricao AS gasto_descricao,
         NULL AS gasto_previsto,
         gv.valor AS gasto_valor,
