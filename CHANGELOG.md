@@ -1,3 +1,10 @@
+## [1.18.2](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.18.1...v1.18.2) (2026-02-06)
+
+
+### Bug Fixes
+
+* corrige problema na view vw_gastos_ativos, relacionado a collation ([f7f7ef8](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/f7f7ef8970251859bddf4625b1ec4580d5c4c5c5))
+
 ## [1.18.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.18.0...v1.18.1) (2026-02-05)
 
 
