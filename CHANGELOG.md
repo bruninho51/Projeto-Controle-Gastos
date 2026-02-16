@@ -1,3 +1,10 @@
+# [1.20.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.19.0...v1.20.0) (2026-02-16)
+
+
+### Features
+
+* remove entrypoint ([b928bd2](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/b928bd23f1a57804458a2e3cc7d121dfc79ed838))
+
 # [1.19.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.18.2...v1.19.0) (2026-02-16)
 
 
