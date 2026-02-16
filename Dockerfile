@@ -32,12 +32,11 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma.config.js .
 RUN npx prisma generate
 
-# Copia o entrypoint
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY bootstrap.sh /app/bootstrap.sh
+RUN chmod +x /app/bootstrap.sh
 
 # Expõe a porta da aplicação
 EXPOSE 3000
 
 # Comando padrão
-CMD ["node", "dist/src/main.js"]
+CMD ["/app/bootstrap.sh"]
