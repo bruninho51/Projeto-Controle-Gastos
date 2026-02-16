@@ -1,6 +1,6 @@
 {
   "name": "orcamentos-api",
-  "version": "1.18.2",
+  "version": "1.19.0",
   "description": "API do sistema de controle de orçamentos pessoais.",
   "author": "Bruno Mendes Pimenta<bruno.mendes44@gmail.com>",
   "private": true,
