@@ -39,8 +39,5 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Expõe a porta da aplicação
 EXPOSE 3000
 
-# Define o entrypoint
-ENTRYPOINT ["entrypoint.sh"]
-
 # Comando padrão
 CMD ["node", "dist/src/main.js"]

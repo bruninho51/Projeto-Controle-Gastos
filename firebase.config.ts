@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 function readJsonFile(filename: string) {
-  const filePath = path.join(process.cwd(), filename);
+  const filePath = path.join(process.cwd(), 'secrets', filename);
   try {
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     return JSON.parse(fileContent);
