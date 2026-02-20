@@ -37,7 +37,12 @@ describe("GastosFixosController (v1) (E2E)", () => {
     await runPrismaMigrations();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [OrcamentosModule, GastosFixosModule, CategoriasGastosModule, AuthModule],
+      imports: [
+        OrcamentosModule,
+        GastosFixosModule,
+        CategoriasGastosModule,
+        AuthModule,
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -94,13 +99,13 @@ describe("GastosFixosController (v1) (E2E)", () => {
           .toString(),
         categoria_id: categoriaMock.id,
       };
-    
+
       const response = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
-    
+
       expect(response.body).toHaveProperty("id");
       expect(response.body.descricao).toBe(createGastoDto.descricao);
       expect(response.body.previsto).toBe(createGastoDto.previsto);
@@ -111,7 +116,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
     it("should create a new gasto fixo with data_venc hour set to 00:00:00", async () => {
       // Cria uma data com hora qualquer
       const dataVenc = faker.date.future();
-    
+
       const createGastoDto: GastoFixoCreateDto = {
         descricao: faker.string.alphanumeric(5),
         previsto: faker.number
@@ -120,28 +125,28 @@ describe("GastosFixosController (v1) (E2E)", () => {
         data_venc: dataVenc,
         categoria_id: categoriaMock.id,
       };
-    
+
       const response = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
-    
+
       // Verifica campos básicos
       expect(response.body).toHaveProperty("id");
       expect(response.body.descricao).toBe(createGastoDto.descricao);
       expect(response.body.previsto).toBe(createGastoDto.previsto);
       expect(response.body.categoria_id).toBe(createGastoDto.categoria_id);
       expect(response.body.orcamento_id).toBe(orcamentoMock.id);
-    
+
       // Converte a data retornada para Date
       const returnedDate = new Date(response.body.data_venc);
-    
+
       // ✅ Compara apenas ano, mês e dia em UTC para ignorar fuso horário
       expect(returnedDate.getUTCFullYear()).toBe(dataVenc.getUTCFullYear());
       expect(returnedDate.getUTCMonth()).toBe(dataVenc.getUTCMonth());
       expect(returnedDate.getUTCDate()).toBe(dataVenc.getUTCDate());
-    
+
       // ✅ Verifica se a hora foi zerada
       expect(returnedDate.getUTCHours()).toBe(0);
       expect(returnedDate.getUTCMinutes()).toBe(0);
@@ -159,8 +164,8 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(400);
 
@@ -190,8 +195,8 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(400);
 
@@ -203,7 +208,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         "previsto is not a valid decimal number.",
         "categoria_id must be an integer number",
         "observacoes must be a string",
-        "data_venc must be a Date instance"
+        "data_venc must be a Date instance",
       ]);
     });
 
@@ -217,8 +222,8 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(404);
 
@@ -234,7 +239,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const categoriaResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(201);
 
@@ -242,7 +247,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/categorias-gastos/${categoriaResponse.body.id}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const createGastoDto: GastoFixoCreateDto = {
@@ -254,8 +259,8 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(404);
 
@@ -274,8 +279,8 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/orcamentos/999/gastos-fixos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/orcamentos/999/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(404);
 
@@ -294,13 +299,13 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createOrcamentoDto)
         .expect(201);
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const createGastoDto: GastoFixoCreateDto = {
@@ -315,7 +320,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(404);
 
@@ -336,7 +341,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(400);
     });
@@ -353,7 +358,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamento2 = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock2)
         .expect(201);
 
@@ -370,18 +375,18 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(gastoFixoOrcamento2)
         .expect(201);
 
       const responseOrcamentoMock = await request(app.getHttpServer())
         .get(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const responseOrcamentoMock2 = await request(app.getHttpServer())
         .get(`${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const orcamento1Ok = responseOrcamentoMock.body.every(
@@ -405,7 +410,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock)
         .expect(201);
 
@@ -422,7 +427,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(gastoFixoOrcamento)
         .expect(201);
 
@@ -430,14 +435,14 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoFixoResponse.body.id}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
-      .get(
-        `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body.length).toBe(0);
@@ -453,7 +458,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock)
         .expect(201);
 
@@ -470,20 +475,20 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(gastoFixoOrcamento)
         .expect(201);
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
-      .get(
-        `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe(
@@ -504,7 +509,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -514,7 +519,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .get(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body.id).toBe(gastoId);
@@ -534,7 +539,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamento2 = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock2)
         .expect(201);
 
@@ -548,7 +553,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -558,7 +563,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .get(
           `${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
     });
 
@@ -567,7 +572,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .get(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/9999`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe("Not Found");
@@ -583,7 +588,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock)
         .expect(201);
 
@@ -599,7 +604,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -609,14 +614,14 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
-      .get(
-        `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe("Not Found");
@@ -632,7 +637,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock)
         .expect(201);
 
@@ -648,7 +653,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -656,14 +661,14 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
         .get(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe(
@@ -684,7 +689,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -700,7 +705,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(200);
 
@@ -719,7 +724,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -740,7 +745,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(400);
 
@@ -768,7 +773,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -801,7 +806,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(400);
 
@@ -828,7 +833,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -842,7 +847,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(200);
 
@@ -860,7 +865,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -874,7 +879,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(200);
 
@@ -891,7 +896,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamento2 = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock2)
         .expect(201);
 
@@ -905,7 +910,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -921,7 +926,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(404);
     });
@@ -937,7 +942,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -949,10 +954,10 @@ describe("GastosFixosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(
-        `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(409);
 
@@ -972,7 +977,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -988,7 +993,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(409);
 
@@ -1007,7 +1012,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/9999`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(404);
     });
@@ -1023,7 +1028,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -1033,7 +1038,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${createResponse.body.id}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const updateGastoDto: GastoFixoUpdateDto = {
@@ -1046,7 +1051,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(404);
     });
@@ -1061,7 +1066,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock)
         .expect(201);
 
@@ -1077,7 +1082,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -1085,7 +1090,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const updateGastoDto: GastoFixoUpdateDto = {
@@ -1098,7 +1103,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateGastoDto)
         .expect(404);
 
@@ -1120,7 +1125,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -1130,7 +1135,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body.soft_delete).toBeTruthy();
@@ -1141,7 +1146,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/9999`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
     });
 
@@ -1155,7 +1160,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamento2 = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock2)
         .expect(201);
 
@@ -1169,7 +1174,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const createResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -1179,7 +1184,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamento2.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
     });
 
@@ -1193,7 +1198,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock)
         .expect(201);
 
@@ -1209,7 +1214,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -1219,14 +1224,14 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       await request(app.getHttpServer())
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
     });
 
@@ -1240,7 +1245,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const orcamentoResponse = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/orcamentos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(orcamentoMock)
         .expect(201);
 
@@ -1256,7 +1261,7 @@ describe("GastosFixosController (v1) (E2E)", () => {
         .post(
           `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos`,
         )
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createGastoDto)
         .expect(201);
 
@@ -1264,14 +1269,14 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
-      .delete(
-        `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoResponse.body.id}/gastos-fixos/${gastoId}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe(

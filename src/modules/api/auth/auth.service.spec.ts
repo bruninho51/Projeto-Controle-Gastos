@@ -116,7 +116,11 @@ describe("AuthService", () => {
         soft_delete: null,
       };
 
-      const payload = { id: user.id, email: user.email, sub: user.id.toString() };
+      const payload = {
+        id: user.id,
+        email: user.email,
+        sub: user.id.toString(),
+      };
       const token = faker.string.uuid();
       jwtService.sign = jest.fn().mockReturnValue(token);
 

@@ -7,7 +7,6 @@ export class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
-
   constructor() {
     const adapter = new PrismaMariaDb({
       host: process.env.DB_HOST,
@@ -15,7 +14,7 @@ export class PrismaService
       password: process.env.DB_PASSWORD,
       port: parseInt(process.env.DB_PORT),
       database: process.env.DB_NAME,
-      connectionLimit: 50
+      connectionLimit: 50,
     });
     super({ adapter });
   }

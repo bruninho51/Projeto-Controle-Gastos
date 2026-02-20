@@ -42,8 +42,8 @@ export class GastosVariadosController {
     description: "Gasto variado criado com sucesso.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
-    @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("access-token")
+  @UseGuards(JwtAuthGuard)
   async create(
     @Req() { user },
     @Param("orcamento_id") orcamento_id: String,
@@ -73,7 +73,7 @@ export class GastosVariadosController {
   @ApiOperation({ summary: "Buscar todos os gastos variados" })
   @ApiResponse({ status: 200, description: "Lista de gastos variados." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async findAll(@Req() { user }, @Param("orcamento_id") orcamento_id: string) {
     const orcamento = await this.orcamentosService.findOne(
@@ -99,7 +99,7 @@ export class GastosVariadosController {
   @ApiResponse({ status: 200, description: "Gasto variado encontrado." })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async findOne(
     @Req() { user },
@@ -133,7 +133,7 @@ export class GastosVariadosController {
   })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async update(
     @Req() { user },
@@ -167,7 +167,7 @@ export class GastosVariadosController {
   })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async remove(
     @Req() { user },

@@ -4,20 +4,32 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { GastoFixoCreateDto } from "./dtos/GastoFixoCreate.dto";
 import { GastoFixoUpdateDto } from "./dtos/GastoFixoUpdate.dto";
 import { faker } from "@faker-js/faker";
+import { GastoFixoFindDto, StatusGasto } from "./dtos/GastoFixoFind.dto";
 
-const mockPrismaService = {
+let mockPrismaService: {
   gastoFixo: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-  },
+    create: jest.Mock;
+    findMany: jest.Mock;
+    findUnique: jest.Mock;
+    update: jest.Mock;
+  };
 };
 
 describe("GastosFixosService", () => {
   let service: GastosFixosService;
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
+    mockPrismaService = {
+      gastoFixo: {
+        create: jest.fn(),
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        update: jest.fn(),
+      },
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GastosFixosService,
@@ -73,8 +85,22 @@ describe("GastosFixosService", () => {
   });
 
   describe("findAll", () => {
+    function getWhere() {
+      const calls = mockPrismaService.gastoFixo.findMany.mock.calls;
+      if (!calls.length) throw new Error("findMany não foi chamado");
+      const lastCall = calls.at(-1);
+      return lastCall[0].where;
+    }
+
+    const BASE_WHERE = Object.freeze({
+      orcamento_id: 1,
+      soft_delete: null,
+    });
+
     it("should return an array of gasto fixo", async () => {
       const orcamento_id = faker.number.int();
+
+      const filters: GastoFixoFindDto = {};
 
       const gastosFixos = [
         {
@@ -95,18 +121,173 @@ describe("GastosFixosService", () => {
 
       mockPrismaService.gastoFixo.findMany.mockResolvedValue(gastosFixos);
 
-      const result = await service.findAll(orcamento_id);
+      const result = await service.findAll(orcamento_id, filters);
 
       expect(result).toEqual(gastosFixos);
       expect(mockPrismaService.gastoFixo.findMany).toHaveBeenCalledWith({
         include: {
           categoriaGasto: true,
         },
-        where: { 
+        where: {
           orcamento_id,
-          soft_delete: null 
+          soft_delete: null,
         },
       });
+    });
+
+    it("should filter by descricao", async () => {
+      const searchedValue = faker.string.alpha();
+
+      await service.findAll(1, { descricao: searchedValue });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        descricao: { contains: searchedValue },
+      });
+    });
+
+    it("should filter by status PAGO", async () => {
+      await service.findAll(1, { status: StatusGasto.PAGO });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        data_pgto: { not: null },
+      });
+    });
+
+    it("should filter by status NAO_PAGO", async () => {
+      await service.findAll(1, { status: StatusGasto.NAO_PAGO });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        data_pgto: { equals: null },
+      });
+    });
+
+    it("should filter by data_pgto day", async () => {
+      const date = new Date("2026-02-10");
+
+      await service.findAll(1, { data_pgto: date });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        data_pgto: { equals: date },
+      });
+    });
+
+    it("should filter by data_pgto range", async () => {
+      const inicio = new Date("2026-02-01");
+      const fim = new Date("2026-02-10");
+
+      await service.findAll(1, {
+        data_pgto_inicio: inicio,
+        data_pgto_fim: fim,
+      });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        data_pgto: {
+          gte: inicio,
+          lte: fim,
+        },
+      });
+    });
+
+    it("should filter vencido true", async () => {
+      await service.findAll(1, { vencido: true });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
+      });
+    });
+
+    it("should filter vencido false", async () => {
+      await service.findAll(1, { vencido: false });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        NOT: {
+          AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
+        },
+      });
+    });
+
+    it("should filter by nome_categoria", async () => {
+      const nome = faker.string.alpha(10);
+
+      await service.findAll(1, { nome_categoria: nome });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        categoriaGasto: {
+          nome: { contains: nome },
+        },
+      });
+    });
+
+    it("should apply all filters together PAGO and NAO VENCIDO", async () => {
+      const descricao = faker.string.alpha(10);
+      const categoria = faker.string.alpha(10);
+      const inicio = new Date("2026-02-01");
+      const fim = new Date("2026-02-10");
+
+      await service.findAll(1, {
+        descricao,
+        status: StatusGasto.PAGO,
+        data_pgto_inicio: inicio,
+        data_pgto_fim: fim,
+        vencido: false,
+        nome_categoria: categoria,
+      });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        descricao: { contains: descricao },
+        categoriaGasto: { nome: { contains: categoria } },
+        data_pgto: {
+          not: null,
+          gte: inicio,
+          lte: fim,
+        },
+        NOT: {
+          AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
+        },
+      });
+    });
+
+    it("should apply all filters together NAO_PAGO and VENCIDO", async () => {
+      const descricao = faker.string.alpha(10);
+      const categoria = faker.string.alpha(10);
+      const inicio = new Date("2026-02-01");
+      const fim = new Date("2026-02-10");
+
+      await service.findAll(1, {
+        descricao,
+        status: StatusGasto.NAO_PAGO,
+        data_pgto_inicio: inicio,
+        data_pgto_fim: fim,
+        vencido: true,
+        nome_categoria: categoria,
+      });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        descricao: { contains: descricao },
+        categoriaGasto: { nome: { contains: categoria } },
+        data_pgto: {
+          equals: null,
+          gte: inicio,
+          lte: fim,
+        },
+        AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
+      });
+    });
+
+    it("should not add extra operators when no filters", async () => {
+      await service.findAll(1, {});
+
+      expect(getWhere()).toStrictEqual(BASE_WHERE);
     });
   });
 

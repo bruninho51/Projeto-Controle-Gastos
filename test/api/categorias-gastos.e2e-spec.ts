@@ -69,8 +69,8 @@ describe("CategoriasGastosController (e2e)", () => {
       });
 
       const response = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/categorias-gastos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
@@ -88,10 +88,8 @@ describe("CategoriasGastosController (e2e)", () => {
       });
 
       const response = await request(app.getHttpServer())
-      .get(
-        `${apiGlobalPrefix}/categorias-gastos`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`);
+        .get(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`);
 
       const result = response.body.filter((c) => c.id === categoria.id);
 
@@ -106,8 +104,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/categorias-gastos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(201);
 
@@ -121,8 +119,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/categorias-gastos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(400);
 
@@ -141,8 +139,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/categorias-gastos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(400);
 
@@ -163,8 +161,8 @@ describe("CategoriasGastosController (e2e)", () => {
       });
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/categorias-gastos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send({ nome })
         .expect(201);
 
@@ -187,8 +185,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/categorias-gastos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(409);
 
@@ -207,7 +205,7 @@ describe("CategoriasGastosController (e2e)", () => {
 
       await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(400);
     });
@@ -216,8 +214,8 @@ describe("CategoriasGastosController (e2e)", () => {
       const invalidCategoria = {};
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/categorias-gastos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(invalidCategoria)
         .expect(400);
 
@@ -242,7 +240,7 @@ describe("CategoriasGastosController (e2e)", () => {
 
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(404);
     });
@@ -261,8 +259,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(200);
 
@@ -275,7 +273,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const categoria = await prisma.categoriaGasto.create({
         data: {
           nome,
-          usuario_id: user.id
+          usuario_id: user.id,
         },
       });
 
@@ -284,8 +282,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(200);
 
@@ -306,8 +304,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(200);
 
@@ -329,8 +327,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(400);
 
@@ -358,8 +356,8 @@ describe("CategoriasGastosController (e2e)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updatedCategoria)
         .expect(400);
 
@@ -376,7 +374,7 @@ describe("CategoriasGastosController (e2e)", () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/999`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send({ nome })
         .expect(404);
     });
@@ -395,7 +393,7 @@ describe("CategoriasGastosController (e2e)", () => {
 
       await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoriaGasto1.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send({ nome: nome2 })
         .expect(409);
     });
@@ -412,8 +410,8 @@ describe("CategoriasGastosController (e2e)", () => {
       });
 
       const response = await request(app.getHttpServer())
-      .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body).toHaveProperty("soft_delete");
@@ -430,19 +428,19 @@ describe("CategoriasGastosController (e2e)", () => {
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
     });
 
     it("should return 404 if categoria de gasto does not exist", async () => {
       await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/999`)
-        .set('Authorization', `Bearer ${userJwt}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
     });
   });

@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Req,
   UseGuards,
+  Query,
 } from "@nestjs/common";
 import { GastosFixosService } from "./gastos-fixos.service";
 import { GastoFixoCreateDto } from "./dtos/GastoFixoCreate.dto";
@@ -24,6 +25,7 @@ import {
 import { OrcamentosService } from "../orcamentos/orcamentos.service";
 import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { GastoFixoFindDto } from "./dtos/GastoFixoFind.dto";
 
 @ApiTags("Gastos Fixos")
 @Controller("orcamentos/:orcamento_id/gastos-fixos")
@@ -39,8 +41,8 @@ export class GastosFixosController {
   @ApiBody({ type: GastoFixoCreateDto })
   @ApiResponse({ status: 201, description: "Gasto fixo criado com sucesso." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
-    @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("access-token")
+  @UseGuards(JwtAuthGuard)
   async create(
     @Req() { user },
     @Param("orcamento_id") orcamento_id: String,
@@ -70,9 +72,13 @@ export class GastosFixosController {
   @ApiOperation({ summary: "Buscar todos os gastos fixos" })
   @ApiResponse({ status: 200, description: "Lista de gastos fixos." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
-  async findAll(@Req() { user }, @Param("orcamento_id") orcamento_id: string) {
+  async findAll(
+    @Req() { user },
+    @Param("orcamento_id") orcamento_id: string,
+    @Query() query: GastoFixoFindDto,
+  ) {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -82,7 +88,7 @@ export class GastosFixosController {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
     }
 
-    return this.gastosFixosService.findAll(orcamento.id);
+    return this.gastosFixosService.findAll(orcamento.id, query);
   }
 
   @Get(":id")
@@ -96,7 +102,7 @@ export class GastosFixosController {
   @ApiResponse({ status: 200, description: "Gasto fixo encontrado." })
   @ApiResponse({ status: 404, description: "Gasto fixo não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async findOne(
     @Req() { user },
@@ -130,7 +136,7 @@ export class GastosFixosController {
   })
   @ApiResponse({ status: 404, description: "Gasto fixo não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async update(
     @Req() { user },
@@ -161,7 +167,7 @@ export class GastosFixosController {
   @ApiResponse({ status: 200, description: "Gasto fixo removido com sucesso." })
   @ApiResponse({ status: 404, description: "Gasto fixo não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async remove(
     @Req() { user },

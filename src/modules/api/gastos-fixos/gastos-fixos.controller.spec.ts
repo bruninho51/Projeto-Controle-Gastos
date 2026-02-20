@@ -7,6 +7,7 @@ import { faker } from "@faker-js/faker";
 import { OrcamentosService } from "../orcamentos/orcamentos.service";
 import { NotFoundException } from "@nestjs/common";
 import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
+import { GastoFixoFindDto } from "./dtos/GastoFixoFind.dto";
 
 const mockGastosFixosService = {
   create: jest.fn(),
@@ -283,6 +284,7 @@ describe("GastosFixosController", () => {
       ];
 
       const orcamentoDto = { id: faker.number.int() };
+      const filters: GastoFixoFindDto = {};
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.findAll.mockResolvedValue(gastos);
@@ -292,10 +294,11 @@ describe("GastosFixosController", () => {
       const result = await controller.findAll(
         { user: { id: usuarioId } },
         orcamento_id,
+        filters,
       );
 
       expect(result).toEqual(gastos);
-      expect(service.findAll).toHaveBeenCalledWith(orcamentoDto.id);
+      expect(service.findAll).toHaveBeenCalledWith(orcamentoDto.id, filters);
     });
 
     it("should call orcamentos service", async () => {
@@ -307,13 +310,18 @@ describe("GastosFixosController", () => {
       ];
 
       const orcamentoDto = { id: faker.number.int() };
+      const filters: GastoFixoFindDto = {};
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.findAll.mockResolvedValue(gastos);
 
       const usuarioId = faker.number.int();
 
-      await controller.findAll({ user: { id: usuarioId } }, orcamento_id);
+      await controller.findAll(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        filters,
+      );
 
       expect(orcamentosService.findOne).toHaveBeenCalledWith(
         usuarioId,
@@ -330,6 +338,7 @@ describe("GastosFixosController", () => {
       ];
 
       const orcamentoDto = null;
+      const filters: GastoFixoFindDto = {};
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.findAll.mockResolvedValue(gastos);
@@ -339,6 +348,7 @@ describe("GastosFixosController", () => {
       const promise = controller.findAll(
         { user: { id: usuarioId } },
         orcamento_id,
+        filters,
       );
 
       await expect(promise).rejects.toThrow(

@@ -32,7 +32,7 @@ export class OrcamentosController {
   @ApiBody({ type: OrcamentoCreateDto })
   @ApiResponse({ status: 201, description: "Orçamento criado com sucesso." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   create(@Req() { user }, @Body() createOrcamentoDto: OrcamentoCreateDto) {
     return this.orcamentoService.create(user.id, createOrcamentoDto);
@@ -42,7 +42,7 @@ export class OrcamentosController {
   @ApiOperation({ summary: "Buscar todos os orçamentos" })
   @ApiResponse({ status: 200, description: "Lista de orçamentos." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   findAll(@Req() { user }) {
     return this.orcamentoService.findAll(user.id);
@@ -59,7 +59,7 @@ export class OrcamentosController {
   @ApiResponse({ status: 200, description: "Orçamento encontrado." })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async findOne(@Req() { user }, @Param("id") id: string) {
     return this.orcamentoService.findOne(user.id, +id);
@@ -80,7 +80,7 @@ export class OrcamentosController {
   })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   update(
     @Req() { user },
@@ -101,7 +101,7 @@ export class OrcamentosController {
   @ApiResponse({ status: 200, description: "Orçamento removido com sucesso." })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   remove(@Req() { user }, @Param("id") id: string) {
     return this.orcamentoService.softDelete(user.id, +id);

@@ -5,12 +5,18 @@ import { globalFilters } from "./filters/global-filters";
 import { globalPipes } from "./pipes/globalPipes";
 import { globalInterceptors } from "./interceptors/globalInterceptors";
 import { Registry } from "prom-client";
-import 'dotenv/config';
+import "dotenv/config";
+import { NextFunction, Request, Response } from "express";
 
 async function bootstrap() {
   const apiGlobalPrefix = "/api/v1";
 
   const app = await NestFactory.create(AppModule);
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    res.setHeader("X-Powered-By", "Orcamentos API");
+    next();
+  });
 
   app.enableCors({
     origin: "*",
@@ -25,16 +31,16 @@ async function bootstrap() {
   globalInterceptors.forEach((gi) => app.useGlobalInterceptors(gi));
 
   const register = app.get(Registry);
-  const promClient = await import('prom-client');
+  const promClient = await import("prom-client");
   promClient.collectDefaultMetrics({ register });
 
-  app.use('/metrics', async (_req, res) => {
+  app.use("/metrics", async (_req, res) => {
     try {
       const metrics = await register.metrics();
-      res.setHeader('Content-Type', register.contentType);
+      res.setHeader("Content-Type", register.contentType);
       res.end(metrics);
     } catch (err) {
-      res.status(500).end('Error collecting metrics');
+      res.status(500).end("Error collecting metrics");
     }
   });
 
@@ -44,12 +50,12 @@ async function bootstrap() {
     .setVersion("1.0")
     .addBearerAuth(
       {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        in: 'header',
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        in: "header",
       },
-      'access-token',
+      "access-token",
     )
     .build();
 

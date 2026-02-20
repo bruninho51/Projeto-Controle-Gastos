@@ -32,8 +32,8 @@ export class InvestimentosController {
   @ApiBody({ type: InvestimentoCreateDto })
   @ApiResponse({ status: 201, description: "Investimento criado com sucesso." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
-    @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("access-token")
+  @UseGuards(JwtAuthGuard)
   create(
     @Req() { user },
     @Body() createInvestimentoDto: InvestimentoCreateDto,
@@ -45,7 +45,7 @@ export class InvestimentosController {
   @ApiOperation({ summary: "Buscar todos os investimentos" })
   @ApiResponse({ status: 200, description: "Lista de investimentos." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   findAll(@Req() { user }) {
     return this.investimentosService.findAll(user.id);
@@ -62,7 +62,7 @@ export class InvestimentosController {
   @ApiResponse({ status: 200, description: "Investimento encontrado." })
   @ApiResponse({ status: 404, description: "Investimento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async findOne(@Req() { user }, @Param("id") id: string) {
     return this.investimentosService.findOne(user.id, +id);
@@ -83,7 +83,7 @@ export class InvestimentosController {
   })
   @ApiResponse({ status: 404, description: "Investimento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   update(
     @Req() { user },
@@ -111,7 +111,7 @@ export class InvestimentosController {
   })
   @ApiResponse({ status: 404, description: "Investimento não encontrado." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   remove(@Req() { user }, @Param("id") id: string) {
     return this.investimentosService.softDelete(user.id, +id);

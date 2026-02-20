@@ -40,8 +40,8 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo criado com sucesso.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
-    @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("access-token")
+  @UseGuards(JwtAuthGuard)
   async create(
     @Req() { user },
     @Param("investimento_id") investimento_id: String,
@@ -74,7 +74,7 @@ export class LinhaDoTempoInvestimentosController {
     description: "Lista de lançamentos na linha do tempo.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async findAll(
     @Req() { user },
@@ -111,7 +111,7 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async findOne(
     @Req() { user },
@@ -150,7 +150,7 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async update(
     @Req() { user },
@@ -194,7 +194,7 @@ export class LinhaDoTempoInvestimentosController {
     description: "Registro de linha do tempo não encontrado.",
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
   async remove(
     @Req() { user },

@@ -33,7 +33,11 @@ describe("InvestimentosController (v1) (E2E)", () => {
     await runPrismaMigrations();
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [InvestimentosModule, LinhaDoTempoInvestimentosModule, AuthModule],
+      imports: [
+        InvestimentosModule,
+        LinhaDoTempoInvestimentosModule,
+        AuthModule,
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -55,7 +59,7 @@ describe("InvestimentosController (v1) (E2E)", () => {
     categoriaInvestimento = await prismaService.categoriaInvestimento.create({
       data: {
         nome: faker.string.alpha(5),
-      }
+      },
     });
 
     globalPipes.forEach((gp) => app.useGlobalPipes(gp));
@@ -82,8 +86,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -106,8 +110,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(400);
 
@@ -138,8 +142,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(400);
 
@@ -174,8 +178,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       });
 
       const response = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send({ nome, descricao, valor_inicial, categoria_id })
         .expect(201);
 
@@ -199,8 +203,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       } as InvestimentoCreateDto;
 
       await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(400);
     });
@@ -209,8 +213,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
   describe("GET ${apiGlobalPrefix}/investimentos", () => {
     it("should return all investimentos", async () => {
       const response = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
@@ -232,10 +236,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       });
 
       const response = await request(app.getHttpServer())
-      .get(
-        `${apiGlobalPrefix}/investimentos`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`);
+        .get(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`);
 
       const result = response.body.filter((i) => i.id === investimento.id);
 
@@ -255,16 +257,16 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
       const investimentoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body.id).toBe(investimentoId);
@@ -280,8 +282,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
 
     it("should return 404 if investimento not found", async () => {
       const response = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/9999`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/9999`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe("Not Found");
@@ -298,21 +300,21 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const responseInvestimento = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
       const investimentoId = responseInvestimento.body.id;
 
       await request(app.getHttpServer())
-      .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const response = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
 
       expect(response.body.message).toBe("Not Found");
@@ -331,8 +333,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -344,8 +346,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(200);
 
@@ -364,8 +366,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -376,8 +378,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(200);
 
@@ -395,8 +397,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -407,14 +409,14 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send({ data_inatividade: new Date() })
         .expect(200);
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(200);
 
@@ -432,8 +434,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -448,8 +450,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(400);
 
@@ -479,8 +481,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -498,8 +500,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(400);
 
@@ -526,18 +528,16 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
       const investimentoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-      .delete(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`);
+        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`);
 
       const updateInvestimentoDto: InvestimentoUpdateDto = {
         nome: "Investimento C Atualizado",
@@ -545,8 +545,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(404);
     });
@@ -564,16 +564,16 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
       const investimentoId = createResponse.body.id;
 
       const response = await request(app.getHttpServer())
-      .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       expect(response.body.soft_delete).toBeTruthy();
@@ -590,21 +590,21 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
       const investimentoId = createResponse.body.id;
 
       await request(app.getHttpServer())
-      .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       await request(app.getHttpServer())
-      .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
     });
   });
@@ -621,8 +621,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createInvestimentoResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -636,16 +636,16 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempoDto)
         .expect(201);
 
       const investimento = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const valor_inicial = createInvestimentoDto.valor_inicial;
@@ -666,8 +666,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createInvestimentoResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -688,24 +688,24 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempo1Dto)
         .expect(201);
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempo2Dto)
         .expect(201);
 
       const investimento = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const valor_inicial = createInvestimentoDto.valor_inicial;
@@ -726,8 +726,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createInvestimentoResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -748,24 +748,24 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempo1Dto)
         .expect(201);
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempo2Dto)
         .expect(201);
 
       const investimento = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const valor_inicial = createInvestimentoDto.valor_inicial;
@@ -786,8 +786,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createInvestimentoResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -801,10 +801,10 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempoDto)
         .expect(201);
 
@@ -815,14 +815,14 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(200);
 
       const investimento = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const valor_inicial = updateInvestimentoDto.valor_inicial;
@@ -843,8 +843,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createInvestimentoResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -858,23 +858,23 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const linhaDoTempo = await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempoDto)
         .expect(201);
 
       await request(app.getHttpServer())
-      .delete(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${linhaDoTempo.body.id}`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${linhaDoTempo.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const investimento = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const valor_inicial = createInvestimentoDto.valor_inicial;
@@ -895,8 +895,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createInvestimentoResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -917,31 +917,31 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempo1Dto)
         .expect(201);
 
       const responseLinhaDoTempo2 = await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempo2Dto)
         .expect(201);
 
       await request(app.getHttpServer())
-      .delete(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${responseLinhaDoTempo2.body.id}`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .delete(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo/${responseLinhaDoTempo2.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const investimento = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const valor_inicial = createInvestimentoDto.valor_inicial;
@@ -962,8 +962,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createInvestimentoResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -977,23 +977,23 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       await request(app.getHttpServer())
-      .post(
-        `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
-      )
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(
+          `${apiGlobalPrefix}/investimentos/${investimentoId}/linha-do-tempo`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(linhaDoTempoDto)
         .expect(201);
 
       const new_valor_inicial = "665.45";
       await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send({ valor_inicial: new_valor_inicial })
         .expect(200);
 
       const investimento = await request(app.getHttpServer())
-      .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .get(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
       const valor_inicial = new_valor_inicial;
@@ -1014,8 +1014,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const createResponse = await request(app.getHttpServer())
-      .post(`${apiGlobalPrefix}/investimentos`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .post(`${apiGlobalPrefix}/investimentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(createInvestimentoDto)
         .expect(201);
 
@@ -1028,8 +1028,8 @@ describe("InvestimentosController (v1) (E2E)", () => {
       };
 
       const response = await request(app.getHttpServer())
-      .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
-      .set('Authorization', `Bearer ${userJwt}`)
+        .patch(`${apiGlobalPrefix}/investimentos/${investimentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
         .send(updateInvestimentoDto)
         .expect(200);
 
