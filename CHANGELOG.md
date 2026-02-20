@@ -1,3 +1,10 @@
+# [1.21.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.20.0...v1.21.0) (2026-02-20)
+
+
+### Features
+
+* adiciona filtros na rota de obter gastos fixos ([e3eac21](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/e3eac218417f8dc1421b12ae87d63ac765195ade))
+
 # [1.20.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.19.0...v1.20.0) (2026-02-16)
 
 
