@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
 import { GastoVariadoUpdateDto } from "./dtos/GastoVariadoUpdate.dto";
@@ -6,7 +6,7 @@ import { GastoVariado } from "@prisma/client";
 
 @Injectable()
 export class GastosVariadosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async create(
     orcamento_id: number,

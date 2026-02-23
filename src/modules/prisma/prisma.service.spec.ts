@@ -1,42 +1,45 @@
-import { Test, TestingModule } from "@nestjs/testing";
-import { PrismaService } from "./prisma.service";
+import { PrismaService, prismaServiceProvider } from "./prisma.service";
+
+jest.mock("@prisma/adapter-mariadb", () => ({
+  PrismaMariaDb: jest.fn().mockImplementation(() => ({})),
+}));
+
+const mockConnect = jest.fn().mockResolvedValue(undefined);
+const mockDisconnect = jest.fn().mockResolvedValue(undefined);
+
+jest.mock("@prisma/client", () => ({
+  PrismaClient: jest.fn().mockImplementation(() => ({
+    $connect: mockConnect,
+    $disconnect: mockDisconnect,
+    $extends: jest.fn().mockImplementation(function () {
+      return this;
+    }),
+  })),
+}));
 
 describe("PrismaService", () => {
   let prismaService: PrismaService;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [PrismaService],
-    }).compile();
-
-    prismaService = module.get<PrismaService>(PrismaService);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    prismaService = prismaServiceProvider.useFactory();
   });
 
   it("should be defined", () => {
     expect(prismaService).toBeDefined();
   });
 
-  describe("onModuleInit", () => {
-    it("should call $connect on PrismaClient when the module is initialized", async () => {
-      const $connect = jest
-        .spyOn(prismaService, "$connect")
-        .mockImplementation(async () => {});
-
-      await prismaService.onModuleInit();
-
-      expect($connect).toHaveBeenCalled();
+  describe("$connect", () => {
+    it("should call $connect on PrismaClient", async () => {
+      await prismaService.$connect();
+      expect(mockConnect).toHaveBeenCalled();
     });
   });
 
-  describe("onModuleDestroy", () => {
-    it("should call $disconnect on PrismaClient when the module is destroyed", async () => {
-      const $disconnect = jest
-        .spyOn(prismaService, "$disconnect")
-        .mockImplementation(async () => {});
-
-      await prismaService.onModuleDestroy();
-
-      expect($disconnect).toHaveBeenCalled();
+  describe("$disconnect", () => {
+    it("should call $disconnect on PrismaClient", async () => {
+      await prismaService.$disconnect();
+      expect(mockDisconnect).toHaveBeenCalled();
     });
   });
 });

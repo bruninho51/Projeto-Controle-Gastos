@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
 import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
@@ -6,7 +6,7 @@ import { CategoriaGasto } from "@prisma/client";
 
 @Injectable()
 export class CategoriasGastosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async findAll(usuarioId: number): Promise<CategoriaGasto[]> {
     return this.prisma.categoriaGasto.findMany({

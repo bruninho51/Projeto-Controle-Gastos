@@ -1,6 +1,11 @@
 import * as Docker from "dockerode";
 
-process.env.DATABASE_URL = "mysql://root:root@localhost:10330/orcamentos";
+process.env.DB_HOST = "localhost";
+process.env.DB_PORT = "10330";
+process.env.DB_NAME = "orcamentos";
+process.env.DB_USER = "root";
+process.env.DB_PASSWORD = "root";
+process.env.JWT_SECRET = "sua_chave_secreta_aqui_32_caracteres_minimo";
 
 export default async function () {
   return new Promise(async (resolve, reject) => {
@@ -31,6 +36,6 @@ export default async function () {
     setTimeout(() => {
       console.log("Container MySQL 8.0 iniciado com sucesso");
       resolve(true);
-    }, 20000);
+    }, 50000);
   });
 }

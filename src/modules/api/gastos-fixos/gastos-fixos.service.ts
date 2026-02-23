@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { GastoFixoCreateDto } from "./dtos/GastoFixoCreate.dto";
 import { GastoFixoUpdateDto } from "./dtos/GastoFixoUpdate.dto";
@@ -7,7 +7,7 @@ import { GastoFixoFindDto, StatusGasto } from "./dtos/GastoFixoFind.dto";
 
 @Injectable()
 export class GastosFixosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async create(
     orcamento_id: number,

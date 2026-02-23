@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Usuario } from "@prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
@@ -6,7 +6,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
 

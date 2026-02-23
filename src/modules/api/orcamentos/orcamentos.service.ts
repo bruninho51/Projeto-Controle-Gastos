@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { Orcamento } from "@prisma/client";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
@@ -6,7 +6,7 @@ import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 
 @Injectable()
 export class OrcamentosService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async create(
     usuarioId: number,

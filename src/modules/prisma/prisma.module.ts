@@ -1,8 +1,27 @@
-import { Module } from "@nestjs/common";
-import { PrismaService } from "./prisma.service";
+import { Global, Module, OnApplicationShutdown } from "@nestjs/common";
+import { ModuleRef } from "@nestjs/core";
+import { PrismaService, prismaServiceProvider } from "./prisma.service";
 
+@Global()
 @Module({
-  providers: [PrismaService],
+  providers: [
+    prismaServiceProvider,
+    {
+      provide: "PRISMA_LIFECYCLE",
+      useFactory: async (prisma: PrismaService) => {
+        await prisma.$connect();
+        return prisma;
+      },
+      inject: [PrismaService],
+    },
+  ],
   exports: [PrismaService],
 })
-export class PrismaModule {}
+export class PrismaModule implements OnApplicationShutdown {
+  constructor(private readonly moduleRef: ModuleRef) {}
+
+  async onApplicationShutdown() {
+    const prisma = this.moduleRef.get<PrismaService>(PrismaService);
+    await prisma.$disconnect();
+  }
+}
