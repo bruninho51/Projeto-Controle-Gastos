@@ -1,3 +1,10 @@
+## [1.21.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.21.0...v1.21.1) (2026-02-23)
+
+
+### Bug Fixes
+
+* intercepta e relança DriverAdapterError devido a bug de vazamento no Prisma 7 ([f30883f](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/f30883f1a57efb5e91059c78867aaea87fde8041))
+
 # [1.21.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.20.0...v1.21.0) (2026-02-20)
 
 
