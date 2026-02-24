@@ -1,5 +1,4 @@
-image: node:24.13.1
-
+image: node:24.13.1-alpine
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
@@ -7,8 +6,10 @@ variables:
 
 workflow:
   auto_cancel:
-    on_new_commit: interruptible   # cancela jobs interruptible ao receber novo commit
-    on_job_failure: none           # não cancela ao falhar um job
+    on_new_commit: interruptible
+    on_job_failure: none
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 default:
   interruptible: true
@@ -19,9 +20,6 @@ stages:
   - e2e
   - deploy
 
-# -----------------------------
-# Cache global melhorado
-# -----------------------------
 cache: &global-cache
   key:
     files:
@@ -31,6 +29,9 @@ cache: &global-cache
     - .npm/
   policy: pull-push
 
+# -----------------------------
+# SECURITY
+# -----------------------------
 Security Audit:
   stage: security
   cache:
@@ -39,10 +40,7 @@ Security Audit:
   before_script:
     - npm ci --no-audit --no-fund
   script:
-    # Gera relatório JSON (sempre gera, mesmo falhando)
     - npm audit --production --json > npm-audit.json || true
-    
-    # Exibe resumo no log
     - echo "=== RESUMO DE VULNERABILIDADES ==="
     - npm audit --production
   artifacts:
@@ -50,9 +48,8 @@ Security Audit:
     paths:
       - npm-audit.json
     when: always
-  only:
-    refs:
-      - main
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # -----------------------------
 # UNIT TESTS
@@ -74,12 +71,11 @@ Execute Unit Tests:
       - coverage/
   needs:
     - job: Security Audit
-  only:
-    refs:
-      - main
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # -----------------------------
-# E2E TESTS (com Docker)
+# E2E TESTS
 # -----------------------------
 Execute EndtoEnd Tests:
   stage: e2e
@@ -101,9 +97,8 @@ Execute EndtoEnd Tests:
     - npm run test:e2e
   needs:
     - job: Execute Unit Tests
-  only:
-    refs:
-      - main
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # -----------------------------
 # DEPLOY
@@ -126,6 +121,5 @@ Release & Publish Image:
     - npm run release
   needs:
     - job: Execute EndtoEnd Tests
-  only:
-    refs:
-      - main
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
