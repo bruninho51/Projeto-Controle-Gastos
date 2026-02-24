@@ -92,8 +92,7 @@
     "diff": "^8.0.2",
     "tar": "^7.5.0",
     "lodash": "^4.17.21",
-    "ajv": "^8.17.1",
-    "npm": "^11.0.0"
+    "ajv": "^8.17.1"
   },
   "jest": {
     "moduleFileExtensions": [
