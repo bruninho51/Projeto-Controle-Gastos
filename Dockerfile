@@ -1,5 +1,5 @@
 # Etapa 1 — build com Prisma + devDependencies
-FROM node:20-alpine AS builder
+FROM node:24.13.1-alpine AS builder
 WORKDIR /app
 
 # Copia arquivos de dependência
@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Etapa 2 — imagem final com apenas dependências de produção
-FROM node:20-alpine
+FROM node:24.13.1-alpine
 WORKDIR /app
 
 # Copia apenas arquivos necessários

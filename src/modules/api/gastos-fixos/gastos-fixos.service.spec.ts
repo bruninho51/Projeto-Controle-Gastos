@@ -88,7 +88,7 @@ describe("GastosFixosService", () => {
     function getWhere() {
       const calls = mockPrismaService.gastoFixo.findMany.mock.calls;
       if (!calls.length) throw new Error("findMany não foi chamado");
-      const lastCall = calls.at(-1);
+      const lastCall = calls[calls.length - 1];
       return lastCall[0].where;
     }
 
