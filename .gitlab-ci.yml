@@ -20,7 +20,7 @@ cache:
 # -----------------------------
 # UNIT TESTS
 # -----------------------------
-Execute Unit Tests:
+unit_tests:
   stage: unit
   environment:
     name: production
@@ -40,9 +40,9 @@ Execute Unit Tests:
 # -----------------------------
 # E2E TESTS (com Docker)
 # -----------------------------
-Execute EndtoEnd Tests:
+e2e_tests:
   stage: e2e
-  image: docker:latest
+  image: docker:24
   services:
     - docker:dind
   variables:
@@ -55,18 +55,18 @@ Execute EndtoEnd Tests:
   script:
     - npm run test:e2e
   needs:
-    - job: unit
+    - job: unit_tests
       artifacts: false
   only:
     refs:
       - main
 
 # -----------------------------
-# DEPLOY
+# RELEASE & PUBLISH IMAGE
 # -----------------------------
-Release & Publish Image:
+release_publish_image:
   stage: deploy
-  image: docker:latest
+  image: docker:24
   services:
     - docker:dind
   environment:
@@ -79,7 +79,7 @@ Release & Publish Image:
     # semantic-release executa o build.sh automaticamente
     - npm run release
   needs:
-    - job: e2e
+    - job: e2e_tests
       artifacts: false
   only:
     refs:
