@@ -152,11 +152,18 @@ describe("CategoriasGastosController (e2e)", () => {
 
     it("should create categoria gasto even if it has already been created and deleted (soft delete)", async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
+
       const categoria_gasto = await prisma.categoriaGasto.create({
         data: {
           nome,
-          soft_delete: new Date(),
           usuario_id: user.id,
+        },
+      });
+
+      await prisma.categoriaGasto.update({
+        where: { id: categoria_gasto.id },
+        data: {
+          soft_delete: new Date(),
         },
       });
 

@@ -172,8 +172,14 @@ describe("InvestimentosController (v1) (E2E)", () => {
           descricao,
           valor_inicial,
           categoria_id,
-          soft_delete: new Date(),
           usuario_id: user.id,
+        },
+      });
+
+      await prismaService.investimento.update({
+        where: { id: investimento.id },
+        data: {
+          soft_delete: new Date(),
         },
       });
 
