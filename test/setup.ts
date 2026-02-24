@@ -1,39 +1,37 @@
-import * as Docker from "dockerode";
 import * as dotenv from "dotenv";
+import { GenericContainer, Wait } from "testcontainers";
 
 dotenv.config({
   path: ".env.test",
 });
 
 export default async function () {
-  return new Promise(async (resolve, reject) => {
-    const docker = new Docker({ socketPath: "/var/run/docker.sock" });
+  // Cria container MySQL
+  const container = await new GenericContainer("mysql:8.0")
+    .withExposedPorts(3306)
+    .withEnvironment({
+      MYSQL_ROOT_PASSWORD: process.env.DB_PASSWORD!,
+      MYSQL_DATABASE: process.env.DB_NAME!,
+    })
+    .withHealthCheck({
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -P 3306 -uroot -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1'"],
+      interval: 5_000,
+      timeout: 3_000,
+      retries: 10,
+      startPeriod: 10_000,
+    })
+    .withWaitStrategy(Wait.forHealthCheck())
+    .start();
 
-    console.log("\nCriando container Docker MySQL 8.0");
+  // Porta dinâmica!
+  const host = container.getHost();
+  const port = container.getMappedPort(3306);
 
-    const container = await docker.createContainer({
-      name: "orcamentos_tests",
-      Image: "mysql:8.0",
-      Env: ["MYSQL_ROOT_PASSWORD=root", "MYSQL_DATABASE=orcamentos"],
-      ExposedPorts: {
-        "3306/tcp": {},
-      },
-      HostConfig: {
-        PortBindings: {
-          "3306/tcp": [
-            {
-              HostPort: "10330",
-            },
-          ],
-        },
-      },
-    });
+  process.env.DB_HOST = host;
+  process.env.DB_PORT = port.toString();
 
-    await container.start();
+  // Salva no global para teardown
+  (global as any).__MYSQL_CONTAINER__ = container;
 
-    setTimeout(() => {
-      console.log("Container MySQL 8.0 iniciado com sucesso");
-      resolve(true);
-    }, 50000);
-  });
+  console.log(`MySQL container started at ${host}:${port}`);
 }
