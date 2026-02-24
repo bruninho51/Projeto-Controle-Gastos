@@ -1,11 +1,9 @@
 import * as Docker from "dockerode";
+import * as dotenv from "dotenv";
 
-process.env.DB_HOST = "localhost";
-process.env.DB_PORT = "10330";
-process.env.DB_NAME = "orcamentos";
-process.env.DB_USER = "root";
-process.env.DB_PASSWORD = "root";
-process.env.JWT_SECRET = "sua_chave_secreta_aqui_32_caracteres_minimo";
+dotenv.config({
+  path: ".env.test",
+});
 
 export default async function () {
   return new Promise(async (resolve, reject) => {

@@ -5,27 +5,66 @@ variables:
   DOCKER_TLS_CERTDIR: "/certs"
 
 stages:
-  - test
+  - unit
+  - e2e
   - deploy
 
-test:
-  stage: test
+# -----------------------------
+# Cache global
+# -----------------------------
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+
+# -----------------------------
+# UNIT TESTS
+# -----------------------------
+Execute Unit Tests:
+  stage: unit
   environment:
     name: production
   before_script:
-    - npm install
+    - npm ci
     - npx prisma generate
   script:
     - npm run test:cov
   artifacts:
-    expire_in: 120 mins
+    expire_in: 2h
     paths:
       - coverage/
   only:
     refs:
       - main
 
-deploy:
+# -----------------------------
+# E2E TESTS (com Docker)
+# -----------------------------
+Execute EndtoEnd Tests:
+  stage: e2e
+  image: docker:latest
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    - apk add --no-cache nodejs npm
+    - npm ci
+    - npx prisma generate
+  script:
+    - npm run test:e2e
+  needs:
+    - job: unit
+      artifacts: false
+  only:
+    refs:
+      - main
+
+# -----------------------------
+# DEPLOY
+# -----------------------------
+Build and Deploy Image:
   stage: deploy
   image: docker:latest
   services:
@@ -34,16 +73,13 @@ deploy:
     name: production
   before_script:
     - apk add --no-cache nodejs npm git
-    - npm install
+    - npm ci
     - chmod +x ./ci_cd/build.sh
-    - cd ./ci_cd
-    - ls -la
-    - cd ..
   script:
-    # Executa semantic-release que chama automaticamente o build.sh
+    # semantic-release executa o build.sh automaticamente
     - npm run release
   needs:
-    - job: test
+    - job: e2e
       artifacts: false
   only:
     refs:
