@@ -1,4 +1,4 @@
-image: node:20.20.0  # lts/iron = 20.20.0
+image: node:24.13.1
 
 variables:
   DOCKER_DRIVER: overlay2
