@@ -157,8 +157,14 @@ describe("OrcamentosController (v1) (E2E)", () => {
         data: {
           nome,
           valor_inicial,
-          soft_delete: new Date(),
           usuario_id: user.id,
+        },
+      });
+
+      await prismaService.orcamento.update({
+        where: { id: orcamento.id },
+        data: {
+          soft_delete: new Date(),
         },
       });
 
