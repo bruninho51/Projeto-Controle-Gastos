@@ -64,7 +64,7 @@ Execute EndtoEnd Tests:
 # -----------------------------
 # DEPLOY
 # -----------------------------
-Build and Deploy Image:
+Release & Publish Image:
   stage: deploy
   image: docker:latest
   services:
