@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: orcamentos-api
-          image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.21.1
+          image: registry.gitlab.com/bruninho51/projeto-controle-gastos:v1.22.0
           imagePullPolicy: Always
           ports:
             - containerPort: 3000

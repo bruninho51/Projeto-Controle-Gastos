@@ -1,3 +1,10 @@
+# [1.22.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.21.1...v1.22.0) (2026-02-24)
+
+
+### Features
+
+* caso não encontre o arquivo do firebase, segue sem exception ([1a04e8e](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/1a04e8e115aa373ab1cb0e961918842120eaa424))
+
 ## [1.21.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.21.0...v1.21.1) (2026-02-23)
 
 
