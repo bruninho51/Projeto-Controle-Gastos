@@ -52,10 +52,11 @@ Execute EndtoEnd Tests:
     - apk add --no-cache nodejs npm
     - npm ci
     - npx prisma generate
+    - docker pull mysql:8.0
   script:
     - npm run test:e2e
   needs:
-    - job: Execute Unit Tests
+    - job: Execute Unit TestsZZ
       artifacts: false
   only:
     refs:
