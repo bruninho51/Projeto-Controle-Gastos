@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { AuthService } from "./auth.service";
-import { admin } from "../../../../firebase.config";
+import { firebaseApp } from "../../../../firebase.config";
 
 @Controller("auth")
 export class AuthController {
@@ -11,7 +11,7 @@ export class AuthController {
     try {
       const { idToken } = body;
 
-      const firebaseUser = await admin.auth().verifyIdToken(idToken);
+      const firebaseUser = await firebaseApp.auth().verifyIdToken(idToken);
 
       let user = await this.authService.findOrCreateUser(firebaseUser);
 

@@ -2,18 +2,30 @@ import * as admin from 'firebase-admin';
 import * as path from 'path';
 import * as fs from 'fs';
 
-function readJsonFile(filename: string) {
-  const filePath = path.join(process.cwd(), 'secrets', filename);
+let firebaseApp: admin.app.App | null = null;
+
+function tryInitializeFirebase() {
   try {
+    const filePath = path.join(process.cwd(), 'secrets', 'firebase-cert.json');
+
+    if (!fs.existsSync(filePath)) {
+      console.warn('Certificado do Firebase não encontrado. Firebase não será inicializado.');
+      return null;
+    }
+
     const fileContent = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(fileContent);
+    const serviceAccount = JSON.parse(fileContent);
+
+    return admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+
   } catch (error) {
-    throw new Error(`Erro ao ler o arquivo ${filename}: ${error.message}`);
+    console.error('Erro ao inicializar o Firebase:', error.message);
+    return null;
   }
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(readJsonFile('firebase-cert.json')),
-});
+firebaseApp = tryInitializeFirebase();
 
-export { admin };
+export { firebaseApp };
