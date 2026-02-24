@@ -4,7 +4,14 @@ variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
   npm_config_cache: "$CI_PROJECT_DIR/.npm"
-  AUTO_CANCEL_REDUNDANT_PIPELINES: "true"
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible   # cancela jobs interruptible ao receber novo commit
+    on_job_failure: none           # não cancela ao falhar um job
+
+default:
+  interruptible: true
 
 stages:
   - security
