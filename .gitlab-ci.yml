@@ -56,7 +56,7 @@ Execute EndtoEnd Tests:
   script:
     - npm run test:e2e
   needs:
-    - job: Execute Unit TestsZZ
+    - job: Execute Unit Tests
       artifacts: false
   only:
     refs:
