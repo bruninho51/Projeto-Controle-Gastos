@@ -39,8 +39,6 @@ Security Audit:
     - npm audit --production
   artifacts:
     expire_in: 90d
-    reports:
-      security: npm-audit.json
     paths:
       - npm-audit.json
     when: always
