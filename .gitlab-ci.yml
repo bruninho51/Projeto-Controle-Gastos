@@ -42,7 +42,7 @@ Security Audit:
   script:
     - npm audit --production --json > npm-audit.json || true
     - echo "=== RESUMO DE VULNERABILIDADES ==="
-    - npm audit --production
+    - npm audit --production --audit-level=high
   artifacts:
     expire_in: 90d
     paths:
