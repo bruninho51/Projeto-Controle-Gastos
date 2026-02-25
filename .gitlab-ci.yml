@@ -53,9 +53,8 @@ Security Audit:
   before_script:
     - npm ci --prefer-offline --no-audit --no-fund
   script:
-    - npm audit --production --json > npm-audit.json || true
-    - echo "=== RESUMO DE VULNERABILIDADES ==="
-    - npm audit --production --audit-level=high
+    - npm audit --json > npm-audit.json || true
+    - npx better-npm-audit audit --level high || true
   artifacts:
     expire_in: 90d
     paths:
