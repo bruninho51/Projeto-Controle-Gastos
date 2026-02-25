@@ -9,6 +9,7 @@ import {
   NotFoundException,
   Req,
   UseGuards,
+  Query,
 } from "@nestjs/common";
 import { GastosVariadosService } from "./gastos-variados.service";
 import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
@@ -24,6 +25,7 @@ import {
 import { OrcamentosService } from "../orcamentos/orcamentos.service";
 import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { GastoVariadoFindDto } from "./dtos/GastoVariadoFind.dto";
 
 @ApiTags("Gastos Variados")
 @Controller("orcamentos/:orcamento_id/gastos-variados")
@@ -75,7 +77,11 @@ export class GastosVariadosController {
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   @ApiBearerAuth("access-token")
   @UseGuards(JwtAuthGuard)
-  async findAll(@Req() { user }, @Param("orcamento_id") orcamento_id: string) {
+  async findAll(
+    @Req() { user },
+    @Param("orcamento_id") orcamento_id: string,
+    @Query() query: GastoVariadoFindDto,
+  ) {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -85,7 +91,7 @@ export class GastosVariadosController {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
     }
 
-    return this.gastosVariadosService.findAll(orcamento.id);
+    return this.gastosVariadosService.findAll(orcamento.id, query);
   }
 
   @Get(":id")

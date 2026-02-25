@@ -7,6 +7,7 @@ import { faker } from "@faker-js/faker";
 import { OrcamentosService } from "../orcamentos/orcamentos.service";
 import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
 import { NotFoundException } from "@nestjs/common";
+import { GastoVariadoFindDto } from "./dtos/GastoVariadoFind.dto";
 
 const mockGastosVariadosService = {
   create: jest.fn(),
@@ -296,6 +297,7 @@ describe("GastosVariadosController", () => {
       ];
 
       const orcamentoDto = { id: faker.number.int() };
+      const filters: GastoVariadoFindDto = {};
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosVariadosService.findAll.mockResolvedValue(gastos);
@@ -305,10 +307,11 @@ describe("GastosVariadosController", () => {
       const result = await controller.findAll(
         { user: { id: usuarioId } },
         orcamento_id,
+        filters,
       );
 
       expect(result).toEqual(gastos);
-      expect(service.findAll).toHaveBeenCalledWith(orcamentoDto.id);
+      expect(service.findAll).toHaveBeenCalledWith(orcamentoDto.id, filters);
     });
 
     it("should call orcamentos service", async () => {
@@ -330,13 +333,18 @@ describe("GastosVariadosController", () => {
       ];
 
       const orcamentoDto = { id: faker.number.int() };
+      const filters: GastoVariadoFindDto = {};
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosVariadosService.findAll.mockResolvedValue(gastos);
 
       const usuarioId = faker.number.int();
 
-      await controller.findAll({ user: { id: usuarioId } }, orcamento_id);
+      await controller.findAll(
+        { user: { id: usuarioId } },
+        orcamento_id,
+        filters,
+      );
 
       expect(orcamentosService.findOne).toHaveBeenCalledWith(
         usuarioId,
@@ -363,6 +371,7 @@ describe("GastosVariadosController", () => {
       ];
 
       const orcamentoDto = null;
+      const filters: GastoVariadoFindDto = {};
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosVariadosService.findAll.mockResolvedValue(gastos);
@@ -372,6 +381,7 @@ describe("GastosVariadosController", () => {
       const promise = controller.findAll(
         { user: { id: usuarioId } },
         orcamento_id,
+        filters,
       );
 
       await expect(promise).rejects.toThrow(

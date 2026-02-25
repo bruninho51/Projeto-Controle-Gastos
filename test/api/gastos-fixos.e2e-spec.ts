@@ -18,6 +18,7 @@ import { CategoriasGastosModule } from "../../src/modules/api/categorias-gastos/
 import { formatValue } from "../utils/format-value";
 import { AuthService } from "../../src/modules/api/auth/auth.service";
 import { AuthModule } from "../../src/modules/api/auth/auth.module";
+import { StatusGasto } from "../../src/modules/api/gastos-fixos/dtos/GastoFixoFind.dto";
 
 jest.setTimeout(10000); // 10 segundos
 
@@ -674,6 +675,986 @@ describe("GastosFixosController (v1) (E2E)", () => {
       expect(response.body.message).toBe(
         "O orçamento informado não foi encontrado.",
       );
+    });
+
+    it("should filter gastos fixos by description (partial search)", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoFixo1: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Internet - Teste",
+        previsto: "150.00",
+      };
+
+      const gastoFixo2: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Internet - Teste 2",
+        previsto: "150.00",
+      };
+
+      const gastoFixo3: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Água - Teste",
+        previsto: "80.00",
+      };
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo3)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ descricao: "Internet" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2);
+      expect(
+        response.body.every((gasto) => gasto.descricao.includes("Internet")),
+      ).toBeTruthy();
+      expect(
+        response.body.every((gasto) => gasto.orcamento_id === testOrcamento.id),
+      ).toBeTruthy();
+    });
+
+    it("should filter gastos fixos by status PAGO", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoFixoPago: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixoNaoPago: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const responsePago = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixoPago)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${responsePago.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({ data_pgto: new Date(), valor: "150.00" } as GastoFixoUpdateDto)
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixoNaoPago)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ status: StatusGasto.PAGO })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].valor).not.toBeNull();
+      expect(response.body[0].data_pgto).not.toBeNull();
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+    });
+
+    it("should filter gastos fixos by status NAO_PAGO", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoFixoPago: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixoNaoPago: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const responsePago = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixoPago)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${responsePago.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({ data_pgto: new Date(), valor: "150.00" } as GastoFixoUpdateDto)
+        .expect(200);
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixoNaoPago)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ status: StatusGasto.NAO_PAGO })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].valor).toBeNull();
+      expect(response.body[0].data_pgto).toBeNull();
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+    });
+
+    it("should filter gastos fixos by exact payment date", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const dataBusca = new Date("2026-02-10");
+
+      const gastoFixo1: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixo2: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoPago1 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gastoPago1.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({ data_pgto: dataBusca, valor: "150.00" } as GastoFixoUpdateDto)
+        .expect(200);
+
+      const gastoPago2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gastoPago2.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-15"),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ data_pgto: "2026-02-10" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+
+      const dataPgtoReturned = new Date(response.body[0].data_pgto)
+        .toISOString()
+        .split("T")[0];
+      expect(dataPgtoReturned).toBe("2026-02-10");
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+    });
+
+    it("should filter gastos fixos by payment date range with only start date", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Criar gastos não pagos primeiro
+      const gastoFixo1: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixo2: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixo3: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      // Criar gasto 1 (data: 2026-02-10)
+      const gasto1 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto1.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-10"),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Criar gasto 2 (data: 2026-02-15)
+      const gasto2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto2.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-15"),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Criar gasto 3 (data: 2026-02-20)
+      const gasto3 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo3)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto3.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-20"),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ data_pgto_inicio: "2026-02-15" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2); // Deve retornar gastos de 15/02 e 20/02
+
+      response.body.forEach((gasto) => {
+        const dataPgto = new Date(gasto.data_pgto).toISOString().split("T")[0];
+        expect(dataPgto >= "2026-02-15").toBeTruthy();
+        expect(gasto.orcamento_id).toBe(testOrcamento.id);
+      });
+    });
+
+    it("should filter gastos fixos by payment date range with only end date", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Criar gastos não pagos primeiro
+      const gastoFixo1: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixo2: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixo3: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      // Criar gasto 1 (data: 2026-02-10)
+      const gasto1 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto1.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-10"),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Criar gasto 2 (data: 2026-02-15)
+      const gasto2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto2.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-15"),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Criar gasto 3 (data: 2026-02-20)
+      const gasto3 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo3)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto3.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-20"),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ data_pgto_fim: "2026-02-15" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2); // Deve retornar gastos de 10/02 e 15/02
+
+      response.body.forEach((gasto) => {
+        const dataPgto = new Date(gasto.data_pgto).toISOString().split("T")[0];
+        expect(dataPgto <= "2026-02-15").toBeTruthy();
+        expect(gasto.orcamento_id).toBe(testOrcamento.id);
+      });
+    });
+
+    it("should filter gastos fixos by overdue (vencido = true)", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Data de vencimento no passado
+      const dataPassada = new Date();
+      dataPassada.setMonth(dataPassada.getMonth() - 1);
+
+      // Data de vencimento no futuro
+      const dataFutura = new Date();
+      dataFutura.setMonth(dataFutura.getMonth() + 1);
+
+      // Criar gastos não pagos primeiro
+      const gastoVencido: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Vencido",
+        previsto: "150.00",
+        data_venc: dataPassada,
+      };
+
+      const gastoNaoVencido: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Não Vencido",
+        previsto: "150.00",
+        data_venc: dataFutura,
+      };
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVencido)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoNaoVencido)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ vencido: true })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].descricao).toBe("Gasto Vencido");
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+
+      // Verificar se a data de vencimento é anterior à data atual
+      const hoje = new Date();
+      expect(new Date(response.body[0].data_venc) < hoje).toBeTruthy();
+    });
+
+    it("should filter gastos fixos by not overdue (vencido = false)", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Data de vencimento no passado
+      const dataPassada = new Date();
+      dataPassada.setMonth(dataPassada.getMonth() - 1);
+
+      // Data de vencimento no futuro
+      const dataFutura = new Date();
+      dataFutura.setMonth(dataFutura.getMonth() + 1);
+
+      // Criar gastos não pagos primeiro
+      const gastoVencido: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Vencido",
+        previsto: "150.00",
+        data_venc: dataPassada,
+      };
+
+      const gastoNaoVencido: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Não Vencido",
+        previsto: "150.00",
+        data_venc: dataFutura,
+      };
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVencido)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoNaoVencido)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ vencido: false })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].descricao).toBe("Gasto Não Vencido");
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+
+      // Verificar se a data de vencimento é futura
+      const hoje = new Date();
+      expect(new Date(response.body[0].data_venc) >= hoje).toBeTruthy();
+    });
+
+    it("should filter gastos fixos by not overdue (vencido = false)", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Data de vencimento no passado
+      const dataPassada = new Date();
+      dataPassada.setMonth(dataPassada.getMonth() - 1);
+
+      // Data de vencimento no futuro
+      const dataFutura = new Date();
+      dataFutura.setMonth(dataFutura.getMonth() + 1);
+
+      // Criar gastos não pagos primeiro
+      const gastoVencido: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Vencido",
+        previsto: "150.00",
+        data_venc: dataPassada,
+      };
+
+      const gastoNaoVencido: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Não Vencido",
+        previsto: "150.00",
+        data_venc: dataFutura,
+      };
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVencido)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoNaoVencido)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ vencido: false })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].descricao).toBe("Gasto Não Vencido");
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+
+      // Verificar se a data de vencimento é futura
+      const hoje = new Date();
+      expect(new Date(response.body[0].data_venc) >= hoje).toBeTruthy();
+    });
+
+    it("should filter gastos fixos by category name", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Criar categoria específica para este teste
+      const categoriaEspecifica: CategoriaGastoCreateDto = {
+        nome: "Categoria Teste Filtro",
+      };
+
+      const categoriaResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(categoriaEspecifica)
+        .expect(201);
+
+      // Criar gastos não pagos primeiro
+      const gastoFixo1: GastoFixoCreateDto = {
+        categoria_id: categoriaResponse.body.id,
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      const gastoFixo2: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id, // Categoria padrão
+        descricao: faker.string.alphanumeric(5),
+        previsto: "150.00",
+      };
+
+      // Criar gasto 1 (categoria específica)
+      const gasto1 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto1.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date(),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Criar gasto 2 (categoria padrão)
+      const gasto2 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto2.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date(),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ nome_categoria: "Teste Filtro" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].categoriaGasto.nome).toBe(
+        "Categoria Teste Filtro",
+      );
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+    });
+
+    it("should combine multiple filters", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Criar gastos não pagos primeiro
+      const gastoFixo1: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Internet Paga",
+        previsto: "150.00",
+      };
+
+      const gastoFixo2: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Internet Não Paga",
+        previsto: "150.00",
+      };
+
+      const gastoFixo3: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Água Paga",
+        previsto: "80.00",
+      };
+
+      // Criar gasto 1 (Internet Paga)
+      const gasto1 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto1.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-10"),
+          valor: "150.75",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Criar gasto 2 (Internet Não Paga)
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo2)
+        .expect(201);
+
+      // Criar gasto 3 (Água Paga)
+      const gasto3 = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo3)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto3.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date("2026-02-15"),
+          valor: "85.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({
+          descricao: "Internet",
+          status: StatusGasto.PAGO,
+        })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].descricao).toBe("Internet Paga");
+      expect(response.body[0].valor).toBe("150.75");
+      expect(response.body[0].data_pgto).not.toBeNull();
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+    });
+
+    it("should return empty array when no gastos fixos match filters", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Criar gasto não pago primeiro
+      const gastoFixo: GastoFixoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Teste",
+        previsto: "150.00",
+      };
+
+      const gasto = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoFixo)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .patch(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos/${gasto.body.id}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          data_pgto: new Date(),
+          valor: "150.00",
+        } as GastoFixoUpdateDto)
+        .expect(200);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({
+          descricao: "NaoExiste",
+          status: StatusGasto.NAO_PAGO,
+        })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(0);
+    });
+
+    it("should return 400 when vencido filter has invalid value", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-fixos`)
+        .query({ vencido: "invalido" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(400);
+
+      // Assert
+      expect(response.body.message).toEqual(["vencido deve ser true ou false"]);
     });
   });
 

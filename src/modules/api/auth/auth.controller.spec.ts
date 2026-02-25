@@ -46,7 +46,9 @@ describe("AuthController", () => {
         nome: firebaseUser.name,
       };
 
-      (firebaseApp.auth().verifyIdToken as jest.Mock).mockResolvedValue(firebaseUser);
+      (firebaseApp.auth().verifyIdToken as jest.Mock).mockResolvedValue(
+        firebaseUser,
+      );
 
       authService.findOrCreateUser = jest.fn().mockResolvedValue(user);
       authService.generateJwt = jest.fn().mockResolvedValue(accessToken);
@@ -66,7 +68,9 @@ describe("AuthController", () => {
       const idToken = faker.string.uuid();
       const errorMock = new Error(faker.lorem.sentence());
 
-      (firebaseApp.auth().verifyIdToken as jest.Mock).mockRejectedValue(errorMock);
+      (firebaseApp.auth().verifyIdToken as jest.Mock).mockRejectedValue(
+        errorMock,
+      );
 
       const result = await authController.googleVerify({ idToken });
 

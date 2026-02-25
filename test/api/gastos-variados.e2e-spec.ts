@@ -518,6 +518,642 @@ describe("GastosVariadosController (v1) (E2E)", () => {
         "O orçamento informado não foi encontrado.",
       );
     });
+
+    it("should filter gastos variados by description (partial search)", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoVariado1: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Internet - Teste",
+        valor: "150.00",
+        data_pgto: new Date(),
+      };
+
+      const gastoVariado2: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Internet - Teste 2",
+        valor: "150.00",
+        data_pgto: new Date(),
+      };
+
+      const gastoVariado3: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Água - Teste",
+        valor: "80.00",
+        data_pgto: new Date(),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado3)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({ descricao: "Internet" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2);
+      expect(
+        response.body.every((gasto) => gasto.descricao.includes("Internet")),
+      ).toBeTruthy();
+      expect(
+        response.body.every((gasto) => gasto.orcamento_id === testOrcamento.id),
+      ).toBeTruthy();
+    });
+
+    it("should filter gastos variados by exact payment date", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const dataBusca = new Date("2026-02-10");
+
+      const gastoVariado1: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: dataBusca,
+      };
+
+      const gastoVariado2: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-15"),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado2)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({ data_pgto: "2026-02-10" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+
+      const dataPgtoReturned = new Date(response.body[0].data_pgto)
+        .toISOString()
+        .split("T")[0];
+      expect(dataPgtoReturned).toBe("2026-02-10");
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+    });
+
+    it("should filter gastos variados by payment date range", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoVariado1: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-10"),
+      };
+
+      const gastoVariado2: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-15"),
+      };
+
+      const gastoVariado3: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-20"),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado3)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({
+          data_pgto_inicio: "2026-02-10",
+          data_pgto_fim: "2026-02-15",
+        })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2);
+
+      response.body.forEach((gasto) => {
+        const dataPgto = new Date(gasto.data_pgto).toISOString().split("T")[0];
+        expect(
+          dataPgto >= "2026-02-10" && dataPgto <= "2026-02-15",
+        ).toBeTruthy();
+        expect(gasto.orcamento_id).toBe(testOrcamento.id);
+      });
+    });
+
+    it("should filter gastos variados by payment date range with only start date", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoVariado1: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-10"),
+      };
+
+      const gastoVariado2: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-15"),
+      };
+
+      const gastoVariado3: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-20"),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado3)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({ data_pgto_inicio: "2026-02-15" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2); // Deve retornar gastos de 15/02 e 20/02
+
+      response.body.forEach((gasto) => {
+        const dataPgto = new Date(gasto.data_pgto).toISOString().split("T")[0];
+        expect(dataPgto >= "2026-02-15").toBeTruthy();
+        expect(gasto.orcamento_id).toBe(testOrcamento.id);
+      });
+    });
+
+    it("should filter gastos variados by payment date range with only end date", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoVariado1: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-10"),
+      };
+
+      const gastoVariado2: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-15"),
+      };
+
+      const gastoVariado3: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date("2026-02-20"),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado3)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({ data_pgto_fim: "2026-02-15" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2); // Deve retornar gastos de 10/02 e 15/02
+
+      response.body.forEach((gasto) => {
+        const dataPgto = new Date(gasto.data_pgto).toISOString().split("T")[0];
+        expect(dataPgto <= "2026-02-15").toBeTruthy();
+        expect(gasto.orcamento_id).toBe(testOrcamento.id);
+      });
+    });
+
+    it("should filter gastos variados by category name", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Criar categoria específica para este teste
+      const categoriaEspecifica: CategoriaGastoCreateDto = {
+        nome: "Categoria Teste Filtro",
+      };
+
+      const categoriaResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(categoriaEspecifica)
+        .expect(201);
+
+      const gastoVariado1: GastoVariadoCreateDto = {
+        categoria_id: categoriaResponse.body.id,
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date(),
+      };
+
+      const gastoVariado2: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id, // Categoria padrão
+        descricao: faker.string.alphanumeric(5),
+        valor: "150.00",
+        data_pgto: new Date(),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado2)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({ nome_categoria: "Teste Filtro" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(1);
+      expect(response.body[0].categoriaGasto.nome).toBe(
+        "Categoria Teste Filtro",
+      );
+      expect(response.body[0].orcamento_id).toBe(testOrcamento.id);
+    });
+
+    it("should combine multiple filters", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      // Criar categoria específica para este teste
+      const categoriaEspecifica: CategoriaGastoCreateDto = {
+        nome: "Categoria Internet",
+      };
+
+      const categoriaResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(categoriaEspecifica)
+        .expect(201);
+
+      const gastoVariado1: GastoVariadoCreateDto = {
+        categoria_id: categoriaResponse.body.id,
+        descricao: "Internet Paga",
+        valor: "150.75",
+        data_pgto: new Date("2026-02-10"),
+      };
+
+      const gastoVariado2: GastoVariadoCreateDto = {
+        categoria_id: categoriaResponse.body.id,
+        descricao: "Internet 2",
+        valor: "200.00",
+        data_pgto: new Date("2026-02-15"),
+      };
+
+      const gastoVariado3: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Água Paga",
+        valor: "85.00",
+        data_pgto: new Date("2026-02-15"),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado1)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado2)
+        .expect(201);
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado3)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({
+          descricao: "Internet",
+          nome_categoria: "Internet",
+          data_pgto_inicio: "2026-02-10",
+          data_pgto_fim: "2026-02-15",
+        })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(2);
+      expect(
+        response.body.every((gasto) => gasto.descricao.includes("Internet")),
+      ).toBeTruthy();
+      expect(
+        response.body.every((gasto) =>
+          gasto.categoriaGasto.nome.includes("Internet"),
+        ),
+      ).toBeTruthy();
+
+      response.body.forEach((gasto) => {
+        const dataPgto = new Date(gasto.data_pgto).toISOString().split("T")[0];
+        expect(
+          dataPgto >= "2026-02-10" && dataPgto <= "2026-02-15",
+        ).toBeTruthy();
+        expect(gasto.orcamento_id).toBe(testOrcamento.id);
+      });
+    });
+
+    it("should return empty array when no gastos variados match filters", async () => {
+      // Arrange
+      const orcamentoMock: OrcamentoCreateDto = {
+        nome: faker.string.alphanumeric(5),
+        valor_inicial: faker.number
+          .float({ min: 1000, max: 5000, fractionDigits: 2 })
+          .toString(),
+      };
+
+      const orcamentoResponse = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/orcamentos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(orcamentoMock)
+        .expect(201);
+
+      const testOrcamento = orcamentoResponse.body;
+
+      const gastoVariado: GastoVariadoCreateDto = {
+        categoria_id: categoriaMock.id,
+        descricao: "Gasto Teste",
+        valor: "150.00",
+        data_pgto: new Date(),
+      };
+
+      await request(app.getHttpServer())
+        .post(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(gastoVariado)
+        .expect(201);
+
+      // Act
+      const response = await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${testOrcamento.id}/gastos-variados`,
+        )
+        .query({
+          descricao: "NaoExiste",
+          data_pgto_inicio: "2025-01-01",
+          data_pgto_fim: "2025-01-31",
+        })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      // Assert
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBe(0);
+    });
   });
 
   describe(`GET ${apiGlobalPrefix}/gastos-variados/:id`, () => {

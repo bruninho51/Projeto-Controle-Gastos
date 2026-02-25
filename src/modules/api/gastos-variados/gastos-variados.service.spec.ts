@@ -4,6 +4,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
 import { GastoVariadoUpdateDto } from "./dtos/GastoVariadoUpdate.dto";
 import { faker } from "@faker-js/faker";
+import { GastoVariadoFindDto } from "./dtos/GastoVariadoFind.dto";
 
 const mockPrismaService = {
   gastoVariado: {
@@ -75,8 +76,22 @@ describe("GastosVariadosService", () => {
   });
 
   describe("findAll", () => {
+    function getWhere() {
+      const calls = mockPrismaService.gastoVariado.findMany.mock.calls;
+      if (!calls.length) throw new Error("findMany não foi chamado");
+      const lastCall = calls[calls.length - 1];
+      return lastCall[0].where;
+    }
+
+    const BASE_WHERE = Object.freeze({
+      orcamento_id: 1,
+      soft_delete: null,
+    });
+
     it("should return an array of gasto variado", async () => {
       const orcamento_id = faker.number.int();
+
+      const filters: GastoVariadoFindDto = {};
 
       const gastosVariados = [
         {
@@ -97,7 +112,7 @@ describe("GastosVariadosService", () => {
 
       mockPrismaService.gastoVariado.findMany.mockResolvedValue(gastosVariados);
 
-      const result = await service.findAll(orcamento_id);
+      const result = await service.findAll(orcamento_id, filters);
 
       expect(result).toEqual(gastosVariados);
       expect(mockPrismaService.gastoVariado.findMany).toHaveBeenCalledWith({
@@ -106,6 +121,89 @@ describe("GastosVariadosService", () => {
         },
         where: { orcamento_id, soft_delete: null },
       });
+    });
+
+    it("should filter by descricao", async () => {
+      const searchedValue = faker.string.alpha();
+
+      await service.findAll(1, { descricao: searchedValue });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        descricao: { contains: searchedValue },
+      });
+    });
+
+    it("should filter by data_pgto day", async () => {
+      const date = new Date("2026-02-10");
+
+      await service.findAll(1, { data_pgto: date });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        data_pgto: { equals: date },
+      });
+    });
+
+    it("should filter by data_pgto range", async () => {
+      const inicio = new Date("2026-02-01");
+      const fim = new Date("2026-02-10");
+
+      await service.findAll(1, {
+        data_pgto_inicio: inicio,
+        data_pgto_fim: fim,
+      });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        data_pgto: {
+          gte: inicio,
+          lte: fim,
+        },
+      });
+    });
+
+    it("should filter by nome_categoria", async () => {
+      const nome = faker.string.alpha(10);
+
+      await service.findAll(1, { nome_categoria: nome });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        categoriaGasto: {
+          nome: { contains: nome },
+        },
+      });
+    });
+
+    it("should apply all filters together", async () => {
+      const descricao = faker.string.alpha(10);
+      const categoria = faker.string.alpha(10);
+      const inicio = new Date("2026-02-01");
+      const fim = new Date("2026-02-10");
+
+      await service.findAll(1, {
+        descricao,
+        data_pgto_inicio: inicio,
+        data_pgto_fim: fim,
+        nome_categoria: categoria,
+      });
+
+      expect(getWhere()).toStrictEqual({
+        ...BASE_WHERE,
+        descricao: { contains: descricao },
+        categoriaGasto: { nome: { contains: categoria } },
+        data_pgto: {
+          gte: inicio,
+          lte: fim,
+        },
+      });
+    });
+
+    it("should not add extra operators when no filters", async () => {
+      await service.findAll(1, {});
+
+      expect(getWhere()).toStrictEqual(BASE_WHERE);
     });
   });
 

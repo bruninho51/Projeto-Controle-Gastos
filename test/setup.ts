@@ -14,7 +14,10 @@ export default async function () {
       MYSQL_DATABASE: process.env.DB_NAME!,
     })
     .withHealthCheck({
-      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -P 3306 -uroot -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1'"],
+      test: [
+        "CMD-SHELL",
+        "mysql -h 127.0.0.1 -P 3306 -uroot -p${MYSQL_ROOT_PASSWORD} -e 'SELECT 1'",
+      ],
       interval: 5_000,
       timeout: 3_000,
       retries: 10,
