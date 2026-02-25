@@ -4,7 +4,6 @@
 ### Features
 
 * atualiza a versão do node e corrige vulnerabilidades ([c2d19bc](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/c2d19bcfcdcfea91ce9d9f7e3efa87e0c86e9909))
-* atualiza a versão do node e corrige vulnerabilidades ([e48ab71](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/e48ab71a3c5ceb176829afe4de40d7091299408e))
 
 # [1.22.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.21.1...v1.22.0) (2026-02-24)
 
