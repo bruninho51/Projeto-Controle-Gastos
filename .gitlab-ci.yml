@@ -9,10 +9,42 @@ stages:
 deploy:
   stage: deploy
   environment: production
+  before_script:
+    - apt-get update && apt-get install -y curl
   script:
+    # Info básica
+    - echo "Node version:"
     - node -v
+    - echo ""
+
+    # 🔎 TESTE 1 — CI_JOB_TOKEN
+    - echo "=============================="
+    - echo "🔎 Testando CI_JOB_TOKEN"
+    - echo "=============================="
+    - |
+      curl -s -o response_ci.json -w "HTTP_STATUS:%{http_code}\n" \
+      --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+      https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos
+    - cat response_ci.json
+    - echo ""
+
+    # 🔎 TESTE 2 — GL_TOKEN
+    - echo "=============================="
+    - echo "🔎 Testando GL_TOKEN"
+    - echo "=============================="
+    - |
+      curl -s -o response_gl.json -w "HTTP_STATUS:%{http_code}\n" \
+      --header "PRIVATE-TOKEN: $GL_TOKEN" \
+      https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos
+    - cat response_gl.json
+    - echo ""
+
+    # Build normal
     - npm ci
     - chmod +x ./ci_cd/build.sh
+
+    # Release com verbose
     - DEBUG=semantic-release:*,@semantic-release/* npm run release
+
   only:
     - main
