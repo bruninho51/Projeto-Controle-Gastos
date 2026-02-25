@@ -1,29 +1,14 @@
-image: node:20
-
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
+image: node:latest
 
 stages:
   - deploy
 
 deploy:
   stage: deploy
-  image: docker:latest
-  services:
-    - docker:dind
-  environment:
-    name: production
-  before_script:
-    - apk add --no-cache nodejs npm git
-    - npm install
-    - chmod +x ./ci_cd/build.sh
-    - cd ./ci_cd
-    - ls -la
-    - cd ..
   script:
-    # Executa semantic-release que chama automaticamente o build.sh
+    - node -v
+    - npm ci
+    - chmod +x ./ci_cd/build.sh
     - npm run release
   only:
-    refs:
-      - main
+    - main
