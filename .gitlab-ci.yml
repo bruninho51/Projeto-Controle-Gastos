@@ -25,9 +25,7 @@ cache: &global-cache
   key:
     files:
       - package-lock.json
-      - prisma/schema.prisma
   paths:
-    - node_modules/
     - .npm/
   policy: pull
 
@@ -41,7 +39,6 @@ Install Dependencies:
     policy: pull-push
   script:
     - npm ci --no-audit --no-fund
-    - npx prisma generate
 
 # -----------------------------
 # SECURITY
@@ -74,6 +71,7 @@ Execute Unit Tests:
     name: production
   before_script:
     - npm ci --prefer-offline --no-audit --no-fund
+    - npx prisma generate
   script:
     - npm run test:cov
   artifacts:
@@ -103,6 +101,7 @@ Execute EndtoEnd Tests:
   before_script:
     - apk add --no-cache docker-cli
     - npm ci --prefer-offline --no-audit --no-fund
+    - npx prisma generate
     - docker pull mysql:8.0
   script:
     - npm run test:e2e
@@ -129,6 +128,7 @@ Release & Publish Image:
   before_script:
     - apk add --no-cache docker-cli git
     - npm ci --prefer-offline --no-audit --no-fund
+    - npx prisma generate
     - chmod +x ./ci_cd/build.sh
   script:
     - npm run release
