@@ -13,7 +13,6 @@ deploy:
   before_script:
     - apt-get update && apt-get install -y curl
   script:
-    # Info básica
     - echo "Node version:"
     - node -v
     - echo ""
@@ -24,8 +23,8 @@ deploy:
     - echo "=============================="
     - |
       curl -s -o response_ci.json -w "HTTP_STATUS:%{http_code}\n" \
-      --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-      https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos
     - cat response_ci.json
     - echo ""
 
@@ -35,18 +34,48 @@ deploy:
     - echo "=============================="
     - |
       curl -s -o response_gl.json -w "HTTP_STATUS:%{http_code}\n" \
-      --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-      https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos
+        --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos
     - cat response_gl.json
+    - echo ""
+
+    # 🔎 TESTE 3 — GL_TOKEN (o que o plugin usa)
+    - echo "=============================="
+    - echo "🔎 Testando GL_TOKEN via path encoded"
+    - echo "=============================="
+    - |
+      curl -s -o response_gl_path.json -w "HTTP_STATUS:%{http_code}\n" \
+        --header "PRIVATE-TOKEN: $GL_TOKEN" \
+        "https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos"
+    - cat response_gl_path.json
+    - echo ""
+
+    # 🔎 TESTE 4 — releases endpoint
+    - echo "=============================="
+    - echo "🔎 Testando endpoint de releases"
+    - echo "=============================="
+    - |
+      curl -s -o response_releases.json -w "HTTP_STATUS:%{http_code}\n" \
+        --header "PRIVATE-TOKEN: $GL_TOKEN" \
+        "https://gitlab.com/api/v4/projects/65827697/releases"
+    - cat response_releases.json
+    - echo ""
+
+    # 🔎 TESTE 5 — quem é esse token
+    - echo "=============================="
+    - echo "🔎 Usuário do GL_TOKEN"
+    - echo "=============================="
+    - |
+      curl -s -o response_user.json -w "HTTP_STATUS:%{http_code}\n" \
+        --header "PRIVATE-TOKEN: $GL_TOKEN" \
+        "https://gitlab.com/api/v4/user"
+    - cat response_user.json
     - echo ""
 
     # Build normal
     - npm ci
     - chmod +x ./ci_cd/build.sh
-
     - git remote set-url origin https://oauth2:${GITLAB_TOKEN}@gitlab.com/bruninho51/projeto-controle-gastos.git
-
-    # Release com verbose
     - DEBUG=semantic-release:*,@semantic-release/* npm run release
 
   only:
