@@ -5,6 +5,7 @@ stages:
 
 deploy:
   stage: deploy
+  environment: production
   script:
     - node -v
     - npm ci
