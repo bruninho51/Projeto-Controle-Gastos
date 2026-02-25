@@ -43,6 +43,8 @@ deploy:
     - npm ci
     - chmod +x ./ci_cd/build.sh
 
+    - git remote set-url origin https://oauth2:${GITLAB_TOKEN}@gitlab.com/bruninho51/projeto-controle-gastos.git
+
     # Release com verbose
     - DEBUG=semantic-release:*,@semantic-release/* npm run release
 
