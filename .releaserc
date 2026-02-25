@@ -33,8 +33,7 @@
      [
        "@semantic-release/gitlab",
        {
-         "gitlabUrl": "https://gitlab.com",
-         "gitlabToken": "${GITLAB_TOKEN}"
+         "gitlabUrl": "https://gitlab.com"
        }
      ]
    ]
