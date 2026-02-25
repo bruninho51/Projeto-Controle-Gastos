@@ -2,6 +2,7 @@ image: node:latest
 
 variables:
   GIT_DEPTH: 0
+  GL_TOKEN: $GITLAB_TOKEN
 
 stages:
   - deploy
