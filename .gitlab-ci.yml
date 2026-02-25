@@ -27,7 +27,18 @@ cache: &global-cache
   paths:
     - node_modules/
     - .npm/
-  policy: pull-push
+  policy: pull
+
+# -----------------------------
+# PRE
+# -----------------------------
+Install Dependencies:
+  stage: .pre
+  cache:
+    <<: *global-cache
+    policy: pull-push  # único job que escreve no cache
+  script:
+    - npm ci --no-audit --no-fund
 
 # -----------------------------
 # SECURITY
@@ -58,6 +69,7 @@ Execute Unit Tests:
   stage: unit
   cache:
     <<: *global-cache
+    policy: pull
   environment:
     name: production
   before_script:
