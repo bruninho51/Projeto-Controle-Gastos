@@ -9,6 +9,6 @@ deploy:
     - node -v
     - npm ci
     - chmod +x ./ci_cd/build.sh
-    - npm run release
+    - DEBUG=semantic-release:*,@semantic-release/* npm run release
   only:
     - main
