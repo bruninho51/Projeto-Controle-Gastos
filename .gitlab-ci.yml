@@ -1,4 +1,4 @@
-image: node:latest
+image: node:24.13.1-bookworm
 
 variables:
   GIT_DEPTH: 0
@@ -39,7 +39,7 @@ deploy:
     - cat response_gl.json
     - echo ""
 
-    # 🔎 TESTE 3 — GL_TOKEN (o que o plugin usa)
+    # 🔎 TESTE 3 — GL_TOKEN via path encoded
     - echo "=============================="
     - echo "🔎 Testando GL_TOKEN via path encoded"
     - echo "=============================="
@@ -61,7 +61,7 @@ deploy:
     - cat response_releases.json
     - echo ""
 
-    # 🔎 TESTE 5 — quem é esse token
+    # 🔎 TESTE 5 — usuário do token
     - echo "=============================="
     - echo "🔎 Usuário do GL_TOKEN"
     - echo "=============================="
@@ -72,10 +72,19 @@ deploy:
     - cat response_user.json
     - echo ""
 
-    # Build normal
+    # Build
     - npm ci
     - chmod +x ./ci_cd/build.sh
     - git remote set-url origin https://oauth2:${GITLAB_TOKEN}@gitlab.com/bruninho51/projeto-controle-gastos.git
+
+    # 🔧 Patch do bug no @semantic-release/gitlab v13
+    - |
+      sed -i \
+        's/headers: { tokenHeader: gitlabToken }/headers: { [tokenHeader]: gitlabToken }/g' \
+        node_modules/@semantic-release/gitlab/lib/verify.js
+    - echo "✅ Patch aplicado:"
+    - grep "tokenHeader" node_modules/@semantic-release/gitlab/lib/verify.js
+
     - DEBUG=semantic-release:*,@semantic-release/* npm run release
 
   only:

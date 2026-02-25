@@ -10,7 +10,7 @@
     "url": "https://gitlab.com/bruninho51/projeto-controle-gastos.git"
   },
   "engines": {
-    "node": ">=24.13.1"
+    "node": ">=24.14.0"
   },
   "scripts": {
     "build": "nest build",
@@ -60,8 +60,8 @@
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/exec": "^7.1.0",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/gitlab": "^13.2.6",
-    "@semantic-release/release-notes-generator": "^14.0.3",
+    "@semantic-release/gitlab": "^13.3.2",
+    "@semantic-release/release-notes-generator": "^14.1.0",
     "@types/dockerode": "^4.0.1",
     "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
