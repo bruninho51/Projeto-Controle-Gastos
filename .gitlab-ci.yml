@@ -28,13 +28,13 @@ deploy:
     - cat response_ci.json
     - echo ""
 
-    # 🔎 TESTE 2 — GL_TOKEN
+    # 🔎 TESTE 2 — GITLAB_TOKEN
     - echo "=============================="
-    - echo "🔎 Testando GL_TOKEN"
+    - echo "🔎 Testando GITLAB_TOKEN"
     - echo "=============================="
     - |
       curl -s -o response_gl.json -w "HTTP_STATUS:%{http_code}\n" \
-      --header "PRIVATE-TOKEN: $GL_TOKEN" \
+      --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
       https://gitlab.com/api/v4/projects/bruninho51%2Fprojeto-controle-gastos
     - cat response_gl.json
     - echo ""
