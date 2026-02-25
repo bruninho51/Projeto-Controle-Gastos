@@ -1,3 +1,10 @@
+# [1.24.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.23.0...v1.24.0) (2026-02-25)
+
+
+### Features
+
+* adiciona suporte a filtros nos gastos variados ([d77bddf](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/d77bddf2e8ed6a794f40e10d5ef4a2db41750883))
+
 # [1.23.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.22.0...v1.23.0) (2026-02-25)
 
 
