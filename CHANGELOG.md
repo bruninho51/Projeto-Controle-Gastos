@@ -1,3 +1,10 @@
+# [1.25.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.24.0...v1.25.0) (2026-03-04)
+
+
+### Features
+
+* melhora a saída da api ([d45e55a](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/d45e55a394d58cd5c6a978f8b3ec72b0a80164f4))
+
 # [1.24.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.23.0...v1.24.0) (2026-02-25)
 
 
