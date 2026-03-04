@@ -8,19 +8,27 @@ import {
   Patch,
   Req,
   UseGuards,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { CategoriasGastosService } from "./categorias-gastos.service";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
 import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
+import { CategoriaGastoResponseDto } from "./dtos/CategoriaGastoResponse.dto";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
 @ApiTags("Categorias de Gastos")
+@ApiBearerAuth("access-token")
+@ApiUnauthorizedResponse({
+  description: "Token inválido ou não informado",
+})
+@UseGuards(JwtAuthGuard)
 @Controller("categorias-gastos")
 export class CategoriasGastosController {
   constructor(
@@ -29,11 +37,14 @@ export class CategoriasGastosController {
 
   @Get()
   @ApiOperation({ summary: "Listar todas as categorias de gastos" })
-  @ApiResponse({ status: 200, description: "Lista de categorias de gastos" })
+  @ApiResponse({
+    status: 200,
+    description: "Lista de categorias de gastos",
+    type: CategoriaGastoResponseDto,
+    isArray: true,
+  })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
-  async findAll(@Req() { user }) {
+  async findAll(@Req() { user }): Promise<CategoriaGastoResponseDto[]> {
     return this.categoriasGastosService.findAll(user.id);
   }
 
@@ -42,15 +53,14 @@ export class CategoriasGastosController {
   @ApiResponse({
     status: 201,
     description: "Categoria de gasto criada com sucesso.",
+    type: CategoriaGastoResponseDto,
   })
   @ApiResponse({ status: 409, description: "Categoria de gasto já existe." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
   async create(
     @Req() { user },
     @Body() createCategoriaDto: CategoriaGastoCreateDto,
-  ) {
+  ): Promise<CategoriaGastoResponseDto> {
     return this.categoriasGastosService.create(user.id, createCategoriaDto);
   }
 
@@ -59,17 +69,16 @@ export class CategoriasGastosController {
   @ApiResponse({
     status: 200,
     description: "Categoria de gasto atualizada com sucesso.",
+    type: CategoriaGastoResponseDto,
   })
   @ApiResponse({ status: 409, description: "Categoria de gasto já existe." })
   @ApiResponse({ status: 404, description: "Categoria de gasto não existe." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
   async update(
     @Req() { user },
-    @Param("id") id: number,
+    @Param("id", ParseIntPipe) id: number,
     @Body() updateCategoriaDto: CategoriaGastoUpdateDto,
-  ) {
+  ): Promise<CategoriaGastoResponseDto> {
     return this.categoriasGastosService.update(user.id, id, updateCategoriaDto);
   }
 
@@ -78,12 +87,14 @@ export class CategoriasGastosController {
   @ApiResponse({
     status: 200,
     description: "Categoria de gasto deletada com sucesso.",
+    type: CategoriaGastoResponseDto,
   })
   @ApiResponse({ status: 404, description: "Categoria de gasto não existe." })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
-  async remove(@Req() { user }, @Param("id") id: number) {
+  async remove(
+    @Req() { user },
+    @Param("id", ParseIntPipe) id: number,
+  ): Promise<CategoriaGastoResponseDto> {
     return this.categoriasGastosService.softDelete(user.id, id);
   }
 }

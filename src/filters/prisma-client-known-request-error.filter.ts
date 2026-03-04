@@ -28,7 +28,7 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
   private handleRecordNotFound(response: Response) {
     return response
       .status(HttpStatus.NOT_FOUND)
-      .json({ message: "Registro não encontrado." });
+      .json({ message: "Registro não encontrado.", statusCode: 404 });
   }
 
   private handleUniqueConstraintError(
@@ -43,12 +43,14 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
       if (constraint === "unique_categoria_gasto") {
         return response.status(HttpStatus.CONFLICT).json({
           message: "A categoria já existe. Por favor, escolha outro nome.",
+          statusCode: 409,
         });
       }
     }
 
     return response.status(HttpStatus.CONFLICT).json({
       message: "Violação de restrição única. Verifique os dados inseridos.",
+      statusCode: 409,
     });
   }
 
@@ -75,6 +77,7 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       message:
         "Erro interno no servidor. Por favor, tente novamente mais tarde.",
+      statusCode: 500,
     });
   }
 }
