@@ -61,7 +61,7 @@ describe("CategoriasGastosController (e2e)", () => {
 
   describe(`GET ${apiGlobalPrefix}/categorias-gastos`, () => {
     it("should return an array of categorias de gastos", async () => {
-      const categoria = await prisma.categoriaGasto.create({
+      await prisma.categoriaGasto.create({
         data: {
           nome: faker.string.alpha(5),
           usuario_id: user.id,
@@ -98,6 +98,7 @@ describe("CategoriasGastosController (e2e)", () => {
   });
 
   describe(`POST ${apiGlobalPrefix}/categorias-gastos`, () => {
+
     it("should create a new categoria de gasto", async () => {
       const newCategoria: CategoriaGastoCreateDto = {
         nome: faker.string.alphanumeric(6).toUpperCase(),
@@ -124,6 +125,7 @@ describe("CategoriasGastosController (e2e)", () => {
         .send(newCategoria)
         .expect(400);
 
+      expect(response.body.statusCode).toBe(400);
       expect(response.body).toHaveProperty("message");
       expect(Array.isArray(response.body.message)).toBe(true);
 
@@ -144,6 +146,7 @@ describe("CategoriasGastosController (e2e)", () => {
         .send(newCategoria)
         .expect(400);
 
+      expect(response.body.statusCode).toBe(400);
       expect(response.body).toHaveProperty("message");
       expect(Array.isArray(response.body.message)).toBe(true);
 
@@ -197,6 +200,7 @@ describe("CategoriasGastosController (e2e)", () => {
         .send(newCategoria)
         .expect(409);
 
+      expect(response.body.statusCode).toBe(409);
       expect(response.body.message).toBe(
         "A categoria já existe. Por favor, escolha outro nome.",
       );
@@ -210,11 +214,13 @@ describe("CategoriasGastosController (e2e)", () => {
         stanger_field: "hello",
       } as CategoriaGastoCreateDto;
 
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post(`${apiGlobalPrefix}/categorias-gastos`)
         .set("Authorization", `Bearer ${userJwt}`)
         .send(newCategoria)
         .expect(400);
+
+      expect(response.body.statusCode).toBe(400);
     });
 
     it("should return a 400 error if invalid data is passed", async () => {
@@ -226,11 +232,13 @@ describe("CategoriasGastosController (e2e)", () => {
         .send(invalidCategoria)
         .expect(400);
 
+      expect(response.body.statusCode).toBe(400);
       expect(response.body.message).toBeDefined();
     });
   });
 
   describe(`PATCH ${apiGlobalPrefix}/categorias-gastos/:id`, () => {
+
     it("should return 404 if try to update a categoria de gasto was deleted (soft delete)", async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
@@ -241,15 +249,13 @@ describe("CategoriasGastosController (e2e)", () => {
         },
       });
 
-      const updatedCategoria = {
-        nome,
-      };
-
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .set("Authorization", `Bearer ${userJwt}`)
-        .send(updatedCategoria)
+        .send({ nome })
         .expect(404);
+
+      expect(response.body.statusCode).toBe(404);
     });
 
     it("should update a categoria de gasto", async () => {
@@ -261,18 +267,14 @@ describe("CategoriasGastosController (e2e)", () => {
         },
       });
 
-      const updatedCategoria = {
-        nome,
-      };
-
       const response = await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .set("Authorization", `Bearer ${userJwt}`)
-        .send(updatedCategoria)
+        .send({ nome })
         .expect(200);
 
       expect(response.body.id).toBe(categoria.id);
-      expect(response.body.nome).toBe(updatedCategoria.nome);
+      expect(response.body.nome).toBe(nome);
     });
 
     it("should return 200 when inactivate a categoria gasto", async () => {
@@ -322,30 +324,23 @@ describe("CategoriasGastosController (e2e)", () => {
     it("should return 400 with correct messages when update a categoria gasto when all fields as null", async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
-        data: {
-          nome,
-          usuario_id: user.id,
-        },
+        data: { nome, usuario_id: user.id },
       });
-
-      const updatedCategoria: Required<CategoriaGastoUpdateDto> = {
-        nome: null,
-        data_inatividade: null,
-      };
 
       const response = await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .set("Authorization", `Bearer ${userJwt}`)
-        .send(updatedCategoria)
+        .send({ nome: null, data_inatividade: null })
         .expect(400);
 
-      expect(response.body).toHaveProperty("message");
+        expect(response.body).toHaveProperty("message");
       expect(Array.isArray(response.body.message)).toBe(true);
 
       expect(response.body.message).toEqual([
         "nome should not be empty",
         "nome must be a string",
       ]);
+      expect(response.body.statusCode).toBe(400);
     });
 
     it("should return 400 with correct messages when update a categoria gasto when all fields as wrong", async () => {
@@ -379,11 +374,13 @@ describe("CategoriasGastosController (e2e)", () => {
 
     it("should return 404 if categoria de gasto does not exist", async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/999`)
         .set("Authorization", `Bearer ${userJwt}`)
         .send({ nome })
         .expect(404);
+
+      expect(response.body.statusCode).toBe(404);
     });
 
     it("should return 409 if name exists when update", async () => {
@@ -398,11 +395,13 @@ describe("CategoriasGastosController (e2e)", () => {
         data: { nome: nome2, usuario_id: user.id },
       });
 
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .patch(`${apiGlobalPrefix}/categorias-gastos/${categoriaGasto1.id}`)
         .set("Authorization", `Bearer ${userJwt}`)
         .send({ nome: nome2 })
         .expect(409);
+
+      expect(response.body.statusCode).toBe(409);
     });
   });
 
@@ -421,16 +420,16 @@ describe("CategoriasGastosController (e2e)", () => {
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
-      expect(response.body).toHaveProperty("soft_delete");
+      await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(404);
     });
 
     it("should return 404 if categoria de gasto was deleted (soft delete)", async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
-        data: {
-          nome,
-          usuario_id: user.id,
-        },
+        data: { nome, usuario_id: user.id },
       });
 
       await request(app.getHttpServer())
@@ -438,17 +437,21 @@ describe("CategoriasGastosController (e2e)", () => {
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
+
+      expect(response.body.statusCode).toBe(404);
     });
 
     it("should return 404 if categoria de gasto does not exist", async () => {
-      await request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/categorias-gastos/999`)
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);
+
+      expect(response.body.statusCode).toBe(404);
     });
   });
 });
