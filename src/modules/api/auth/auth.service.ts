@@ -2,6 +2,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { Usuario } from "@prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
+import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,7 @@ export class AuthService {
     });
   }
 
-  async findOrCreateUser(firebaseUser) {
+  async findOrCreateUser(firebaseUser: DecodedIdToken) {
     let user = await this.findUser(firebaseUser.email);
 
     if (!user) {

@@ -21,6 +21,7 @@ export class DriverAdapterErrorFilter implements ExceptionFilter {
     if (state === "45000") {
       return response.status(HttpStatus.CONFLICT).json({
         message,
+        statusCode: 409,
       });
     }
 
