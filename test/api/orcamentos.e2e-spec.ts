@@ -54,10 +54,20 @@ describe("OrcamentosController (v1) (E2E)", () => {
     authService = moduleFixture.get<AuthService>(AuthService);
 
     user = await authService.findOrCreateUser({
+      aud: "test-project",
+      auth_time: 1700000000,
+      exp: 1700003600,
+      iat: 1700000000,
+      iss: "https://securetoken.google.com/test-project",
+      sub: faker.string.uuid(),
+      uid: faker.string.uuid(),
+      firebase: {
+        identities: {},
+        sign_in_provider: "google.com",
+      },
       email: faker.internet.email(),
       name: faker.person.fullName(),
       picture: faker.internet.url(),
-      uid: faker.string.uuid(),
     });
 
     userJwt = await authService.generateJwt(user);

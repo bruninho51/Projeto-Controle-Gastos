@@ -3,6 +3,7 @@ import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { firebaseApp } from "../../../../firebase.config";
 import { faker } from "@faker-js/faker";
+import { UnauthorizedException } from "@nestjs/common";
 
 // Simulando o Firebase Admin SDK
 jest.mock("../../../../firebase.config", () => ({
@@ -59,7 +60,6 @@ describe("AuthController", () => {
       expect(authService.findOrCreateUser).toHaveBeenCalledWith(firebaseUser);
       expect(authService.generateJwt).toHaveBeenCalledWith(user);
       expect(result).toEqual({
-        message: "Autenticado com sucesso!",
         access_token: accessToken,
       });
     });
@@ -72,13 +72,16 @@ describe("AuthController", () => {
         errorMock,
       );
 
-      const result = await authController.googleVerify({ idToken });
+      try {
+        await authController.googleVerify({ idToken });
+        fail("Expected method to throw");
+      } catch (error) {
+        expect(error).toBeInstanceOf(UnauthorizedException);
+        expect(error.message).toBe("Token inválido ou expirado");
+        expect(error.getStatus()).toBe(401);
+      }
 
       expect(firebaseApp.auth().verifyIdToken).toHaveBeenCalledWith(idToken);
-      expect(result).toEqual({
-        message: "Token inválido ou expirado",
-        error: errorMock,
-      });
     });
   });
 });

@@ -40,10 +40,20 @@ describe("CategoriasGastosController (e2e)", () => {
     authService = moduleFixture.get<AuthService>(AuthService);
 
     user = await authService.findOrCreateUser({
+      aud: "test-project",
+      auth_time: 1700000000,
+      exp: 1700003600,
+      iat: 1700000000,
+      iss: "https://securetoken.google.com/test-project",
+      sub: faker.string.uuid(),
+      uid: faker.string.uuid(),
+      firebase: {
+        identities: {},
+        sign_in_provider: "google.com",
+      },
       email: faker.internet.email(),
       name: faker.person.fullName(),
       picture: faker.internet.url(),
-      uid: faker.string.uuid(),
     });
 
     userJwt = await authService.generateJwt(user);
@@ -98,7 +108,6 @@ describe("CategoriasGastosController (e2e)", () => {
   });
 
   describe(`POST ${apiGlobalPrefix}/categorias-gastos`, () => {
-
     it("should create a new categoria de gasto", async () => {
       const newCategoria: CategoriaGastoCreateDto = {
         nome: faker.string.alphanumeric(6).toUpperCase(),
@@ -238,7 +247,6 @@ describe("CategoriasGastosController (e2e)", () => {
   });
 
   describe(`PATCH ${apiGlobalPrefix}/categorias-gastos/:id`, () => {
-
     it("should return 404 if try to update a categoria de gasto was deleted (soft delete)", async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
@@ -333,7 +341,7 @@ describe("CategoriasGastosController (e2e)", () => {
         .send({ nome: null, data_inatividade: null })
         .expect(400);
 
-        expect(response.body).toHaveProperty("message");
+      expect(response.body).toHaveProperty("message");
       expect(Array.isArray(response.body.message)).toBe(true);
 
       expect(response.body.message).toEqual([

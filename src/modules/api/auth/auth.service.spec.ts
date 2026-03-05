@@ -4,6 +4,7 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { JwtService } from "@nestjs/jwt";
 import { Usuario } from "@prisma/client";
 import { faker } from "@faker-js/faker";
+import { DecodedIdToken } from "firebase-admin/lib/auth/token-verifier";
 
 jest.mock("@nestjs/jwt");
 
@@ -36,10 +37,20 @@ describe("AuthService", () => {
 
   describe("findOrCreateUser", () => {
     it("should return an existing usuario if found", async () => {
-      const firebaseUser = {
+      const firebaseUser: DecodedIdToken = {
+        aud: "test-project",
+        auth_time: Date.now(),
+        exp: Date.now() + 3600,
+        iat: Date.now(),
+        iss: "https://securetoken.google.com/test-project",
+        sub: faker.string.uuid(),
+        uid: faker.string.uuid(),
         email: faker.internet.email(),
         name: faker.person.fullName(),
-        uid: faker.string.uuid(),
+        firebase: {
+          identities: {},
+          sign_in_provider: "google.com",
+        },
       };
 
       const existingUser: Usuario = {
@@ -65,10 +76,20 @@ describe("AuthService", () => {
     });
 
     it("should create a new usuario if not found", async () => {
-      const firebaseUser = {
+      const firebaseUser: DecodedIdToken = {
+        aud: "test-project",
+        auth_time: Date.now(),
+        exp: Date.now() + 3600,
+        iat: Date.now(),
+        iss: "https://securetoken.google.com/test-project",
+        sub: faker.string.uuid(),
+        uid: faker.string.uuid(),
         email: faker.internet.email(),
         name: faker.person.fullName(),
-        uid: faker.string.uuid(),
+        firebase: {
+          identities: {},
+          sign_in_provider: "google.com",
+        },
       };
 
       const newUser: Usuario = {
