@@ -1,3 +1,10 @@
+# [1.26.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.25.0...v1.26.0) (2026-03-05)
+
+
+### Features
+
+* tipa retorno auth ([70cf631](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/70cf631c5bb60631e94f8120eca166f1867e01c3))
+
 # [1.25.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.24.0...v1.25.0) (2026-03-04)
 
 
