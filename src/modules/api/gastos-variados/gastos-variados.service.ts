@@ -2,8 +2,9 @@ import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
 import { GastoVariadoUpdateDto } from "./dtos/GastoVariadoUpdate.dto";
-import { GastoVariado, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { GastoVariadoFindDto } from "./dtos/GastoVariadoFind.dto";
+import { GastoVariadoResponseDto } from "./dtos/GastoVariadoResponse.dto";
 
 @Injectable()
 export class GastosVariadosService {
@@ -12,8 +13,8 @@ export class GastosVariadosService {
   async create(
     orcamento_id: number,
     createGastoDto: GastoVariadoCreateDto,
-  ): Promise<GastoVariado> {
-    return await this.prisma.gastoVariado.create({
+  ): Promise<GastoVariadoResponseDto> {
+    const gastoVariado = await this.prisma.gastoVariado.create({
       include: {
         categoriaGasto: true,
       },
@@ -22,12 +23,14 @@ export class GastosVariadosService {
         orcamento_id,
       },
     });
+
+    return GastoVariadoResponseDto.fromEntity(gastoVariado);
   }
 
   async findAll(
     orcamento_id: number,
     filters: GastoVariadoFindDto,
-  ): Promise<GastoVariado[]> {
+  ): Promise<GastoVariadoResponseDto[]> {
     const where: Prisma.GastoVariadoWhereInput = {
       orcamento_id,
       soft_delete: null,
@@ -36,12 +39,14 @@ export class GastosVariadosService {
       ...this.buildDataPgtoFilter(filters),
     };
 
-    return this.prisma.gastoVariado.findMany({
+    const gastosVariados = await this.prisma.gastoVariado.findMany({
       include: {
         categoriaGasto: true,
       },
       where,
     });
+
+    return gastosVariados.map((c) => GastoVariadoResponseDto.fromEntity(c));
   }
 
   /**
@@ -138,31 +143,35 @@ export class GastosVariadosService {
   async findOne(
     orcamento_id: number,
     id: number,
-  ): Promise<GastoVariado | null> {
-    return this.prisma.gastoVariado.findUnique({
+  ): Promise<GastoVariadoResponseDto | null> {
+    const gastoVariado = await this.prisma.gastoVariado.findUnique({
       include: {
         categoriaGasto: true,
       },
       where: { id, orcamento_id, soft_delete: null },
     });
+
+    return GastoVariadoResponseDto.fromEntity(gastoVariado);
   }
 
   async update(
     orcamento_id: number,
     id: number,
     updateGastoDto: GastoVariadoUpdateDto,
-  ): Promise<GastoVariado> {
-    return this.prisma.gastoVariado.update({
+  ): Promise<GastoVariadoResponseDto> {
+    const gastoVariado = await this.prisma.gastoVariado.update({
       include: {
         categoriaGasto: true,
       },
       where: { id, orcamento_id, soft_delete: null },
       data: updateGastoDto,
     });
+
+    return GastoVariadoResponseDto.fromEntity(gastoVariado);
   }
 
-  async softDelete(orcamento_id: number, id: number): Promise<GastoVariado> {
-    return this.prisma.gastoVariado.update({
+  async softDelete(orcamento_id: number, id: number): Promise<GastoVariadoResponseDto> {
+    const gastoVariado = await this.prisma.gastoVariado.update({
       include: {
         categoriaGasto: true,
       },
@@ -171,5 +180,7 @@ export class GastosVariadosService {
         soft_delete: new Date(),
       },
     });
+
+    return GastoVariadoResponseDto.fromEntity(gastoVariado);
   }
 }

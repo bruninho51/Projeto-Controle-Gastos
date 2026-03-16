@@ -11,8 +11,6 @@ import { OrcamentosService } from "../orcamentos/orcamentos.service";
 import { NotFoundException } from "@nestjs/common";
 import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
 
-// ─── Builders ────────────────────────────────────────────────────────────────
-
 function buildRequest(usuarioId: number = faker.number.int()) {
   return { user: { id: usuarioId } };
 }
@@ -87,8 +85,6 @@ function buildOrcamentoDto(overrides: { id?: number } = {}): { id: number } {
   return { id: faker.number.int(), ...overrides };
 }
 
-// ─── Mock setup ──────────────────────────────────────────────────────────────
-
 const mockGastosFixosService = {
   create: jest.fn().mockResolvedValue(null),
   findAll: jest.fn().mockResolvedValue([]),
@@ -112,8 +108,6 @@ const mockCategoriaGastosService = {
   update: jest.fn().mockResolvedValue(null),
   softDelete: jest.fn().mockResolvedValue(null),
 };
-
-// ─── Suite ───────────────────────────────────────────────────────────────────
 
 describe("GastosFixosController", () => {
   let controller: GastosFixosController;
@@ -148,8 +142,6 @@ describe("GastosFixosController", () => {
   it("should be defined", () => {
     expect(controller).toBeDefined();
   });
-
-  // ─── create ──────────────────────────────────────────────────────────────
 
   describe("create", () => {
     it("should create a new gasto fixo", async () => {
@@ -235,8 +227,6 @@ describe("GastosFixosController", () => {
     });
   });
 
-  // ─── findAll ─────────────────────────────────────────────────────────────
-
   describe("findAll", () => {
     it("should return an array of gastos fixos", async () => {
       const req = buildRequest();
@@ -283,8 +273,6 @@ describe("GastosFixosController", () => {
       );
     });
   });
-
-  // ─── findOne ─────────────────────────────────────────────────────────────
 
   describe("findOne", () => {
     it("should return a gasto fixo by id", async () => {
@@ -347,8 +335,6 @@ describe("GastosFixosController", () => {
     });
   });
 
-  // ─── update ──────────────────────────────────────────────────────────────
-
   describe("update", () => {
     it("should update a gasto fixo", async () => {
       const req = buildRequest();
@@ -408,8 +394,6 @@ describe("GastosFixosController", () => {
       );
     });
   });
-
-  // ─── remove ──────────────────────────────────────────────────────────────
 
   describe("remove", () => {
     it("should perform a soft delete of a gasto fixo", async () => {

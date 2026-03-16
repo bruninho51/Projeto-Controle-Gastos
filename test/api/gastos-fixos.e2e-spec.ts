@@ -2122,14 +2122,19 @@ describe("GastosFixosController (v1) (E2E)", () => {
 
       const gastoId = createResponse.body.id;
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .delete(
           `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
         )
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
-      expect(response.body.soft_delete).toBeTruthy();
+      await request(app.getHttpServer())
+        .get(
+          `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-fixos/${gastoId}`,
+        )
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(404);
     });
 
     it("should return 404 if gasto fixo not found for delete", async () => {

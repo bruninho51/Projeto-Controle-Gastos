@@ -21,13 +21,21 @@ import {
   ApiParam,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import { OrcamentosService } from "../orcamentos/orcamentos.service";
 import { CategoriasGastosService } from "../categorias-gastos/categorias-gastos.service";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { GastoVariadoFindDto } from "./dtos/GastoVariadoFind.dto";
+import { GastoVariadoResponseDto } from "./dtos/GastoVariadoResponse.dto";
 
 @ApiTags("Gastos Variados")
+@ApiBearerAuth("access-token")
+@ApiUnauthorizedResponse({
+  description: "Token inválido ou não informado",
+})
+@ApiResponse({ status: 500, description: "Erro interno no servidor." })
+@UseGuards(JwtAuthGuard)
 @Controller("orcamentos/:orcamento_id/gastos-variados")
 export class GastosVariadosController {
   constructor(
@@ -42,15 +50,14 @@ export class GastosVariadosController {
   @ApiResponse({
     status: 201,
     description: "Gasto variado criado com sucesso.",
+    type: GastoVariadoResponseDto,
   })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ status: 404, description: "Categoria de gasto não existe.|Orçamento não existe." })
   async create(
     @Req() { user },
     @Param("orcamento_id") orcamento_id: String,
     @Body() createGastoDto: GastoVariadoCreateDto,
-  ) {
+  ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -73,15 +80,17 @@ export class GastosVariadosController {
 
   @Get()
   @ApiOperation({ summary: "Buscar todos os gastos variados" })
-  @ApiResponse({ status: 200, description: "Lista de gastos variados." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ 
+    status: 200, 
+    description: "Lista de gastos variados.",
+    type: GastoVariadoResponseDto,
+    isArray: true,
+   })
   async findAll(
     @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Query() query: GastoVariadoFindDto,
-  ) {
+  ): Promise<GastoVariadoResponseDto[]> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -102,16 +111,17 @@ export class GastosVariadosController {
     description: "ID do gasto variado",
     required: true,
   })
-  @ApiResponse({ status: 200, description: "Gasto variado encontrado." })
+  @ApiResponse({ 
+    status: 200, 
+    description: "Gasto variado encontrado.",
+    type: GastoVariadoResponseDto,
+   })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
   async findOne(
     @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
-  ) {
+  ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -136,17 +146,15 @@ export class GastosVariadosController {
   @ApiResponse({
     status: 200,
     description: "Gasto variado atualizado com sucesso.",
+    type: GastoVariadoResponseDto,
   })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
   async update(
     @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
     @Body() updateGastoDto: GastoVariadoUpdateDto,
-  ) {
+  ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -170,16 +178,14 @@ export class GastosVariadosController {
   @ApiResponse({
     status: 200,
     description: "Gasto variado removido com sucesso.",
+    type: GastoVariadoResponseDto,
   })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
   async remove(
     @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
-  ) {
+  ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,

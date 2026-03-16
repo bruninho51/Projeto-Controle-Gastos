@@ -90,7 +90,7 @@ export class GastosFixosController {
     @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Query() query: GastoFixoFindDto,
-  ) {
+  ): Promise<GastoFixoResponseDto[]> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -121,7 +121,7 @@ export class GastosFixosController {
     @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
-  ) {
+  ): Promise<GastoFixoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -154,7 +154,7 @@ export class GastosFixosController {
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
     @Body() updateGastoDto: GastoFixoUpdateDto,
-  ) {
+  ): Promise<GastoFixoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
@@ -185,7 +185,7 @@ export class GastosFixosController {
     @Req() { user },
     @Param("orcamento_id") orcamento_id: string,
     @Param("id") id: string,
-  ) {
+  ): Promise<GastoFixoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
       +orcamento_id,
