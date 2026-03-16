@@ -20,6 +20,7 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiUnauthorizedResponse,
+  ApiBody,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
@@ -28,6 +29,7 @@ import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 @ApiUnauthorizedResponse({
   description: "Token inválido ou não informado",
 })
+@ApiResponse({ status: 500, description: "Erro interno no servidor." })
 @UseGuards(JwtAuthGuard)
 @Controller("categorias-gastos")
 export class CategoriasGastosController {
@@ -50,13 +52,13 @@ export class CategoriasGastosController {
 
   @Post()
   @ApiOperation({ summary: "Criar uma nova categoria de gasto" })
+  @ApiBody({ type: CategoriaGastoCreateDto })
   @ApiResponse({
     status: 201,
     description: "Categoria de gasto criada com sucesso.",
     type: CategoriaGastoResponseDto,
   })
   @ApiResponse({ status: 409, description: "Categoria de gasto já existe." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async create(
     @Req() { user },
     @Body() createCategoriaDto: CategoriaGastoCreateDto,
@@ -73,7 +75,6 @@ export class CategoriasGastosController {
   })
   @ApiResponse({ status: 409, description: "Categoria de gasto já existe." })
   @ApiResponse({ status: 404, description: "Categoria de gasto não existe." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async update(
     @Req() { user },
     @Param("id", ParseIntPipe) id: number,
@@ -90,7 +91,6 @@ export class CategoriasGastosController {
     type: CategoriaGastoResponseDto,
   })
   @ApiResponse({ status: 404, description: "Categoria de gasto não existe." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
   async remove(
     @Req() { user },
     @Param("id", ParseIntPipe) id: number,
