@@ -1,3 +1,13 @@
+# [1.27.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.26.0...v1.27.0) (2026-03-16)
+
+
+### Features
+
+* adiciona gasto fixo response ([9ee5651](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/9ee56510fd0a580317526d3bb27645c832875118))
+* adiciona o dto de retorno na controller de gastos fixos ([4379b69](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/4379b69338cdd05f80e19edd22e740d375a80ebe))
+* adiciona retorno tipado com dto nos gastos variados ([320f493](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/320f4936be1662e16d871e71ab439a24859e361b))
+* implementa retorno na service de gastos fixos ([b29064f](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/b29064fad420aff566ecbbdc36b2633b8fa6123e))
+
 # [1.26.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.25.0...v1.26.0) (2026-03-05)
 
 
