@@ -17,10 +17,10 @@ describe("CategoriasGastosController", () => {
         {
           provide: CategoriasGastosService,
           useValue: {
-            findAll: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            softDelete: jest.fn(),
+            findAll: jest.fn().mockResolvedValue([]),
+            create: jest.fn().mockResolvedValue(null),
+            update: jest.fn().mockResolvedValue(null),
+            softDelete: jest.fn().mockResolvedValue(null),
           },
         },
       ],
