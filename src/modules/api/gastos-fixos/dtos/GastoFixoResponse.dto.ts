@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { GastoFixo } from "@prisma/client";
+import { CategoriaGasto, GastoFixo } from "@prisma/client";
 import { Exclude, Expose, plainToInstance } from "class-transformer";
 import { CategoriaGastoResponseDto } from "../../categorias-gastos/dtos/CategoriaGastoResponse.dto";
 
@@ -105,18 +105,20 @@ export class GastoFixoResponseDto {
   }
 
   static fromEntity(
-    entity: GastoFixo & { categoriaGasto: any },
+    entity: GastoFixo & { categoriaGasto: CategoriaGasto },
   ): GastoFixoResponseDto {
+    if (!entity) return null;
+
     return plainToInstance(
       GastoFixoResponseDto,
       {
         id: entity.id,
         descricao: entity.descricao,
-        previsto: entity.previsto,
-        valor: entity.valor,
+        previsto: entity.previsto ? entity.previsto.toString() : null,
+        valor: entity.valor ? entity.valor.toString() : null,
+        diferenca: entity.diferenca ? entity.diferenca.toString() : null,
         categoria_id: entity.categoria_id,
         orcamento_id: entity.orcamento_id,
-        diferenca: entity.diferenca,
         data_pgto: entity.data_pgto,
         data_venc: entity.data_venc,
         observacoes: entity.observacoes,

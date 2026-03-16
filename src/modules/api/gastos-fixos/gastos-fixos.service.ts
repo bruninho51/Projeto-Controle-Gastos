@@ -4,6 +4,7 @@ import { GastoFixoCreateDto } from "./dtos/GastoFixoCreate.dto";
 import { GastoFixoUpdateDto } from "./dtos/GastoFixoUpdate.dto";
 import { GastoFixo, Prisma } from "@prisma/client";
 import { GastoFixoFindDto, StatusGasto } from "./dtos/GastoFixoFind.dto";
+import { GastoFixoResponseDto } from "./dtos/GastoFixoResponse.dto";
 
 @Injectable()
 export class GastosFixosService {
@@ -12,8 +13,8 @@ export class GastosFixosService {
   async create(
     orcamento_id: number,
     createGastoDto: GastoFixoCreateDto,
-  ): Promise<GastoFixo> {
-    return await this.prisma.gastoFixo.create({
+  ): Promise<GastoFixoResponseDto> {
+    const gastoFixo = await this.prisma.gastoFixo.create({
       include: {
         categoriaGasto: true,
       },
@@ -22,12 +23,14 @@ export class GastosFixosService {
         orcamento_id,
       },
     });
+
+    return GastoFixoResponseDto.fromEntity(gastoFixo);
   }
 
   async findAll(
     orcamento_id: number,
     filters: GastoFixoFindDto,
-  ): Promise<GastoFixo[]> {
+  ): Promise<GastoFixoResponseDto[]> {
     const where: Prisma.GastoFixoWhereInput = {
       orcamento_id,
       soft_delete: null,
@@ -37,10 +40,12 @@ export class GastosFixosService {
       ...this.buildVencidoFilter(filters),
     };
 
-    return this.prisma.gastoFixo.findMany({
+    const gastosFixos = await this.prisma.gastoFixo.findMany({
       include: { categoriaGasto: true },
       where,
     });
+
+    return gastosFixos.map((c) => GastoFixoResponseDto.fromEntity(c));
   }
 
   /**
@@ -140,31 +145,41 @@ export class GastosFixosService {
     return { NOT: { AND: condicaoVencido } };
   }
 
-  async findOne(orcamento_id: number, id: number): Promise<GastoFixo | null> {
-    return this.prisma.gastoFixo.findUnique({
+  async findOne(
+    orcamento_id: number,
+    id: number,
+  ): Promise<GastoFixoResponseDto | null> {
+    const gastoFixo = await this.prisma.gastoFixo.findUnique({
       include: {
         categoriaGasto: true,
       },
       where: { id, orcamento_id, soft_delete: null },
     });
+
+    return GastoFixoResponseDto.fromEntity(gastoFixo);
   }
 
   async update(
     orcamento_id: number,
     id: number,
     updateGastoDto: GastoFixoUpdateDto,
-  ): Promise<GastoFixo> {
-    return this.prisma.gastoFixo.update({
+  ): Promise<GastoFixoResponseDto> {
+    const gastoFixo = await this.prisma.gastoFixo.update({
       include: {
         categoriaGasto: true,
       },
       where: { id, orcamento_id, soft_delete: null },
       data: updateGastoDto,
     });
+
+    return GastoFixoResponseDto.fromEntity(gastoFixo);
   }
 
-  async softDelete(orcamento_id: number, id: number): Promise<GastoFixo> {
-    return this.prisma.gastoFixo.update({
+  async softDelete(
+    orcamento_id: number,
+    id: number,
+  ): Promise<GastoFixoResponseDto> {
+    const gastoFixo = await this.prisma.gastoFixo.update({
       include: {
         categoriaGasto: true,
       },
@@ -173,5 +188,7 @@ export class GastosFixosService {
         soft_delete: new Date(),
       },
     });
+
+    return GastoFixoResponseDto.fromEntity(gastoFixo);
   }
 }

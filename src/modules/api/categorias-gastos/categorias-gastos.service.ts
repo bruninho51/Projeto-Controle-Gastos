@@ -2,7 +2,6 @@ import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
 import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
-import { CategoriaGasto } from "@prisma/client";
 import { CategoriaGastoResponseDto } from "./dtos/CategoriaGastoResponse.dto";
 
 @Injectable()

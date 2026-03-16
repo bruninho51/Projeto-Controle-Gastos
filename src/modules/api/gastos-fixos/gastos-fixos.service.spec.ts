@@ -7,6 +7,84 @@ import { faker } from "@faker-js/faker";
 import { GastoFixoFindDto, StatusGasto } from "./dtos/GastoFixoFind.dto";
 import { CategoriaGasto, GastoFixo, Prisma } from "@prisma/client";
 import { GastoFixoResponseDto } from "./dtos/GastoFixoResponse.dto";
+import { CategoriaGastoResponseDto } from "../categorias-gastos/dtos/CategoriaGastoResponse.dto";
+
+type GastoFixoWithCategoria = GastoFixo & { categoriaGasto: CategoriaGasto };
+
+function buildCategoriaGasto(
+  overrides: Partial<CategoriaGasto> = {},
+): CategoriaGasto {
+  return {
+    id: faker.number.int(),
+    nome: "Categoria Teste",
+    data_criacao: new Date(),
+    data_atualizacao: new Date(),
+    data_inatividade: null,
+    usuario_id: faker.number.int(),
+    soft_delete: null,
+    ...overrides,
+  };
+}
+
+function buildGastoFixo(
+  overrides: Partial<GastoFixoWithCategoria> = {},
+): GastoFixoWithCategoria {
+  const categoriaGasto = overrides.categoriaGasto ?? buildCategoriaGasto();
+  return {
+    id: faker.number.int(),
+    descricao: faker.string.alphanumeric(5),
+    previsto: new Prisma.Decimal(
+      faker.number.float({ min: 100, max: 9999, fractionDigits: 2 }).toString(),
+    ),
+    valor: null,
+    diferenca: null,
+    categoria_id: categoriaGasto.id,
+    orcamento_id: faker.number.int(),
+    data_venc: faker.date.future(),
+    data_pgto: null,
+    soft_delete: null,
+    data_criacao: new Date(),
+    data_atualizacao: new Date(),
+    data_inatividade: null,
+    observacoes: null,
+    ...overrides,
+    categoriaGasto,
+  };
+}
+
+function toResponseDto(
+  gastoFixo: GastoFixoWithCategoria,
+): GastoFixoResponseDto {
+  const { categoriaGasto } = gastoFixo;
+
+  const dto = new GastoFixoResponseDto({});
+
+  dto.id = gastoFixo.id;
+  dto.descricao = gastoFixo.descricao;
+  dto.previsto = gastoFixo.previsto ? gastoFixo.previsto.toString() : null;
+  dto.valor = gastoFixo.valor ? gastoFixo.valor.toString() : null;
+  dto.diferenca = gastoFixo.diferenca ? gastoFixo.diferenca.toString() : null;
+  dto.categoria_id = gastoFixo.categoria_id;
+  dto.orcamento_id = gastoFixo.orcamento_id;
+  dto.data_venc = gastoFixo.data_venc;
+  dto.data_pgto = gastoFixo.data_pgto;
+  dto.observacoes = gastoFixo.observacoes;
+  dto.data_criacao = gastoFixo.data_criacao;
+  dto.data_atualizacao = gastoFixo.data_atualizacao;
+  dto.data_inatividade = gastoFixo.data_inatividade;
+
+  // Transformação para CategoriaGastoResponseDto
+  const categoriaDto = new CategoriaGastoResponseDto({});
+  categoriaDto.id = categoriaGasto.id;
+  categoriaDto.nome = categoriaGasto.nome;
+  categoriaDto.data_criacao = categoriaGasto.data_criacao;
+  categoriaDto.data_atualizacao = categoriaGasto.data_atualizacao;
+  categoriaDto.data_inatividade = categoriaGasto.data_inatividade;
+
+  dto.categoriaGasto = categoriaDto;
+
+  return dto;
+}
 
 let mockPrismaService: {
   gastoFixo: {
@@ -17,28 +95,29 @@ let mockPrismaService: {
   };
 };
 
+function createPrismaMock() {
+  return {
+    gastoFixo: {
+      create: jest.fn().mockResolvedValue(null), // create normalmente retorna o objeto criado, mas null como padrão
+      findMany: jest.fn().mockResolvedValue([]), // findMany sempre retorna array
+      findUnique: jest.fn().mockResolvedValue(null), // findUnique pode retornar null
+      update: jest.fn().mockResolvedValue(null), // update pode retornar null se nada for encontrado
+    },
+  };
+}
+
 describe("GastosFixosService", () => {
   let service: GastosFixosService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    mockPrismaService = {
-      gastoFixo: {
-        create: jest.fn(),
-        findMany: jest.fn(),
-        findUnique: jest.fn(),
-        update: jest.fn(),
-      },
-    };
+    mockPrismaService = createPrismaMock();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GastosFixosService,
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
+        { provide: PrismaService, useValue: mockPrismaService },
       ],
     }).compile();
 
@@ -52,7 +131,6 @@ describe("GastosFixosService", () => {
   describe("create", () => {
     it("should create a new gasto fixo", async () => {
       const orcamento_id = faker.number.int();
-      const gasto_fixo_id = faker.number.int();
 
       const createGastoDto: GastoFixoCreateDto = {
         descricao: faker.string.alphanumeric(5),
@@ -64,60 +142,19 @@ describe("GastosFixosService", () => {
           .toString(),
       };
 
-      const createdGastoFixo: GastoFixo & { categoriaGasto: CategoriaGasto } = {
-        id: gasto_fixo_id,
+      const createdGastoFixo = buildGastoFixo({
         descricao: createGastoDto.descricao,
         previsto: new Prisma.Decimal(createGastoDto.previsto),
-        valor: null,
-        diferenca: null,
         categoria_id: createGastoDto.categoria_id,
         orcamento_id,
         data_venc: createGastoDto.data_venc,
-        data_pgto: null,
-        soft_delete: null,
-        data_criacao: new Date(),
-        data_atualizacao: new Date(),
-        data_inatividade: null,
-        observacoes: null,
-        categoriaGasto: {
-          id: createGastoDto.categoria_id,
-          nome: "Categoria Teste",
-          data_criacao: new Date(),
-          data_atualizacao: new Date(),
-          data_inatividade: null,
-          usuario_id: faker.number.int(),
-          soft_delete: null,
-        },
-      };
-
-      const expectedResponse: GastoFixoResponseDto = {
-        id: createdGastoFixo.id,
-        descricao: createdGastoFixo.descricao,
-        previsto: createdGastoFixo.previsto.toString(),
-        valor: null,
-        diferenca: null,
-        categoria_id: createdGastoFixo.categoria_id,
-        orcamento_id: createdGastoFixo.orcamento_id,
-        data_venc: createdGastoFixo.data_venc,
-        data_pgto: createdGastoFixo.data_pgto,
-        observacoes: createdGastoFixo.observacoes,
-        data_criacao: createdGastoFixo.data_criacao,
-        data_atualizacao: createdGastoFixo.data_atualizacao,
-        data_inatividade: createdGastoFixo.data_inatividade,
-        categoriaGasto: {
-          id: createdGastoFixo.categoriaGasto.id,
-          nome: createdGastoFixo.categoriaGasto.nome,
-          data_criacao: createdGastoFixo.categoriaGasto.data_criacao,
-          data_atualizacao: createdGastoFixo.categoriaGasto.data_atualizacao,
-          data_inatividade: createdGastoFixo.categoriaGasto.data_inatividade,
-        },
-      };
+      });
 
       mockPrismaService.gastoFixo.create.mockResolvedValue(createdGastoFixo);
 
       const result = await service.create(orcamento_id, createGastoDto);
 
-      expect(result).toStrictEqual(expectedResponse);
+      expect(result).toStrictEqual(toResponseDto(createdGastoFixo));
       expect(mockPrismaService.gastoFixo.create).toHaveBeenCalledWith({
         include: { categoriaGasto: true },
         data: { ...createGastoDto, orcamento_id },
@@ -126,125 +163,59 @@ describe("GastosFixosService", () => {
   });
 
   describe("findAll", () => {
-    function getWhere() {
-      const calls = mockPrismaService.gastoFixo.findMany.mock.calls;
-      if (!calls.length) throw new Error("findMany não foi chamado");
-      const lastCall = calls[calls.length - 1];
-      return lastCall[0].where;
-    }
-
     const BASE_WHERE = Object.freeze({
       orcamento_id: 1,
       soft_delete: null,
     });
 
+    function getLastFindManyWhere() {
+      const calls = mockPrismaService.gastoFixo.findMany.mock.calls;
+      if (!calls.length) throw new Error("findMany não foi chamado");
+      return calls[calls.length - 1][0].where;
+    }
+
+    async function findAllWhere(filters: GastoFixoFindDto) {
+      await service.findAll(1, filters);
+      return getLastFindManyWhere();
+    }
+
     it("should return an array of gasto fixo", async () => {
       const orcamento_id = faker.number.int();
-      const filters: GastoFixoFindDto = {};
 
-      const gastosFixos: (GastoFixo & { categoriaGasto: CategoriaGasto })[] = [
-        {
+      const gastosFixos = [
+        buildGastoFixo({
           id: 1,
           descricao: "Gasto Fixo A",
           previsto: new Prisma.Decimal("1000.00"),
-          valor: null,
-          diferenca: null,
           observacoes: "Descrição A",
           categoria_id: 1,
           orcamento_id,
-          data_venc: faker.date.future(),
-          data_pgto: null,
-          soft_delete: null,
-          data_criacao: new Date(),
-          data_atualizacao: new Date(),
-          data_inatividade: null,
-          categoriaGasto: {
+          categoriaGasto: buildCategoriaGasto({
             id: 1,
             nome: "Categoria A",
-            data_criacao: new Date(),
-            data_atualizacao: new Date(),
-            data_inatividade: null,
             usuario_id: 1,
-            soft_delete: null,
-          },
-        },
-        {
+          }),
+        }),
+        buildGastoFixo({
           id: 2,
           descricao: "Gasto Fixo B",
           previsto: new Prisma.Decimal("500.00"),
-          valor: null,
-          diferenca: null,
           observacoes: "Descrição B",
           categoria_id: 2,
           orcamento_id,
-          data_venc: faker.date.future(),
-          data_pgto: null,
-          soft_delete: null,
-          data_criacao: new Date(),
-          data_atualizacao: new Date(),
-          data_inatividade: null,
-          categoriaGasto: {
+          categoriaGasto: buildCategoriaGasto({
             id: 2,
             nome: "Categoria B",
-            data_criacao: new Date(),
-            data_atualizacao: new Date(),
-            data_inatividade: null,
             usuario_id: 2,
-            soft_delete: null,
-          },
-        },
+          }),
+        }),
       ];
-
-      const expectedResponse: GastoFixoResponseDto[] = [{
-        id: gastosFixos[0].id,
-        descricao: gastosFixos[0].descricao,
-        previsto: gastosFixos[0].previsto.toString(),
-        valor: null,
-        diferenca: null,
-        categoria_id: gastosFixos[0].categoria_id,
-        orcamento_id: gastosFixos[0].orcamento_id,
-        data_venc: gastosFixos[0].data_venc,
-        data_pgto: gastosFixos[0].data_pgto,
-        observacoes: gastosFixos[0].observacoes,
-        data_criacao: gastosFixos[0].data_criacao,
-        data_atualizacao: gastosFixos[0].data_atualizacao,
-        data_inatividade: gastosFixos[0].data_inatividade,
-        categoriaGasto: {
-          id: gastosFixos[0].categoriaGasto.id,
-          nome: gastosFixos[0].categoriaGasto.nome,
-          data_criacao: gastosFixos[0].categoriaGasto.data_criacao,
-          data_atualizacao: gastosFixos[0].categoriaGasto.data_atualizacao,
-          data_inatividade: gastosFixos[0].categoriaGasto.data_inatividade,
-        },
-      },{
-        id: gastosFixos[1].id,
-        descricao: gastosFixos[1].descricao,
-        previsto: gastosFixos[1].previsto.toString(),
-        valor: null,
-        diferenca: null,
-        categoria_id: gastosFixos[1].categoria_id,
-        orcamento_id: gastosFixos[1].orcamento_id,
-        data_venc: gastosFixos[1].data_venc,
-        data_pgto: gastosFixos[1].data_pgto,
-        observacoes: gastosFixos[1].observacoes,
-        data_criacao: gastosFixos[1].data_criacao,
-        data_atualizacao: gastosFixos[1].data_atualizacao,
-        data_inatividade: gastosFixos[1].data_inatividade,
-        categoriaGasto: {
-          id: gastosFixos[1].categoriaGasto.id,
-          nome: gastosFixos[1].categoriaGasto.nome,
-          data_criacao: gastosFixos[1].categoriaGasto.data_criacao,
-          data_atualizacao: gastosFixos[1].categoriaGasto.data_atualizacao,
-          data_inatividade: gastosFixos[1].categoriaGasto.data_inatividade,
-        },
-      }];
-
 
       mockPrismaService.gastoFixo.findMany.mockResolvedValue(gastosFixos);
 
-      const result = await service.findAll(orcamento_id, filters);
+      const result = await service.findAll(orcamento_id, {});
 
-      expect(result).toStrictEqual(expectedResponse);
+      expect(result).toStrictEqual(gastosFixos.map(toResponseDto));
       expect(mockPrismaService.gastoFixo.findMany).toHaveBeenCalledWith({
         include: { categoriaGasto: true },
         where: { orcamento_id, soft_delete: null },
@@ -253,24 +224,23 @@ describe("GastosFixosService", () => {
 
     it("should filter by descricao", async () => {
       const searchedValue = faker.string.alpha();
-      await service.findAll(1, { descricao: searchedValue });
-      expect(getWhere()).toStrictEqual({
+      expect(await findAllWhere({ descricao: searchedValue })).toStrictEqual({
         ...BASE_WHERE,
         descricao: { contains: searchedValue },
       });
     });
 
     it("should filter by status PAGO", async () => {
-      await service.findAll(1, { status: StatusGasto.PAGO });
-      expect(getWhere()).toStrictEqual({
+      expect(await findAllWhere({ status: StatusGasto.PAGO })).toStrictEqual({
         ...BASE_WHERE,
         data_pgto: { not: null },
       });
     });
 
     it("should filter by status NAO_PAGO", async () => {
-      await service.findAll(1, { status: StatusGasto.NAO_PAGO });
-      expect(getWhere()).toStrictEqual({
+      expect(
+        await findAllWhere({ status: StatusGasto.NAO_PAGO }),
+      ).toStrictEqual({
         ...BASE_WHERE,
         data_pgto: { equals: null },
       });
@@ -278,8 +248,7 @@ describe("GastosFixosService", () => {
 
     it("should filter by data_pgto day", async () => {
       const date = new Date("2026-02-10");
-      await service.findAll(1, { data_pgto: date });
-      expect(getWhere()).toStrictEqual({
+      expect(await findAllWhere({ data_pgto: date })).toStrictEqual({
         ...BASE_WHERE,
         data_pgto: { equals: date },
       });
@@ -288,27 +257,23 @@ describe("GastosFixosService", () => {
     it("should filter by data_pgto range", async () => {
       const inicio = new Date("2026-02-01");
       const fim = new Date("2026-02-10");
-      await service.findAll(1, {
-        data_pgto_inicio: inicio,
-        data_pgto_fim: fim,
-      });
-      expect(getWhere()).toStrictEqual({
+      expect(
+        await findAllWhere({ data_pgto_inicio: inicio, data_pgto_fim: fim }),
+      ).toStrictEqual({
         ...BASE_WHERE,
         data_pgto: { gte: inicio, lte: fim },
       });
     });
 
     it("should filter vencido true", async () => {
-      await service.findAll(1, { vencido: true });
-      expect(getWhere()).toStrictEqual({
+      expect(await findAllWhere({ vencido: true })).toStrictEqual({
         ...BASE_WHERE,
         AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
       });
     });
 
     it("should filter vencido false", async () => {
-      await service.findAll(1, { vencido: false });
-      expect(getWhere()).toStrictEqual({
+      expect(await findAllWhere({ vencido: false })).toStrictEqual({
         ...BASE_WHERE,
         NOT: {
           AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
@@ -318,8 +283,7 @@ describe("GastosFixosService", () => {
 
     it("should filter by nome_categoria", async () => {
       const nome = faker.string.alpha(10);
-      await service.findAll(1, { nome_categoria: nome });
-      expect(getWhere()).toStrictEqual({
+      expect(await findAllWhere({ nome_categoria: nome })).toStrictEqual({
         ...BASE_WHERE,
         categoriaGasto: { nome: { contains: nome } },
       });
@@ -327,23 +291,23 @@ describe("GastosFixosService", () => {
 
     it("should apply all filters together PAGO e NAO VENCIDO", async () => {
       const descricao = faker.string.alpha(10);
-      const categoria = faker.string.alpha(10);
+      const nome_categoria = faker.string.alpha(10);
       const inicio = new Date("2026-02-01");
       const fim = new Date("2026-02-10");
 
-      await service.findAll(1, {
-        descricao,
-        status: StatusGasto.PAGO,
-        data_pgto_inicio: inicio,
-        data_pgto_fim: fim,
-        vencido: false,
-        nome_categoria: categoria,
-      });
-
-      expect(getWhere()).toStrictEqual({
+      expect(
+        await findAllWhere({
+          descricao,
+          status: StatusGasto.PAGO,
+          data_pgto_inicio: inicio,
+          data_pgto_fim: fim,
+          vencido: false,
+          nome_categoria,
+        }),
+      ).toStrictEqual({
         ...BASE_WHERE,
         descricao: { contains: descricao },
-        categoriaGasto: { nome: { contains: categoria } },
+        categoriaGasto: { nome: { contains: nome_categoria } },
         data_pgto: { not: null, gte: inicio, lte: fim },
         NOT: {
           AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
@@ -353,31 +317,30 @@ describe("GastosFixosService", () => {
 
     it("should apply all filters together NAO_PAGO e VENCIDO", async () => {
       const descricao = faker.string.alpha(10);
-      const categoria = faker.string.alpha(10);
+      const nome_categoria = faker.string.alpha(10);
       const inicio = new Date("2026-02-01");
       const fim = new Date("2026-02-10");
 
-      await service.findAll(1, {
-        descricao,
-        status: StatusGasto.NAO_PAGO,
-        data_pgto_inicio: inicio,
-        data_pgto_fim: fim,
-        vencido: true,
-        nome_categoria: categoria,
-      });
-
-      expect(getWhere()).toStrictEqual({
+      expect(
+        await findAllWhere({
+          descricao,
+          status: StatusGasto.NAO_PAGO,
+          data_pgto_inicio: inicio,
+          data_pgto_fim: fim,
+          vencido: true,
+          nome_categoria,
+        }),
+      ).toStrictEqual({
         ...BASE_WHERE,
         descricao: { contains: descricao },
-        categoriaGasto: { nome: { contains: categoria } },
+        categoriaGasto: { nome: { contains: nome_categoria } },
         data_pgto: { equals: null, gte: inicio, lte: fim },
         AND: [{ data_pgto: null }, { data_venc: { lt: expect.any(Date) } }],
       });
     });
 
     it("should not add extra operators when no filters", async () => {
-      await service.findAll(1, {});
-      expect(getWhere()).toStrictEqual(BASE_WHERE);
+      expect(await findAllWhere({})).toStrictEqual(BASE_WHERE);
     });
   });
 
@@ -385,61 +348,13 @@ describe("GastosFixosService", () => {
     it("should return a single gasto fixo by id", async () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
-
-      const gastoFixo: GastoFixo & { categoriaGasto: CategoriaGasto } = {
-        id: 1,
-        descricao: "Gasto Fixo A",
-        previsto: new Prisma.Decimal("1000.00"),
-        valor: null,
-        diferenca: null,
-        observacoes: "Descrição A",
-        categoria_id: 1,
-        orcamento_id,
-        data_venc: faker.date.future(),
-        data_pgto: null,
-        soft_delete: null,
-        data_criacao: new Date(),
-        data_atualizacao: new Date(),
-        data_inatividade: null,
-        categoriaGasto: {
-          id: 1,
-          nome: "Categoria A",
-          data_criacao: new Date(),
-          data_atualizacao: new Date(),
-          data_inatividade: null,
-          usuario_id: 1,
-          soft_delete: null,
-        },
-      };
-
-      const expectedResponse: GastoFixoResponseDto = {
-        id: gastoFixo.id,
-        descricao: gastoFixo.descricao,
-        previsto: gastoFixo.previsto.toString(),
-        valor: null,
-        diferenca: null,
-        categoria_id: gastoFixo.categoria_id,
-        orcamento_id: gastoFixo.orcamento_id,
-        data_venc: gastoFixo.data_venc,
-        data_pgto: gastoFixo.data_pgto,
-        observacoes: gastoFixo.observacoes,
-        data_criacao: gastoFixo.data_criacao,
-        data_atualizacao: gastoFixo.data_atualizacao,
-        data_inatividade: gastoFixo.data_inatividade,
-        categoriaGasto: {
-          id: gastoFixo.categoriaGasto.id,
-          nome: gastoFixo.categoriaGasto.nome,
-          data_criacao: gastoFixo.categoriaGasto.data_criacao,
-          data_atualizacao: gastoFixo.categoriaGasto.data_atualizacao,
-          data_inatividade: gastoFixo.categoriaGasto.data_inatividade,
-        },
-      };
+      const gastoFixo = buildGastoFixo({ orcamento_id });
 
       mockPrismaService.gastoFixo.findUnique.mockResolvedValue(gastoFixo);
 
       const result = await service.findOne(orcamento_id, gasto_fixo_id);
 
-      expect(result).toStrictEqual(expectedResponse);
+      expect(result).toStrictEqual(toResponseDto(gastoFixo));
       expect(mockPrismaService.gastoFixo.findUnique).toHaveBeenCalledWith({
         include: { categoriaGasto: true },
         where: { id: gasto_fixo_id, orcamento_id, soft_delete: null },
@@ -447,12 +362,9 @@ describe("GastosFixosService", () => {
     });
 
     it("should return null if gasto fixo not found", async () => {
-      const orcamento_id = faker.number.int();
-      const gasto_fixo_id = 999;
-
       mockPrismaService.gastoFixo.findUnique.mockResolvedValue(null);
 
-      const result = await service.findOne(orcamento_id, gasto_fixo_id);
+      const result = await service.findOne(faker.number.int(), 999);
 
       expect(result).toBeNull();
     });
@@ -469,54 +381,7 @@ describe("GastosFixosService", () => {
         observacoes: "Descrição do Gasto Fixo A Atualizado",
       };
 
-      const updatedGastoFixo: GastoFixo & { categoriaGasto: CategoriaGasto } = {
-        id: 1,
-        descricao: "Gasto Fixo A",
-        previsto: new Prisma.Decimal("1000.00"),
-        valor: null,
-        diferenca: null,
-        observacoes: "Descrição A",
-        categoria_id: 1,
-        orcamento_id,
-        data_venc: faker.date.future(),
-        data_pgto: null,
-        soft_delete: null,
-        data_criacao: new Date(),
-        data_atualizacao: new Date(),
-        data_inatividade: null,
-        categoriaGasto: {
-          id: 1,
-          nome: "Categoria A",
-          data_criacao: new Date(),
-          data_atualizacao: new Date(),
-          data_inatividade: null,
-          usuario_id: 1,
-          soft_delete: null,
-        },
-      };
-
-      const expectedResponse: GastoFixoResponseDto = {
-        id: updatedGastoFixo.id,
-        descricao: updatedGastoFixo.descricao,
-        previsto: updatedGastoFixo.previsto.toString(),
-        valor: null,
-        diferenca: null,
-        categoria_id: updatedGastoFixo.categoria_id,
-        orcamento_id: updatedGastoFixo.orcamento_id,
-        data_venc: updatedGastoFixo.data_venc,
-        data_pgto: updatedGastoFixo.data_pgto,
-        observacoes: updatedGastoFixo.observacoes,
-        data_criacao: updatedGastoFixo.data_criacao,
-        data_atualizacao: updatedGastoFixo.data_atualizacao,
-        data_inatividade: updatedGastoFixo.data_inatividade,
-        categoriaGasto: {
-          id: updatedGastoFixo.categoriaGasto.id,
-          nome: updatedGastoFixo.categoriaGasto.nome,
-          data_criacao: updatedGastoFixo.categoriaGasto.data_criacao,
-          data_atualizacao: updatedGastoFixo.categoriaGasto.data_atualizacao,
-          data_inatividade: updatedGastoFixo.categoriaGasto.data_inatividade,
-        },
-      };
+      const updatedGastoFixo = buildGastoFixo({ orcamento_id });
 
       mockPrismaService.gastoFixo.update.mockResolvedValue(updatedGastoFixo);
 
@@ -525,11 +390,10 @@ describe("GastosFixosService", () => {
         gasto_fixo_id,
         updateGastoDto,
       );
-      expect(result).toStrictEqual(expectedResponse);
+
+      expect(result).toStrictEqual(toResponseDto(updatedGastoFixo));
       expect(mockPrismaService.gastoFixo.update).toHaveBeenCalledWith({
-        include: {
-          categoriaGasto: true,
-        },
+        include: { categoriaGasto: true },
         where: { id: gasto_fixo_id, orcamento_id, soft_delete: null },
         data: updateGastoDto,
       });
@@ -541,71 +405,20 @@ describe("GastosFixosService", () => {
       const orcamento_id = faker.number.int();
       const gasto_fixo_id = faker.number.int();
 
-      const gastoFixoToDelete: GastoFixo & { categoriaGasto: CategoriaGasto } =
-        {
-          id: 1,
-          descricao: "Gasto Fixo A",
-          previsto: new Prisma.Decimal("1000.00"),
-          valor: null,
-          diferenca: null,
-          observacoes: "Descrição A",
-          categoria_id: 1,
-          orcamento_id,
-          data_venc: faker.date.future(),
-          data_pgto: null,
-          soft_delete: null,
-          data_criacao: new Date(),
-          data_atualizacao: new Date(),
-          data_inatividade: null,
-          categoriaGasto: {
-            id: 1,
-            nome: "Categoria A",
-            data_criacao: new Date(),
-            data_atualizacao: new Date(),
-            data_inatividade: null,
-            usuario_id: 1,
-            soft_delete: null,
-          },
-        };
-
-      const softDeletedGastoFixo: GastoFixo & { categoriaGasto: CategoriaGasto } = {
-        ...gastoFixoToDelete,
+      const softDeletedGastoFixo = buildGastoFixo({
+        orcamento_id,
         soft_delete: new Date(),
-      };
+      });
 
       mockPrismaService.gastoFixo.update.mockResolvedValue(
         softDeletedGastoFixo,
       );
 
-      const expectedResponse: GastoFixoResponseDto = {
-        id: softDeletedGastoFixo.id,
-        descricao: softDeletedGastoFixo.descricao,
-        previsto: softDeletedGastoFixo.previsto.toString(),
-        valor: null,
-        diferenca: null,
-        categoria_id: softDeletedGastoFixo.categoria_id,
-        orcamento_id: softDeletedGastoFixo.orcamento_id,
-        data_venc: softDeletedGastoFixo.data_venc,
-        data_pgto: softDeletedGastoFixo.data_pgto,
-        observacoes: softDeletedGastoFixo.observacoes,
-        data_criacao: softDeletedGastoFixo.data_criacao,
-        data_atualizacao: softDeletedGastoFixo.data_atualizacao,
-        data_inatividade: softDeletedGastoFixo.data_inatividade,
-        categoriaGasto: {
-          id: softDeletedGastoFixo.categoriaGasto.id,
-          nome: softDeletedGastoFixo.categoriaGasto.nome,
-          data_criacao: softDeletedGastoFixo.categoriaGasto.data_criacao,
-          data_atualizacao: softDeletedGastoFixo.categoriaGasto.data_atualizacao,
-          data_inatividade: softDeletedGastoFixo.categoriaGasto.data_inatividade,
-        },
-      };
-
       const result = await service.softDelete(orcamento_id, gasto_fixo_id);
-      expect(result).toStrictEqual(expectedResponse);
+
+      expect(result).toStrictEqual(toResponseDto(softDeletedGastoFixo));
       expect(mockPrismaService.gastoFixo.update).toHaveBeenCalledWith({
-        include: {
-          categoriaGasto: true,
-        },
+        include: { categoriaGasto: true },
         where: { id: gasto_fixo_id, orcamento_id, soft_delete: null },
         data: { soft_delete: expect.any(Date) },
       });
