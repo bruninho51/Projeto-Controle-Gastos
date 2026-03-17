@@ -9,7 +9,9 @@ import { CategoriaGasto, GastoVariado, Prisma } from "@prisma/client";
 import { CategoriaGastoResponseDto } from "../categorias-gastos/dtos/CategoriaGastoResponse.dto";
 import { GastoVariadoResponseDto } from "./dtos/GastoVariadoResponse.dto";
 
-type GastoVariadoWithCategoria = GastoVariado & { categoriaGasto: CategoriaGasto };
+type GastoVariadoWithCategoria = GastoVariado & {
+  categoriaGasto: CategoriaGasto;
+};
 
 function buildCategoriaGasto(
   overrides: Partial<CategoriaGasto> = {},
@@ -143,7 +145,9 @@ describe("GastosVariadosService", () => {
         data_pgto: createGastoDto.data_pgto,
       });
 
-      mockPrismaService.gastoVariado.create.mockResolvedValue(createdGastoVariado);
+      mockPrismaService.gastoVariado.create.mockResolvedValue(
+        createdGastoVariado,
+      );
 
       const result = await service.create(orcamento_id, createGastoDto);
 
@@ -183,7 +187,11 @@ describe("GastosVariadosService", () => {
           observacoes: "Descrição A",
           categoria_id: 1,
           orcamento_id,
-          categoriaGasto: buildCategoriaGasto({ id: 1, nome: "Categoria A", usuario_id: 1 }),
+          categoriaGasto: buildCategoriaGasto({
+            id: 1,
+            nome: "Categoria A",
+            usuario_id: 1,
+          }),
         }),
         buildGastoVariado({
           id: 2,
@@ -192,7 +200,11 @@ describe("GastosVariadosService", () => {
           observacoes: "Descrição B",
           categoria_id: 2,
           orcamento_id,
-          categoriaGasto: buildCategoriaGasto({ id: 2, nome: "Categoria B", usuario_id: 2 }),
+          categoriaGasto: buildCategoriaGasto({
+            id: 2,
+            nome: "Categoria B",
+            usuario_id: 2,
+          }),
         }),
       ];
 
@@ -312,9 +324,15 @@ describe("GastosVariadosService", () => {
 
       const updatedGastoVariado = buildGastoVariado({ orcamento_id });
 
-      mockPrismaService.gastoVariado.update.mockResolvedValue(updatedGastoVariado);
+      mockPrismaService.gastoVariado.update.mockResolvedValue(
+        updatedGastoVariado,
+      );
 
-      const result = await service.update(orcamento_id, gasto_variado_id, updateGastoDto);
+      const result = await service.update(
+        orcamento_id,
+        gasto_variado_id,
+        updateGastoDto,
+      );
 
       expect(result).toStrictEqual(toResponseDto(updatedGastoVariado));
       expect(mockPrismaService.gastoVariado.update).toHaveBeenCalledWith({
@@ -332,7 +350,10 @@ describe("GastosVariadosService", () => {
 
       let capturedGastoVariado: GastoVariadoWithCategoria;
       mockPrismaService.gastoVariado.update.mockImplementation(() => {
-        capturedGastoVariado = buildGastoVariado({ orcamento_id, soft_delete: new Date() });
+        capturedGastoVariado = buildGastoVariado({
+          orcamento_id,
+          soft_delete: new Date(),
+        });
         return Promise.resolve(capturedGastoVariado);
       });
 

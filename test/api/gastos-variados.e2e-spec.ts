@@ -1831,7 +1831,7 @@ describe("GastosVariadosController (v1) (E2E)", () => {
 
       await request(app.getHttpServer())
         .get(
-          `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados/${gastoId}`
+          `${apiGlobalPrefix}/orcamentos/${orcamentoMock.id}/gastos-variados/${gastoId}`,
         )
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(404);

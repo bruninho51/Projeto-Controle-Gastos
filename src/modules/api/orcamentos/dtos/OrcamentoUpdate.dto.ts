@@ -16,8 +16,10 @@ export class OrcamentoUpdateDto {
   @ApiProperty({
     description: "Nome do orçamento",
     example: "JANEIRO 2025",
+    required: false,
+    nullable: true,
   })
-  nome?: string;
+  nome?: string | null;
 
   @IsDecimal()
   @IsNotEmpty()
@@ -25,8 +27,10 @@ export class OrcamentoUpdateDto {
   @ApiProperty({
     description: "Valor inicial/salário",
     example: "2000.00",
+    required: false,
+    nullable: true,
   })
-  valor_inicial?: string;
+  valor_inicial?: string | null;
 
   @IsOptional()
   @IsDate()
@@ -34,8 +38,10 @@ export class OrcamentoUpdateDto {
   @ApiProperty({
     description: "Data de fechamento do orçamento",
     example: "2025-01-01",
+    required: false,
+    nullable: true,
   })
-  data_encerramento?: Date;
+  data_encerramento?: Date | null;
 
   @IsOptional()
   @IsDate()
@@ -43,6 +49,8 @@ export class OrcamentoUpdateDto {
   @ApiProperty({
     description: "Inativar um registro de orçamento",
     example: "2024-12-01",
+    required: false,
+    nullable: true,
   })
-  data_inatividade?: Date;
+  data_inatividade?: Date | null;
 }

@@ -146,7 +146,7 @@ describe("GastosFixosController", () => {
   describe("create", () => {
     it("should create a new gasto fixo", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
       const categoriaDto = buildCategoriaResponseDto();
@@ -164,7 +164,7 @@ describe("GastosFixosController", () => {
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
       const categoriaDto = buildCategoriaResponseDto();
@@ -176,13 +176,13 @@ describe("GastosFixosController", () => {
 
       expect(orcamentosService.findOne).toHaveBeenCalledWith(
         req.user.id,
-        +orcamento_id,
+        orcamento_id,
       );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const categoriaDto = buildCategoriaResponseDto();
 
@@ -196,7 +196,7 @@ describe("GastosFixosController", () => {
 
     it("should call categoria gasto service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
       const categoriaDto = buildCategoriaResponseDto();
@@ -214,7 +214,7 @@ describe("GastosFixosController", () => {
 
     it("should throw exception if categoria gasto service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
 
@@ -230,7 +230,7 @@ describe("GastosFixosController", () => {
   describe("findAll", () => {
     it("should return an array of gastos fixos", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
       const filters: GastoFixoFindDto = {};
       const gastos: GastoFixoResponseDto[] = [
@@ -249,7 +249,7 @@ describe("GastosFixosController", () => {
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
@@ -258,13 +258,13 @@ describe("GastosFixosController", () => {
 
       expect(orcamentosService.findOne).toHaveBeenCalledWith(
         req.user.id,
-        +orcamento_id,
+        orcamento_id,
       );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
 
@@ -277,10 +277,10 @@ describe("GastosFixosController", () => {
   describe("findOne", () => {
     it("should return a gasto fixo by id", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
-      const gasto = buildGastoFixoResponseDto({ id: +gasto_fixo_id });
+      const gasto = buildGastoFixoResponseDto({ id: gasto_fixo_id });
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.findOne.mockResolvedValue(gasto);
@@ -292,21 +292,21 @@ describe("GastosFixosController", () => {
 
     it("should return null if gasto fixo not found", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.findOne.mockResolvedValue(null);
 
-      const result = await controller.findOne(req, orcamento_id, "999");
+      const result = await controller.findOne(req, orcamento_id, 999);
 
       expect(result).toBeNull();
     });
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
@@ -316,14 +316,14 @@ describe("GastosFixosController", () => {
 
       expect(orcamentosService.findOne).toHaveBeenCalledWith(
         req.user.id,
-        +orcamento_id,
+        orcamento_id,
       );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
 
@@ -338,11 +338,11 @@ describe("GastosFixosController", () => {
   describe("update", () => {
     it("should update a gasto fixo", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
       const dto = buildUpdateDto();
       const orcamentoDto = buildOrcamentoDto();
-      const updatedGasto = buildGastoFixoResponseDto({ id: +gasto_fixo_id });
+      const updatedGasto = buildGastoFixoResponseDto({ id: gasto_fixo_id });
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.update.mockResolvedValue(updatedGasto);
@@ -357,15 +357,15 @@ describe("GastosFixosController", () => {
       expect(result).toStrictEqual(updatedGasto);
       expect(service.update).toHaveBeenCalledWith(
         orcamentoDto.id,
-        +gasto_fixo_id,
+        gasto_fixo_id,
         dto,
       );
     });
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
       const dto = buildUpdateDto();
       const orcamentoDto = buildOrcamentoDto();
 
@@ -375,14 +375,14 @@ describe("GastosFixosController", () => {
 
       expect(orcamentosService.findOne).toHaveBeenCalledWith(
         req.user.id,
-        +orcamento_id,
+        orcamento_id,
       );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
       const dto = buildUpdateDto({ data_venc: faker.date.future() });
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
@@ -398,10 +398,10 @@ describe("GastosFixosController", () => {
   describe("remove", () => {
     it("should perform a soft delete of a gasto fixo", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
-      const deletedGasto = buildGastoFixoResponseDto({ id: +gasto_fixo_id });
+      const deletedGasto = buildGastoFixoResponseDto({ id: gasto_fixo_id });
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosFixosService.softDelete.mockResolvedValue(deletedGasto);
@@ -411,14 +411,14 @@ describe("GastosFixosController", () => {
       expect(result).toStrictEqual(deletedGasto);
       expect(service.softDelete).toHaveBeenCalledWith(
         orcamentoDto.id,
-        +gasto_fixo_id,
+        gasto_fixo_id,
       );
     });
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
@@ -427,14 +427,14 @@ describe("GastosFixosController", () => {
 
       expect(orcamentosService.findOne).toHaveBeenCalledWith(
         req.user.id,
-        +orcamento_id,
+        orcamento_id,
       );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_fixo_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_fixo_id = faker.number.int();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
 

@@ -3,29 +3,91 @@ import { OrcamentosController } from "./orcamentos.controller";
 import { OrcamentosService } from "./orcamentos.service";
 import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
+import { OrcamentoResponseDto } from "./dtos/OrcamentoResponse.dto";
 import { faker } from "@faker-js/faker";
 
-const mockOrcamentosService = {
-  create: jest.fn(),
-  findAll: jest.fn(),
-  findOne: jest.fn(),
-  update: jest.fn(),
-  softDelete: jest.fn(),
+function buildRequest(usuarioId: number = faker.number.int()) {
+  return { user: { id: usuarioId } };
+}
+
+function buildCreateDto(
+  overrides: Partial<OrcamentoCreateDto> = {},
+): OrcamentoCreateDto {
+  return {
+    nome: faker.string.alphanumeric(8),
+    valor_inicial: faker.number
+      .float({ min: 100, max: 9999, fractionDigits: 2 })
+      .toString(),
+    ...overrides,
+  };
+}
+
+function buildUpdateDto(
+  overrides: Partial<OrcamentoUpdateDto> = {},
+): OrcamentoUpdateDto {
+  return {
+    nome: faker.string.alphanumeric(8),
+    valor_inicial: faker.number
+      .float({ min: 100, max: 9999, fractionDigits: 2 })
+      .toString(),
+    ...overrides,
+  };
+}
+
+function buildOrcamentoResponseDto(
+  overrides: Partial<OrcamentoResponseDto> = {},
+): OrcamentoResponseDto {
+  return new OrcamentoResponseDto({
+    id: faker.number.int(),
+    nome: faker.string.alphanumeric(8),
+    valor_inicial: faker.number
+      .float({ min: 100, max: 9999, fractionDigits: 2 })
+      .toString(),
+    valor_atual: faker.number
+      .float({ min: 100, max: 9999, fractionDigits: 2 })
+      .toString(),
+    valor_livre: faker.number
+      .float({ min: 100, max: 9999, fractionDigits: 2 })
+      .toString(),
+    data_encerramento: null,
+    data_criacao: new Date(),
+    data_atualizacao: new Date(),
+    ...overrides,
+  });
+}
+
+let mockOrcamentosService: {
+  create: jest.Mock;
+  findAll: jest.Mock;
+  findOne: jest.Mock;
+  update: jest.Mock;
+  softDelete: jest.Mock;
 };
 
-describe("OrcamentoController", () => {
+function createServiceMock() {
+  return {
+    create: jest.fn().mockResolvedValue(null),
+    findAll: jest.fn().mockResolvedValue([]),
+    findOne: jest.fn().mockResolvedValue(null),
+    update: jest.fn().mockResolvedValue(null),
+    softDelete: jest.fn().mockResolvedValue(null),
+  };
+}
+
+describe("OrcamentosController", () => {
   let controller: OrcamentosController;
   let service: OrcamentosService;
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
+    mockOrcamentosService = createServiceMock();
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrcamentosController],
       providers: [
         OrcamentosService,
-        {
-          provide: OrcamentosService,
-          useValue: mockOrcamentosService,
-        },
+        { provide: OrcamentosService, useValue: mockOrcamentosService },
       ],
     }).compile();
 
@@ -39,141 +101,102 @@ describe("OrcamentoController", () => {
 
   describe("create", () => {
     it("should create a new orcamento", async () => {
-      const createOrcamentoDto: OrcamentoCreateDto = {
-        nome: "Orçamento A",
-        valor_inicial: "1000.00",
-      };
+      const req = buildRequest();
+      const dto = buildCreateDto();
+      const created = buildOrcamentoResponseDto({ nome: dto.nome });
 
-      const createdOrcamento = {
-        ...createOrcamentoDto,
-        id: 1,
-        data_criacao: new Date(),
-        data_atualizacao: new Date(),
-      };
+      mockOrcamentosService.create.mockResolvedValue(created);
 
-      mockOrcamentosService.create.mockResolvedValue(createdOrcamento);
+      const result = await controller.create(req, dto);
 
-      const userId = faker.number.int();
-
-      const result = await controller.create(
-        { user: { id: userId } },
-        createOrcamentoDto,
-      );
-
-      expect(result).toEqual(createdOrcamento);
-      expect(service.create).toHaveBeenCalledWith(userId, createOrcamentoDto);
+      expect(result).toEqual(created);
+      expect(service.create).toHaveBeenCalledWith(req.user.id, dto);
     });
   });
 
   describe("findAll", () => {
     it("should return an array of orcamentos", async () => {
+      const req = buildRequest();
       const orcamentos = [
-        {
-          id: 1,
-          nome: "Orçamento A",
-          valor_inicial: "1000.00",
-          valor_atual: "1200.00",
-          valor_livre: "200.00",
-        },
-        {
-          id: 2,
-          nome: "Orçamento B",
-          valor_inicial: "500.00",
-          valor_atual: "600.00",
-          valor_livre: "100.00",
-        },
+        buildOrcamentoResponseDto(),
+        buildOrcamentoResponseDto(),
       ];
 
       mockOrcamentosService.findAll.mockResolvedValue(orcamentos);
 
-      const userId = faker.number.int();
-
-      const result = await controller.findAll({ user: { id: userId } });
+      const result = await controller.findAll(req);
 
       expect(result).toEqual(orcamentos);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(service.findAll).toHaveBeenCalledWith(req.user.id);
     });
   });
 
   describe("findOne", () => {
     it("should return a single orcamento by id", async () => {
-      const orcamento = {
-        id: 1,
-        nome: "Orçamento A",
-        valor_inicial: "1000.00",
-        valor_atual: "1200.00",
-        valor_livre: "200.00",
-      };
+      const req = buildRequest();
+      const orcamento_id = faker.number.int();
+      const orcamento = buildOrcamentoResponseDto({ id: orcamento_id });
 
       mockOrcamentosService.findOne.mockResolvedValue(orcamento);
 
-      const userId = faker.number.int();
-
-      const result = await controller.findOne({ user: { id: userId } }, "1");
+      const result = await controller.findOne(req, orcamento_id);
 
       expect(result).toEqual(orcamento);
-      expect(service.findOne).toHaveBeenCalledWith(userId, 1);
+      expect(service.findOne).toHaveBeenCalledWith(req.user.id, orcamento_id);
     });
 
     it("should return null if orcamento not found", async () => {
+      const req = buildRequest();
+
       mockOrcamentosService.findOne.mockResolvedValue(null);
 
-      const userId = faker.number.int();
-
-      const result = await controller.findOne({ user: { id: userId } }, "999");
+      const result = await controller.findOne(req, 999);
 
       expect(result).toBeNull();
-      expect(service.findOne).toHaveBeenCalledWith(userId, 999);
+      expect(service.findOne).toHaveBeenCalledWith(req.user.id, 999);
     });
   });
 
   describe("update", () => {
     it("should update an orcamento", async () => {
-      const updateOrcamentoDto: OrcamentoUpdateDto = {
-        nome: "Orçamento A Atualizado",
-        valor_inicial: "1300.00",
-      };
+      const req = buildRequest();
+      const orcamento_id = faker.number.int();
+      const dto = buildUpdateDto();
+      const updated = buildOrcamentoResponseDto({
+        id: orcamento_id,
+        nome: dto.nome,
+      });
 
-      const updatedOrcamento: OrcamentoUpdateDto = {
-        nome: "Orçamento A Atualizado",
-        valor_inicial: "1000.00",
-      };
+      mockOrcamentosService.update.mockResolvedValue(updated);
 
-      mockOrcamentosService.update.mockResolvedValue(updatedOrcamento);
+      const result = await controller.update(req, orcamento_id, dto);
 
-      const userId = faker.number.int();
-
-      const result = await controller.update(
-        { user: { id: userId } },
-        "1",
-        updateOrcamentoDto,
-      );
-
-      expect(result).toEqual(updatedOrcamento);
+      expect(result).toEqual(updated);
       expect(service.update).toHaveBeenCalledWith(
-        userId,
-        1,
-        updateOrcamentoDto,
+        req.user.id,
+        orcamento_id,
+        dto,
       );
     });
   });
 
   describe("remove", () => {
     it("should perform a soft delete of an orcamento", async () => {
-      const orcamentoToDelete = {
-        id: 1,
-        nome: "Orçamento A",
-        valor_inicial: "1000.00",
-      };
+      const req = buildRequest();
+      const orcamento_id = faker.number.int();
+      const deleted = buildOrcamentoResponseDto({
+        id: orcamento_id,
+      });
 
-      mockOrcamentosService.softDelete.mockResolvedValue(orcamentoToDelete);
+      mockOrcamentosService.softDelete.mockResolvedValue(deleted);
 
-      const userId = faker.number.int();
+      const result = await controller.remove(req, orcamento_id);
 
-      const result = await controller.remove({ user: { id: userId } }, "1");
-
-      expect(result).toEqual(orcamentoToDelete);
-      expect(service.softDelete).toHaveBeenCalledWith(userId, 1);
+      expect(result).toEqual(deleted);
+      expect(service.softDelete).toHaveBeenCalledWith(
+        req.user.id,
+        orcamento_id,
+      );
     });
   });
 });

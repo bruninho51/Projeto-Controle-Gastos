@@ -17,8 +17,10 @@ export class GastoVariadoUpdateDto {
   @ApiProperty({
     description: "Descrição do gasto variado",
     example: "PIZZA",
+    required: false,
+    nullable: true,
   })
-  descricao?: string;
+  descricao?: string | null;
 
   @IsDecimal()
   @IsNotEmpty()
@@ -26,8 +28,10 @@ export class GastoVariadoUpdateDto {
   @ApiProperty({
     description: "Valor",
     example: "130.00",
+    required: false,
+    nullable: true,
   })
-  valor?: string;
+  valor?: string | null;
 
   @IsOptional()
   @IsDate()
@@ -35,8 +39,10 @@ export class GastoVariadoUpdateDto {
   @ApiProperty({
     description: "Data do pagamento",
     example: "2024-12-01",
+    required: false,
+    nullable: true,
   })
-  data_pgto?: Date;
+  data_pgto?: Date | null;
 
   @IsInt()
   @IsNotEmpty()
@@ -44,16 +50,20 @@ export class GastoVariadoUpdateDto {
   @ApiProperty({
     description: "ID da categoria do gasto",
     example: 1,
+    required: false,
+    nullable: true,
   })
-  categoria_id?: number;
+  categoria_id?: number | null;
 
   @IsOptional()
   @IsString()
   @ApiProperty({
     description: "Observações adicionais sobre o gasto variado",
     example: "Pizza de mussarela.",
+    required: false,
+    nullable: true,
   })
-  observacoes?: string;
+  observacoes?: string | null;
 
   @IsDate()
   @IsOptional()
@@ -61,6 +71,8 @@ export class GastoVariadoUpdateDto {
   @ApiProperty({
     description: "Inativar o gasto variado",
     example: "2024-12-01",
+    required: false,
+    nullable: true,
   })
-  data_inatividade?: Date;
+  data_inatividade?: Date | null;
 }

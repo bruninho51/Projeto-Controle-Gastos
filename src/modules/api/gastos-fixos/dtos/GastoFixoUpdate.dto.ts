@@ -17,8 +17,10 @@ export class GastoFixoUpdateDto {
   @ApiProperty({
     description: "Descrição do gasto fixo",
     example: "CONTA DE LUZ",
+    required: false,
+    nullable: true,
   })
-  descricao?: string;
+  descricao?: string | null;
 
   @IsDecimal()
   @IsNotEmpty()
@@ -26,16 +28,20 @@ export class GastoFixoUpdateDto {
   @ApiProperty({
     description: "Valor previsto",
     example: "130.00",
+    required: false,
+    nullable: true,
   })
-  previsto?: string;
+  previsto?: string | null;
 
   @IsOptional()
   @IsDecimal()
   @ApiProperty({
     description: "Valor efetivamente pago",
     example: "130.00",
+    required: false,
+    nullable: true,
   })
-  valor?: string;
+  valor?: string | null;
 
   @IsOptional()
   @IsDate()
@@ -43,8 +49,10 @@ export class GastoFixoUpdateDto {
   @ApiProperty({
     description: "Data do pagamento",
     example: "2024-12-01",
+    required: false,
+    nullable: true,
   })
-  data_pgto?: Date;
+  data_pgto?: Date | null;
 
   @IsOptional()
   @IsDate()
@@ -52,8 +60,10 @@ export class GastoFixoUpdateDto {
   @ApiProperty({
     description: "Data de vencimento do gasto fixo",
     example: "2024-12-20",
+    required: false,
+    nullable: true,
   })
-  data_venc?: Date;
+  data_venc?: Date | null;
 
   @IsInt()
   @IsNotEmpty()
@@ -61,16 +71,20 @@ export class GastoFixoUpdateDto {
   @ApiProperty({
     description: "ID da categoria do gasto",
     example: 1,
+    required: false,
+    nullable: true,
   })
-  categoria_id?: number;
+  categoria_id?: number | null;
 
   @IsOptional()
   @IsString()
   @ApiProperty({
     description: "Observações adicionais sobre o gasto fixo",
     example: "Pagar até o dia 20 desse mês.",
+    required: false,
+    nullable: true,
   })
-  observacoes?: string;
+  observacoes?: string | null;
 
   @IsOptional()
   @IsDate()
@@ -78,6 +92,8 @@ export class GastoFixoUpdateDto {
   @ApiProperty({
     description: "Inativar o gasto fixo",
     example: "2024-12-01",
+    required: false,
+    nullable: true,
   })
-  data_inatividade?: Date;
+  data_inatividade?: Date | null;
 }

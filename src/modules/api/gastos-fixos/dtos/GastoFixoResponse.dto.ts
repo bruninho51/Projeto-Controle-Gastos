@@ -1,7 +1,11 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { CategoriaGasto, GastoFixo } from "@prisma/client";
-import { Exclude, Expose, plainToInstance } from "class-transformer";
+import { Exclude, Expose, plainToInstance, Type } from "class-transformer";
 import { CategoriaGastoResponseDto } from "../../categorias-gastos/dtos/CategoriaGastoResponse.dto";
+
+type GastoFixoWithCategoria = GastoFixo & {
+  categoriaGasto: CategoriaGasto;
+};
 
 @Exclude()
 export class GastoFixoResponseDto {
@@ -17,12 +21,19 @@ export class GastoFixoResponseDto {
   descricao: string;
 
   @Expose()
-  @ApiProperty({ example: "320", description: "Valor previsto para o gasto" })
+  @ApiProperty({
+    example: "320.00",
+    description: "Valor previsto para o gasto",
+  })
   previsto: string;
 
   @Expose()
-  @ApiProperty({ example: "281.34", description: "Valor efetivamente gasto" })
-  valor: string;
+  @ApiProperty({
+    example: "281.34",
+    nullable: true,
+    description: "Valor efetivamente gasto",
+  })
+  valor: string | null;
 
   @Expose()
   @ApiProperty({
@@ -41,34 +52,34 @@ export class GastoFixoResponseDto {
   @Expose()
   @ApiProperty({
     example: "38.66",
+    nullable: true,
     description: "Diferença entre previsto e valor",
   })
-  diferenca: string;
+  diferenca: string | null;
 
   @Expose()
   @ApiProperty({
     example: "2025-12-02T00:00:00.000Z",
+    nullable: true,
     description: "Data do pagamento",
   })
-  data_pgto: Date;
+  data_pgto: Date | null;
 
   @Expose()
   @ApiProperty({
-    example: null,
-    required: false,
+    example: "2025-12-10T00:00:00.000Z",
     nullable: true,
     description: "Data de vencimento do gasto",
   })
-  data_venc?: Date | null;
+  data_venc: Date | null;
 
   @Expose()
   @ApiProperty({
-    example: null,
-    required: false,
+    example: "Conta referente ao mês de dezembro",
     nullable: true,
     description: "Observações adicionais sobre o gasto",
   })
-  observacoes?: string | null;
+  observacoes: string | null;
 
   @Expose()
   @ApiProperty({
@@ -80,20 +91,21 @@ export class GastoFixoResponseDto {
   @Expose()
   @ApiProperty({
     example: "2025-12-08T18:47:41.000Z",
+    nullable: true,
     description: "Data da última atualização do registro",
   })
-  data_atualizacao: Date;
+  data_atualizacao: Date | null;
 
   @Expose()
   @ApiProperty({
-    example: null,
-    required: false,
+    example: "2025-12-08T18:47:41.000Z",
     nullable: true,
     description: "Data em que o registro foi inativado",
   })
-  data_inatividade?: Date | null;
+  data_inatividade: Date | null;
 
   @Expose()
+  @Type(() => CategoriaGastoResponseDto)
   @ApiProperty({
     type: () => CategoriaGastoResponseDto,
     description: "Categoria do gasto",
@@ -105,8 +117,8 @@ export class GastoFixoResponseDto {
   }
 
   static fromEntity(
-    entity: GastoFixo & { categoriaGasto: CategoriaGasto },
-  ): GastoFixoResponseDto {
+    entity: GastoFixoWithCategoria | null,
+  ): GastoFixoResponseDto | null {
     if (!entity) return null;
 
     return plainToInstance(
@@ -114,9 +126,9 @@ export class GastoFixoResponseDto {
       {
         id: entity.id,
         descricao: entity.descricao,
-        previsto: entity.previsto ? entity.previsto.toString() : null,
-        valor: entity.valor ? entity.valor.toString() : null,
-        diferenca: entity.diferenca ? entity.diferenca.toString() : null,
+        previsto: entity.previsto.toString(),
+        valor: entity.valor?.toString() ?? null,
+        diferenca: entity.diferenca?.toString() ?? null,
         categoria_id: entity.categoria_id,
         orcamento_id: entity.orcamento_id,
         data_pgto: entity.data_pgto,

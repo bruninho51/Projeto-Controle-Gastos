@@ -8,6 +8,7 @@ import {
   Patch,
   Req,
   UseGuards,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { OrcamentosService } from "./orcamentos.service";
 import {
@@ -17,12 +18,20 @@ import {
   ApiParam,
   ApiBody,
   ApiBearerAuth,
+  ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { OrcamentoResponseDto } from "./dtos/OrcamentoResponse.dto";
 
 @ApiTags("Orçamentos")
+@ApiBearerAuth("access-token")
+@ApiUnauthorizedResponse({
+  description: "Token inválido ou não informado",
+})
+@ApiResponse({ status: 500, description: "Erro interno no servidor." })
+@UseGuards(JwtAuthGuard)
 @Controller("orcamentos")
 export class OrcamentosController {
   constructor(private readonly orcamentoService: OrcamentosService) {}
@@ -30,21 +39,27 @@ export class OrcamentosController {
   @Post()
   @ApiOperation({ summary: "Criar um novo orçamento" })
   @ApiBody({ type: OrcamentoCreateDto })
-  @ApiResponse({ status: 201, description: "Orçamento criado com sucesso." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
-  create(@Req() { user }, @Body() createOrcamentoDto: OrcamentoCreateDto) {
+  @ApiResponse({
+    status: 201,
+    description: "Orçamento criado com sucesso.",
+    type: OrcamentoResponseDto,
+  })
+  create(
+    @Req() { user },
+    @Body() createOrcamentoDto: OrcamentoCreateDto,
+  ): Promise<OrcamentoResponseDto> {
     return this.orcamentoService.create(user.id, createOrcamentoDto);
   }
 
   @Get()
   @ApiOperation({ summary: "Buscar todos os orçamentos" })
-  @ApiResponse({ status: 200, description: "Lista de orçamentos." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
-  findAll(@Req() { user }) {
+  @ApiResponse({
+    status: 200,
+    description: "Lista de orçamentos.",
+    type: OrcamentoResponseDto,
+    isArray: true,
+  })
+  findAll(@Req() { user }): Promise<OrcamentoResponseDto[]> {
     return this.orcamentoService.findAll(user.id);
   }
 
@@ -52,24 +67,28 @@ export class OrcamentosController {
   @ApiOperation({ summary: "Buscar um orçamento pelo ID" })
   @ApiParam({
     name: "id",
-    type: "string",
+    type: Number,
     description: "ID do orçamento",
     required: true,
   })
-  @ApiResponse({ status: 200, description: "Orçamento encontrado." })
+  @ApiResponse({
+    status: 200,
+    description: "Orçamento encontrado.",
+    type: OrcamentoResponseDto,
+  })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
-  async findOne(@Req() { user }, @Param("id") id: string) {
-    return this.orcamentoService.findOne(user.id, +id);
+  async findOne(
+    @Req() { user },
+    @Param("id", ParseIntPipe) id: number,
+  ): Promise<OrcamentoResponseDto> {
+    return this.orcamentoService.findOne(user.id, id);
   }
 
   @Patch(":id")
   @ApiOperation({ summary: "Atualizar um orçamento" })
   @ApiParam({
     name: "id",
-    type: "string",
+    type: Number,
     description: "ID do orçamento",
     required: true,
   })
@@ -77,33 +96,35 @@ export class OrcamentosController {
   @ApiResponse({
     status: 200,
     description: "Orçamento atualizado com sucesso.",
+    type: OrcamentoResponseDto,
   })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
   update(
     @Req() { user },
-    @Param("id") id: string,
+    @Param("id", ParseIntPipe) id: number,
     @Body() updateOrcamentoDto: OrcamentoUpdateDto,
-  ) {
-    return this.orcamentoService.update(user.id, +id, updateOrcamentoDto);
+  ): Promise<OrcamentoResponseDto> {
+    return this.orcamentoService.update(user.id, id, updateOrcamentoDto);
   }
 
   @Delete(":id")
   @ApiOperation({ summary: "Remover um orçamento" })
   @ApiParam({
     name: "id",
-    type: "string",
+    type: Number,
     description: "ID do orçamento",
     required: true,
   })
-  @ApiResponse({ status: 200, description: "Orçamento removido com sucesso." })
+  @ApiResponse({
+    status: 200,
+    description: "Orçamento removido com sucesso.",
+    type: OrcamentoResponseDto,
+  })
   @ApiResponse({ status: 404, description: "Orçamento não encontrado." })
-  @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
-  remove(@Req() { user }, @Param("id") id: string) {
-    return this.orcamentoService.softDelete(user.id, +id);
+  remove(
+    @Req() { user },
+    @Param("id", ParseIntPipe) id: number,
+  ): Promise<OrcamentoResponseDto> {
+    return this.orcamentoService.softDelete(user.id, id);
   }
 }

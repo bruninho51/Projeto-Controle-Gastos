@@ -121,14 +121,19 @@ describe("GastosVariadosController", () => {
         GastosVariadosService,
         { provide: GastosVariadosService, useValue: mockGastosVariadosService },
         { provide: OrcamentosService, useValue: mockOrcamentosService },
-        { provide: CategoriasGastosService, useValue: mockCategoriaGastosService },
+        {
+          provide: CategoriasGastosService,
+          useValue: mockCategoriaGastosService,
+        },
       ],
     }).compile();
 
     controller = module.get<GastosVariadosController>(GastosVariadosController);
     service = module.get<GastosVariadosService>(GastosVariadosService);
     orcamentosService = module.get<OrcamentosService>(OrcamentosService);
-    categoriaGastosService = module.get<CategoriasGastosService>(CategoriasGastosService);
+    categoriaGastosService = module.get<CategoriasGastosService>(
+      CategoriasGastosService,
+    );
   });
 
   it("should be defined", () => {
@@ -138,7 +143,7 @@ describe("GastosVariadosController", () => {
   describe("create", () => {
     it("should create a new gasto variado", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
       const categoriaDto = buildCategoriaResponseDto();
@@ -156,7 +161,7 @@ describe("GastosVariadosController", () => {
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
       const categoriaDto = buildCategoriaResponseDto();
@@ -166,12 +171,15 @@ describe("GastosVariadosController", () => {
 
       await controller.create(req, orcamento_id, dto);
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(req.user.id, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        req.user.id,
+        orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const categoriaDto = buildCategoriaResponseDto();
 
@@ -185,7 +193,7 @@ describe("GastosVariadosController", () => {
 
     it("should call categoria gasto service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
       const categoriaDto = buildCategoriaResponseDto();
@@ -195,12 +203,15 @@ describe("GastosVariadosController", () => {
 
       await controller.create(req, orcamento_id, dto);
 
-      expect(categoriaGastosService.findOne).toHaveBeenCalledWith(req.user.id, +dto.categoria_id);
+      expect(categoriaGastosService.findOne).toHaveBeenCalledWith(
+        req.user.id,
+        dto.categoria_id,
+      );
     });
 
     it("should throw exception if categoria gasto service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const dto = buildCreateDto();
       const orcamentoDto = buildOrcamentoDto();
 
@@ -216,7 +227,7 @@ describe("GastosVariadosController", () => {
   describe("findAll", () => {
     it("should return an array of gastos variados", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
       const filters: GastoVariadoFindDto = {};
       const gastos: GastoVariadoResponseDto[] = [
@@ -235,19 +246,22 @@ describe("GastosVariadosController", () => {
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
 
       await controller.findAll(req, orcamento_id, {});
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(req.user.id, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        req.user.id,
+        orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
 
@@ -260,36 +274,40 @@ describe("GastosVariadosController", () => {
   describe("findOne", () => {
     it("should return a gasto variado by id", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
-      const gasto = buildGastoVariadoResponseDto({ id: +gasto_variado_id });
+      const gasto = buildGastoVariadoResponseDto({ id: gasto_variado_id });
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosVariadosService.findOne.mockResolvedValue(gasto);
 
-      const result = await controller.findOne(req, orcamento_id, gasto_variado_id);
+      const result = await controller.findOne(
+        req,
+        orcamento_id,
+        gasto_variado_id,
+      );
 
       expect(result).toEqual(gasto);
     });
 
     it("should return null if gasto variado not found", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosVariadosService.findOne.mockResolvedValue(null);
 
-      const result = await controller.findOne(req, orcamento_id, "999");
+      const result = await controller.findOne(req, orcamento_id, 999);
 
       expect(result).toBeNull();
     });
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
@@ -297,17 +315,22 @@ describe("GastosVariadosController", () => {
 
       await controller.findOne(req, orcamento_id, gasto_variado_id);
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(req.user.id, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        req.user.id,
+        orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
 
-      await expect(controller.findOne(req, orcamento_id, gasto_variado_id)).rejects.toThrow(
+      await expect(
+        controller.findOne(req, orcamento_id, gasto_variado_id),
+      ).rejects.toThrow(
         new NotFoundException("O orçamento informado não foi encontrado."),
       );
     });
@@ -316,25 +339,36 @@ describe("GastosVariadosController", () => {
   describe("update", () => {
     it("should update a gasto variado", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
       const dto = buildUpdateDto({ data_pgto: new Date() });
       const orcamentoDto = buildOrcamentoDto();
-      const updatedGasto = buildGastoVariadoResponseDto({ id: +gasto_variado_id });
+      const updatedGasto = buildGastoVariadoResponseDto({
+        id: gasto_variado_id,
+      });
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosVariadosService.update.mockResolvedValue(updatedGasto);
 
-      const result = await controller.update(req, orcamento_id, gasto_variado_id, dto);
+      const result = await controller.update(
+        req,
+        orcamento_id,
+        gasto_variado_id,
+        dto,
+      );
 
       expect(result).toEqual(updatedGasto);
-      expect(service.update).toHaveBeenCalledWith(orcamentoDto.id, +gasto_variado_id, dto);
+      expect(service.update).toHaveBeenCalledWith(
+        orcamentoDto.id,
+        gasto_variado_id,
+        dto,
+      );
     });
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
       const dto = buildUpdateDto();
       const orcamentoDto = buildOrcamentoDto();
 
@@ -342,18 +376,23 @@ describe("GastosVariadosController", () => {
 
       await controller.update(req, orcamento_id, gasto_variado_id, dto);
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(req.user.id, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        req.user.id,
+        orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
       const dto = buildUpdateDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
 
-      await expect(controller.update(req, orcamento_id, gasto_variado_id, dto)).rejects.toThrow(
+      await expect(
+        controller.update(req, orcamento_id, gasto_variado_id, dto),
+      ).rejects.toThrow(
         new NotFoundException("O orçamento informado não foi encontrado."),
       );
     });
@@ -362,41 +401,55 @@ describe("GastosVariadosController", () => {
   describe("remove", () => {
     it("should perform a soft delete of a gasto variado", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
-      const deletedGasto = buildGastoVariadoResponseDto({ id: +gasto_variado_id });
+      const deletedGasto = buildGastoVariadoResponseDto({
+        id: gasto_variado_id,
+      });
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
       mockGastosVariadosService.softDelete.mockResolvedValue(deletedGasto);
 
-      const result = await controller.remove(req, orcamento_id, gasto_variado_id);
+      const result = await controller.remove(
+        req,
+        orcamento_id,
+        gasto_variado_id,
+      );
 
       expect(result).toEqual(deletedGasto);
-      expect(service.softDelete).toHaveBeenCalledWith(orcamentoDto.id, +gasto_variado_id);
+      expect(service.softDelete).toHaveBeenCalledWith(
+        orcamentoDto.id,
+        gasto_variado_id,
+      );
     });
 
     it("should call orcamentos service", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
       const orcamentoDto = buildOrcamentoDto();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(orcamentoDto);
 
       await controller.remove(req, orcamento_id, gasto_variado_id);
 
-      expect(orcamentosService.findOne).toHaveBeenCalledWith(req.user.id, +orcamento_id);
+      expect(orcamentosService.findOne).toHaveBeenCalledWith(
+        req.user.id,
+        orcamento_id,
+      );
     });
 
     it("should throw exception if orcamentos service returns null", async () => {
       const req = buildRequest();
-      const orcamento_id = faker.number.int().toString();
-      const gasto_variado_id = faker.number.int().toString();
+      const orcamento_id = faker.number.int();
+      const gasto_variado_id = faker.number.int();
 
       mockOrcamentosService.findOne.mockReturnValueOnce(null);
 
-      await expect(controller.remove(req, orcamento_id, gasto_variado_id)).rejects.toThrow(
+      await expect(
+        controller.remove(req, orcamento_id, gasto_variado_id),
+      ).rejects.toThrow(
         new NotFoundException("O orçamento informado não foi encontrado."),
       );
     });

@@ -170,7 +170,10 @@ export class GastosVariadosService {
     return GastoVariadoResponseDto.fromEntity(gastoVariado);
   }
 
-  async softDelete(orcamento_id: number, id: number): Promise<GastoVariadoResponseDto> {
+  async softDelete(
+    orcamento_id: number,
+    id: number,
+  ): Promise<GastoVariadoResponseDto> {
     const gastoVariado = await this.prisma.gastoVariado.update({
       include: {
         categoriaGasto: true,

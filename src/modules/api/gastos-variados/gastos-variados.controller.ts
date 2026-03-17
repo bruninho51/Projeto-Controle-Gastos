@@ -4,12 +4,13 @@ import {
   Post,
   Body,
   Param,
-  Patch,
   Delete,
-  NotFoundException,
+  Patch,
   Req,
   UseGuards,
   Query,
+  ParseIntPipe,
+  NotFoundException,
 } from "@nestjs/common";
 import { GastosVariadosService } from "./gastos-variados.service";
 import { GastoVariadoCreateDto } from "./dtos/GastoVariadoCreate.dto";
@@ -46,21 +47,30 @@ export class GastosVariadosController {
 
   @Post()
   @ApiOperation({ summary: "Criar um novo gasto variado" })
+  @ApiParam({
+    name: "orcamento_id",
+    type: Number,
+    description: "ID do orçamento",
+    required: true,
+  })
   @ApiBody({ type: GastoVariadoCreateDto })
   @ApiResponse({
     status: 201,
     description: "Gasto variado criado com sucesso.",
     type: GastoVariadoResponseDto,
   })
-  @ApiResponse({ status: 404, description: "Categoria de gasto não existe.|Orçamento não existe." })
+  @ApiResponse({
+    status: 404,
+    description: "Categoria de gasto não existe.|Orçamento não existe.",
+  })
   async create(
     @Req() { user },
-    @Param("orcamento_id") orcamento_id: String,
+    @Param("orcamento_id", ParseIntPipe) orcamento_id: number,
     @Body() createGastoDto: GastoVariadoCreateDto,
   ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
-      +orcamento_id,
+      orcamento_id,
     );
     const categoriaGasto = await this.categoriaGastosService.findOne(
       user.id,
@@ -80,20 +90,26 @@ export class GastosVariadosController {
 
   @Get()
   @ApiOperation({ summary: "Buscar todos os gastos variados" })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiParam({
+    name: "orcamento_id",
+    type: Number,
+    description: "ID do orçamento",
+    required: true,
+  })
+  @ApiResponse({
+    status: 200,
     description: "Lista de gastos variados.",
     type: GastoVariadoResponseDto,
     isArray: true,
-   })
+  })
   async findAll(
     @Req() { user },
-    @Param("orcamento_id") orcamento_id: string,
+    @Param("orcamento_id", ParseIntPipe) orcamento_id: number,
     @Query() query: GastoVariadoFindDto,
   ): Promise<GastoVariadoResponseDto[]> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
-      +orcamento_id,
+      orcamento_id,
     );
 
     if (!orcamento) {
@@ -106,39 +122,51 @@ export class GastosVariadosController {
   @Get(":id")
   @ApiOperation({ summary: "Buscar um gasto variado pelo ID" })
   @ApiParam({
+    name: "orcamento_id",
+    type: Number,
+    description: "ID do orçamento",
+    required: true,
+  })
+  @ApiParam({
     name: "id",
-    type: "string",
+    type: Number,
     description: "ID do gasto variado",
     required: true,
   })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: "Gasto variado encontrado.",
     type: GastoVariadoResponseDto,
-   })
+  })
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   async findOne(
     @Req() { user },
-    @Param("orcamento_id") orcamento_id: string,
-    @Param("id") id: string,
+    @Param("orcamento_id", ParseIntPipe) orcamento_id: number,
+    @Param("id", ParseIntPipe) id: number,
   ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
-      +orcamento_id,
+      orcamento_id,
     );
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
     }
 
-    return this.gastosVariadosService.findOne(orcamento.id, +id);
+    return this.gastosVariadosService.findOne(orcamento.id, id);
   }
 
   @Patch(":id")
   @ApiOperation({ summary: "Atualizar um gasto variado" })
   @ApiParam({
+    name: "orcamento_id",
+    type: Number,
+    description: "ID do orçamento",
+    required: true,
+  })
+  @ApiParam({
     name: "id",
-    type: "string",
+    type: Number,
     description: "ID do gasto variado",
     required: true,
   })
@@ -151,27 +179,33 @@ export class GastosVariadosController {
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   async update(
     @Req() { user },
-    @Param("orcamento_id") orcamento_id: string,
-    @Param("id") id: string,
+    @Param("orcamento_id", ParseIntPipe) orcamento_id: number,
+    @Param("id", ParseIntPipe) id: number,
     @Body() updateGastoDto: GastoVariadoUpdateDto,
   ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
-      +orcamento_id,
+      orcamento_id,
     );
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
     }
 
-    return this.gastosVariadosService.update(orcamento.id, +id, updateGastoDto);
+    return this.gastosVariadosService.update(orcamento.id, id, updateGastoDto);
   }
 
   @Delete(":id")
   @ApiOperation({ summary: "Remover um gasto variado" })
   @ApiParam({
+    name: "orcamento_id",
+    type: Number,
+    description: "ID do orçamento",
+    required: true,
+  })
+  @ApiParam({
     name: "id",
-    type: "string",
+    type: Number,
     description: "ID do gasto variado",
     required: true,
   })
@@ -183,18 +217,18 @@ export class GastosVariadosController {
   @ApiResponse({ status: 404, description: "Gasto variado não encontrado." })
   async remove(
     @Req() { user },
-    @Param("orcamento_id") orcamento_id: string,
-    @Param("id") id: string,
+    @Param("orcamento_id", ParseIntPipe) orcamento_id: number,
+    @Param("id", ParseIntPipe) id: number,
   ): Promise<GastoVariadoResponseDto> {
     const orcamento = await this.orcamentosService.findOne(
       user.id,
-      +orcamento_id,
+      orcamento_id,
     );
 
     if (!orcamento) {
       throw new NotFoundException("O orçamento informado não foi encontrado.");
     }
 
-    return this.gastosVariadosService.softDelete(orcamento.id, +id);
+    return this.gastosVariadosService.softDelete(orcamento.id, id);
   }
 }

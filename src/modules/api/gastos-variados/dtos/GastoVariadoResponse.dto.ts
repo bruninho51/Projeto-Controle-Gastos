@@ -3,7 +3,9 @@ import { GastoVariado, CategoriaGasto } from "@prisma/client";
 import { Exclude, Expose, plainToInstance, Type } from "class-transformer";
 import { CategoriaGastoResponseDto } from "../../categorias-gastos/dtos/CategoriaGastoResponse.dto";
 
-type GastoVariadoWithCategoria = GastoVariado & { categoriaGasto: CategoriaGasto };
+type GastoVariadoWithCategoria = GastoVariado & {
+  categoriaGasto: CategoriaGasto;
+};
 
 @Exclude()
 export class GastoVariadoResponseDto {
@@ -12,45 +14,41 @@ export class GastoVariadoResponseDto {
   id: number;
 
   @Expose()
-  @ApiProperty({ example: "Mercado", description: "Descrição do gasto variado" })
+  @ApiProperty({
+    example: "Mercado",
+    description: "Descrição do gasto variado",
+  })
   descricao: string;
 
   @Expose()
   @ApiProperty({ example: "350.00", description: "Valor do gasto" })
-  valor: string | null;
+  valor: string;
 
   @Expose()
   @ApiProperty({
     example: 1,
     description: "Identificador da categoria do gasto",
-    required: false,
-    nullable: true,
   })
-  categoria_id: number | null;
+  categoria_id: number;
 
   @Expose()
   @ApiProperty({
     example: 3,
     description: "Identificador do orçamento ao qual o gasto pertence",
-    required: false,
-    nullable: true,
   })
-  orcamento_id: number | null;
+  orcamento_id: number;
 
   @Expose()
   @ApiProperty({
     example: "2025-05-08",
     description: "Data em que o gasto foi realizado",
-    required: false,
-    nullable: true,
   })
-  data_pgto: Date | null;
+  data_pgto: Date;
 
   @Expose()
   @ApiProperty({
     example: "Compra no supermercado",
     description: "Observações sobre o gasto variado",
-    required: false,
     nullable: true,
   })
   observacoes: string | null;
@@ -60,21 +58,21 @@ export class GastoVariadoResponseDto {
     example: "2025-03-05T21:31:27.000Z",
     description: "Data de criação do registro",
   })
-  data_criacao: Date | null;
+  data_criacao: Date;
 
   @Expose()
   @ApiProperty({
     example: "2025-03-05T21:31:27.000Z",
+    nullable: true,
     description: "Data da última atualização do registro",
   })
   data_atualizacao: Date | null;
 
   @Expose()
   @ApiProperty({
-    example: null,
-    description: "Data em que o gasto foi inativado",
-    required: false,
+    example: "2025-03-05T21:31:27.000Z",
     nullable: true,
+    description: "Data em que o gasto foi inativado",
   })
   data_inatividade: Date | null;
 
@@ -83,16 +81,16 @@ export class GastoVariadoResponseDto {
   @ApiProperty({
     type: () => CategoriaGastoResponseDto,
     description: "Categoria associada ao gasto variado",
-    required: false,
-    nullable: true,
   })
-  categoriaGasto: CategoriaGastoResponseDto | null;
+  categoriaGasto: CategoriaGastoResponseDto;
 
   constructor(partial: Partial<GastoVariadoResponseDto>) {
     Object.assign(this, partial);
   }
 
-  static fromEntity(entity: GastoVariadoWithCategoria | null): GastoVariadoResponseDto | null {
+  static fromEntity(
+    entity: GastoVariadoWithCategoria | null,
+  ): GastoVariadoResponseDto | null {
     if (entity == null) return null;
 
     return plainToInstance(
@@ -100,7 +98,7 @@ export class GastoVariadoResponseDto {
       {
         id: entity.id,
         descricao: entity.descricao,
-        valor: entity.valor?.toString() ?? null,
+        valor: entity.valor.toString(),
         categoria_id: entity.categoria_id,
         orcamento_id: entity.orcamento_id,
         data_pgto: entity.data_pgto,
@@ -108,7 +106,9 @@ export class GastoVariadoResponseDto {
         data_criacao: entity.data_criacao,
         data_atualizacao: entity.data_atualizacao,
         data_inatividade: entity.data_inatividade,
-        categoriaGasto: CategoriaGastoResponseDto.fromEntity(entity.categoriaGasto)
+        categoriaGasto: CategoriaGastoResponseDto.fromEntity(
+          entity.categoriaGasto,
+        ),
       },
       { excludeExtraneousValues: true },
     );

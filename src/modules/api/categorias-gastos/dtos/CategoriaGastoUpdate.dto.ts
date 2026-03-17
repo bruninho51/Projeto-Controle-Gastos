@@ -15,8 +15,10 @@ export class CategoriaGastoUpdateDto {
   @ApiProperty({
     description: "Nome da categoria",
     example: "Alimentação",
+    required: false,
+    nullable: true,
   })
-  nome?: string;
+  nome?: string | null;
 
   @IsOptional()
   @IsDate()
@@ -24,6 +26,8 @@ export class CategoriaGastoUpdateDto {
   @ApiProperty({
     description: "Inativar a categoria de gastos",
     example: "2024-12-01",
+    required: false,
+    nullable: true,
   })
-  data_inatividade?: Date;
+  data_inatividade?: Date | null;
 }

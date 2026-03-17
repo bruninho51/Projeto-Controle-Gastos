@@ -4,22 +4,72 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
 import { faker } from "@faker-js/faker";
+import { Orcamento, Prisma } from "@prisma/client";
+import { OrcamentoResponseDto } from "./dtos/OrcamentoResponse.dto";
 
-const mockPrismaService = {
+function buildOrcamento(overrides: Partial<Orcamento> = {}): Orcamento {
+  return {
+    id: faker.number.int(),
+    nome: faker.string.alphanumeric(5),
+    valor_inicial: Prisma.Decimal("1000.00"),
+    valor_atual: Prisma.Decimal("1000.00"),
+    valor_livre: Prisma.Decimal("1000.00"),
+    usuario_id: faker.number.int(),
+    data_encerramento: null,
+    soft_delete: null,
+    data_criacao: new Date(),
+    data_atualizacao: new Date(),
+    data_inatividade: null,
+    ...overrides,
+  };
+}
+
+function toResponseDto(orcamento: Orcamento): OrcamentoResponseDto {
+  const dto = new OrcamentoResponseDto({});
+
+  dto.id = orcamento.id;
+  dto.nome = orcamento.nome;
+  dto.valor_inicial = orcamento.valor_inicial.toString();
+  dto.valor_atual = orcamento.valor_atual.toString();
+  dto.valor_livre = orcamento.valor_livre.toString();
+  dto.data_encerramento = orcamento.data_encerramento;
+  dto.data_criacao = orcamento.data_criacao;
+  dto.data_atualizacao = orcamento.data_atualizacao;
+  dto.data_inatividade = orcamento.data_inatividade;
+
+  return dto;
+}
+
+let mockPrismaService: {
   orcamento: {
-    create: jest.fn(),
-    findMany: jest.fn(),
-    findUnique: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  },
+    create: jest.Mock;
+    findMany: jest.Mock;
+    findUnique: jest.Mock;
+    update: jest.Mock;
+    delete: jest.Mock;
+  };
 };
+
+function createPrismaMock() {
+  return {
+    orcamento: {
+      create: jest.fn().mockResolvedValue(null),
+      findMany: jest.fn().mockResolvedValue([]),
+      findUnique: jest.fn().mockResolvedValue(null),
+      update: jest.fn().mockResolvedValue(null),
+      delete: jest.fn().mockResolvedValue(null),
+    },
+  };
+}
 
 describe("OrcamentosService", () => {
   let service: OrcamentosService;
-  let prismaService: PrismaService;
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
+    mockPrismaService = createPrismaMock();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         OrcamentosService,
@@ -31,7 +81,6 @@ describe("OrcamentosService", () => {
     }).compile();
 
     service = module.get<OrcamentosService>(OrcamentosService);
-    prismaService = module.get<PrismaService>(PrismaService);
   });
 
   it("should be defined", () => {
@@ -40,25 +89,24 @@ describe("OrcamentosService", () => {
 
   describe("create", () => {
     it("should create a new orcamento", async () => {
+      const usuarioId = faker.number.int();
+
       const createOrcamentoDto: OrcamentoCreateDto = {
         nome: "Orçamento A",
         valor_inicial: "1000.00",
       };
 
-      const createdOrcamento = {
-        id: 1,
-        ...createOrcamentoDto,
-        data_criacao: new Date(),
-        data_atualizacao: new Date(),
-      };
-
-      const usuarioId = faker.number.int();
+      const createdOrcamento = buildOrcamento({
+        nome: createOrcamentoDto.nome,
+        valor_inicial: Prisma.Decimal(createOrcamentoDto.valor_inicial),
+        usuario_id: usuarioId,
+      });
 
       mockPrismaService.orcamento.create.mockResolvedValue(createdOrcamento);
 
       const result = await service.create(usuarioId, createOrcamentoDto);
 
-      expect(result).toEqual(createdOrcamento);
+      expect(result).toStrictEqual(toResponseDto(createdOrcamento));
       expect(mockPrismaService.orcamento.create).toHaveBeenCalledWith({
         data: { ...createOrcamentoDto, usuario_id: usuarioId },
       });
@@ -67,30 +115,18 @@ describe("OrcamentosService", () => {
 
   describe("findAll", () => {
     it("should return an array of orcamentos", async () => {
+      const usuarioId = faker.number.int();
+
       const orcamentos = [
-        {
-          id: 1,
-          nome: "Orçamento A",
-          valor_inicial: "1000.00",
-          valor_atual: "1200.00",
-          valor_livre: "200.00",
-        },
-        {
-          id: 2,
-          nome: "Orçamento B",
-          valor_inicial: "500.00",
-          valor_atual: "600.00",
-          valor_livre: "100.00",
-        },
+        buildOrcamento({ id: 1, nome: "Orçamento A", usuario_id: usuarioId }),
+        buildOrcamento({ id: 2, nome: "Orçamento B", usuario_id: usuarioId }),
       ];
 
       mockPrismaService.orcamento.findMany.mockResolvedValue(orcamentos);
 
-      const usuarioId = faker.number.int();
-
       const result = await service.findAll(usuarioId);
 
-      expect(result).toEqual(orcamentos);
+      expect(result).toStrictEqual(orcamentos.map(toResponseDto));
       expect(mockPrismaService.orcamento.findMany).toHaveBeenCalledWith({
         where: { usuario_id: usuarioId, soft_delete: null },
       });
@@ -99,33 +135,29 @@ describe("OrcamentosService", () => {
 
   describe("findOne", () => {
     it("should return a single orcamento by id", async () => {
-      const orcamento = {
-        id: 1,
-        nome: "Orçamento A",
-        valor_inicial: "1000.00",
-        valor_atual: "1200.00",
-        valor_livre: "200.00",
+      const usuarioId = faker.number.int();
+      const orcamentoId = faker.number.int();
+
+      const orcamento = buildOrcamento({
+        id: orcamentoId,
+        usuario_id: usuarioId,
         data_encerramento: new Date("2024-12-31"),
-        data_criacao: new Date(),
-        data_atualizacao: new Date(),
-      };
+      });
 
       mockPrismaService.orcamento.findUnique.mockResolvedValue(orcamento);
 
-      const usuarioId = faker.number.int();
+      const result = await service.findOne(usuarioId, orcamentoId);
 
-      const result = await service.findOne(usuarioId, 1);
-
-      expect(result).toEqual(orcamento);
+      expect(result).toStrictEqual(toResponseDto(orcamento));
       expect(mockPrismaService.orcamento.findUnique).toHaveBeenCalledWith({
-        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
+        where: { id: orcamentoId, usuario_id: usuarioId, soft_delete: null },
       });
     });
 
     it("should return null if orcamento not found", async () => {
-      mockPrismaService.orcamento.findUnique.mockResolvedValue(null);
-
       const usuarioId = faker.number.int();
+
+      mockPrismaService.orcamento.findUnique.mockResolvedValue(null);
 
       const result = await service.findOne(usuarioId, 999);
 
@@ -138,31 +170,32 @@ describe("OrcamentosService", () => {
 
   describe("update", () => {
     it("should update an orcamento", async () => {
+      const usuarioId = faker.number.int();
+      const orcamentoId = faker.number.int();
+
       const updateOrcamentoDto: OrcamentoUpdateDto = {
         nome: "Orçamento A Atualizado",
         valor_inicial: "1300.00",
       };
 
-      const updatedOrcamento = {
-        id: 1,
-        nome: "Orçamento A Atualizado",
-        valor_inicial: "1300.00",
-        valor_atual: "1300.00",
-        valor_livre: "1300.00",
-        data_encerramento: null,
-        data_criacao: new Date(),
-        data_atualizacao: new Date(),
-      };
+      const updatedOrcamento = buildOrcamento({
+        id: orcamentoId,
+        usuario_id: usuarioId,
+        nome: updateOrcamentoDto.nome,
+        valor_inicial: Prisma.Decimal(updateOrcamentoDto.valor_inicial),
+      });
 
       mockPrismaService.orcamento.update.mockResolvedValue(updatedOrcamento);
 
-      const usuarioId = faker.number.int();
+      const result = await service.update(
+        usuarioId,
+        orcamentoId,
+        updateOrcamentoDto,
+      );
 
-      const result = await service.update(usuarioId, 1, updateOrcamentoDto);
-
-      expect(result).toEqual(updatedOrcamento);
+      expect(result).toStrictEqual(toResponseDto(updatedOrcamento));
       expect(mockPrismaService.orcamento.update).toHaveBeenCalledWith({
-        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
+        where: { id: orcamentoId, usuario_id: usuarioId, soft_delete: null },
         data: updateOrcamentoDto,
       });
     });
@@ -170,30 +203,24 @@ describe("OrcamentosService", () => {
 
   describe("softDelete", () => {
     it("should perform a soft delete of an orcamento", async () => {
-      const orcamentoToDelete = {
-        id: 1,
-        nome: "Orçamento A",
-        valor_inicial: "1000.00",
-        valor_atual: "1200.00",
-        valor_livre: "200.00",
-      };
+      const usuarioId = faker.number.int();
+      const orcamentoId = faker.number.int();
 
-      const softDeletedOrcamento = {
-        ...orcamentoToDelete,
+      const softDeletedOrcamento = buildOrcamento({
+        id: orcamentoId,
+        usuario_id: usuarioId,
         soft_delete: new Date(),
-      };
+      });
 
       mockPrismaService.orcamento.update.mockResolvedValue(
         softDeletedOrcamento,
       );
 
-      const usuarioId = faker.number.int();
+      const result = await service.softDelete(usuarioId, orcamentoId);
 
-      const result = await service.softDelete(usuarioId, 1);
-
-      expect(result).toEqual(softDeletedOrcamento);
+      expect(result).toStrictEqual(toResponseDto(softDeletedOrcamento));
       expect(mockPrismaService.orcamento.update).toHaveBeenCalledWith({
-        where: { id: 1, usuario_id: usuarioId, soft_delete: null },
+        where: { id: orcamentoId, usuario_id: usuarioId, soft_delete: null },
         data: { soft_delete: expect.any(Date) },
       });
     });

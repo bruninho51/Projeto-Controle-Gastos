@@ -21,6 +21,7 @@ import {
   ApiBearerAuth,
   ApiUnauthorizedResponse,
   ApiBody,
+  ApiParam,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 
@@ -68,6 +69,12 @@ export class CategoriasGastosController {
 
   @Patch(":id")
   @ApiOperation({ summary: "Atualizar uma categoria de gasto" })
+  @ApiParam({
+    name: "id",
+    type: Number,
+    description: "ID da categoria de gasto",
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: "Categoria de gasto atualizada com sucesso.",
@@ -85,6 +92,12 @@ export class CategoriasGastosController {
 
   @Delete(":id")
   @ApiOperation({ summary: "Deletar uma categoria de gasto (soft delete)" })
+  @ApiParam({
+    name: "id",
+    type: Number,
+    description: "ID da categoria de gasto",
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: "Categoria de gasto deletada com sucesso.",

@@ -510,12 +510,15 @@ describe("OrcamentosController (v1) (E2E)", () => {
 
       const orcamentoId = createResponse.body.id;
 
-      const response = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .delete(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
-      expect(response.body.soft_delete).toBeTruthy();
+      await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/orcamentos/${orcamentoId}`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(404);
     });
 
     it("should return 404 if orcamento was deleted (soft delete)", async () => {
@@ -591,7 +594,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -603,7 +605,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -677,7 +678,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -689,7 +689,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -745,7 +744,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -757,7 +755,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -813,7 +810,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -825,7 +821,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -900,7 +895,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -912,7 +906,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -971,7 +964,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -983,7 +975,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -1052,7 +1043,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -1064,7 +1054,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -1128,7 +1117,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -1140,7 +1128,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -1188,7 +1175,7 @@ describe("OrcamentosController (v1) (E2E)", () => {
         data_pgto: new Date(),
       };
 
-      const res = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .patch(
           `${apiGlobalPrefix}/orcamentos/${orcamento.body.id}/gastos-fixos/${gastoFixo.body.id}`,
         )
@@ -1225,7 +1212,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -1237,7 +1223,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
 
@@ -1306,7 +1291,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
       expect(response.body).toEqual({
         id: orcamento.body.id,
         nome: orcamentoMock.nome,
-        usuario_id: user.id,
         valor_inicial: valor_inicial,
         valor_atual: valor_atual,
         valor_livre: valor_livre,
@@ -1318,7 +1302,6 @@ describe("OrcamentosController (v1) (E2E)", () => {
           /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
         ),
         data_inatividade: null,
-        soft_delete: null,
       });
     });
   });
