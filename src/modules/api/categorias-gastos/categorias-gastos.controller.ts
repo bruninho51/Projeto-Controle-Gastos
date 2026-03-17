@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
   ParseIntPipe,
+  Query,
 } from "@nestjs/common";
 import { CategoriasGastosService } from "./categorias-gastos.service";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
@@ -24,6 +25,7 @@ import {
   ApiParam,
 } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
+import { CategoriaGastoFindDto } from "./dtos/CategoriaGastoFind.dto";
 
 @ApiTags("Categorias de Gastos")
 @ApiBearerAuth("access-token")
@@ -47,8 +49,11 @@ export class CategoriasGastosController {
     isArray: true,
   })
   @ApiResponse({ status: 500, description: "Erro interno no servidor." })
-  async findAll(@Req() { user }): Promise<CategoriaGastoResponseDto[]> {
-    return this.categoriasGastosService.findAll(user.id);
+  async findAll(
+    @Req() { user },
+    @Query() query: CategoriaGastoFindDto,
+  ): Promise<CategoriaGastoResponseDto[]> {
+    return this.categoriasGastosService.findAll(user.id, query);
   }
 
   @Post()

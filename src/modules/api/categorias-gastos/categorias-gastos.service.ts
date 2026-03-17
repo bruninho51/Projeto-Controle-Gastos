@@ -3,20 +3,37 @@ import { PrismaService } from "../../prisma/prisma.service";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
 import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
 import { CategoriaGastoResponseDto } from "./dtos/CategoriaGastoResponse.dto";
+import { CategoriaGastoFindDto } from "./dtos/CategoriaGastoFind.dto";
+import { Prisma } from "@prisma/client";
 
 @Injectable()
 export class CategoriasGastosService {
   constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
-  async findAll(usuarioId: number): Promise<CategoriaGastoResponseDto[]> {
+  async findAll(
+    usuarioId: number,
+    filters: CategoriaGastoFindDto,
+  ): Promise<CategoriaGastoResponseDto[]> {
     const categorias = await this.prisma.categoriaGasto.findMany({
       where: {
         usuario_id: usuarioId,
         soft_delete: null,
+        ...this.buildNomeFilter(filters),
       },
     });
 
     return categorias.map((c) => CategoriaGastoResponseDto.fromEntity(c));
+  }
+
+  /**
+   * Filtra por nome parcial (LIKE %nome%).
+   */
+  private buildNomeFilter(
+    filters: CategoriaGastoFindDto,
+  ): Prisma.CategoriaGastoWhereInput {
+    if (!filters.nome) return {};
+
+    return { nome: { contains: filters.nome } };
   }
 
   async findOne(
