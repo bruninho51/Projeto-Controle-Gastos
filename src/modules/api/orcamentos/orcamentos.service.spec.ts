@@ -6,6 +6,7 @@ import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
 import { faker } from "@faker-js/faker";
 import { Orcamento, Prisma } from "@prisma/client";
 import { OrcamentoResponseDto } from "./dtos/OrcamentoResponse.dto";
+import { OrcamentoFindDto } from "./dtos/OrcamentoFind.dto";
 
 function buildOrcamento(overrides: Partial<Orcamento> = {}): Orcamento {
   return {
@@ -114,6 +115,22 @@ describe("OrcamentosService", () => {
   });
 
   describe("findAll", () => {
+    const BASE_WHERE = Object.freeze({
+      usuario_id: 1,
+      soft_delete: null,
+    });
+
+    function getLastFindManyWhere() {
+      const calls = mockPrismaService.orcamento.findMany.mock.calls;
+      if (!calls.length) throw new Error("findMany não foi chamado");
+      return calls[calls.length - 1][0].where;
+    }
+
+    async function findAllWhere(filters: OrcamentoFindDto) {
+      await service.findAll(1, filters);
+      return getLastFindManyWhere();
+    }
+
     it("should return an array of orcamentos", async () => {
       const usuarioId = faker.number.int();
 
@@ -124,12 +141,64 @@ describe("OrcamentosService", () => {
 
       mockPrismaService.orcamento.findMany.mockResolvedValue(orcamentos);
 
-      const result = await service.findAll(usuarioId);
+      const result = await service.findAll(usuarioId, {});
 
       expect(result).toStrictEqual(orcamentos.map(toResponseDto));
       expect(mockPrismaService.orcamento.findMany).toHaveBeenCalledWith({
         where: { usuario_id: usuarioId, soft_delete: null },
       });
+    });
+
+    it("should filter by nome", async () => {
+      const nome = faker.string.alpha(8);
+      expect(await findAllWhere({ nome })).toStrictEqual({
+        ...BASE_WHERE,
+        nome: { contains: nome },
+      });
+    });
+
+    it("should filter encerrado true", async () => {
+      expect(await findAllWhere({ encerrado: true })).toStrictEqual({
+        ...BASE_WHERE,
+        data_encerramento: { not: null },
+      });
+    });
+
+    it("should filter encerrado false", async () => {
+      expect(await findAllWhere({ encerrado: false })).toStrictEqual({
+        ...BASE_WHERE,
+        data_encerramento: null,
+      });
+    });
+
+    it("should filter inativo true", async () => {
+      expect(await findAllWhere({ inativo: true })).toStrictEqual({
+        ...BASE_WHERE,
+        data_inatividade: { not: null },
+      });
+    });
+
+    it("should filter inativo false", async () => {
+      expect(await findAllWhere({ inativo: false })).toStrictEqual({
+        ...BASE_WHERE,
+        data_inatividade: null,
+      });
+    });
+
+    it("should apply all filters together", async () => {
+      const nome = faker.string.alpha(8);
+      expect(
+        await findAllWhere({ nome, encerrado: true, inativo: false }),
+      ).toStrictEqual({
+        ...BASE_WHERE,
+        nome: { contains: nome },
+        data_encerramento: { not: null },
+        data_inatividade: null,
+      });
+    });
+
+    it("should not add extra operators when no filters", async () => {
+      expect(await findAllWhere({})).toStrictEqual(BASE_WHERE);
     });
   });
 

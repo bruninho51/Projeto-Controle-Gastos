@@ -4,6 +4,7 @@ import { OrcamentosService } from "./orcamentos.service";
 import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
 import { OrcamentoResponseDto } from "./dtos/OrcamentoResponse.dto";
+import { OrcamentoFindDto } from "./dtos/OrcamentoFind.dto";
 import { faker } from "@faker-js/faker";
 
 function buildRequest(usuarioId: number = faker.number.int()) {
@@ -117,6 +118,7 @@ describe("OrcamentosController", () => {
   describe("findAll", () => {
     it("should return an array of orcamentos", async () => {
       const req = buildRequest();
+      const filters: OrcamentoFindDto = {};
       const orcamentos = [
         buildOrcamentoResponseDto(),
         buildOrcamentoResponseDto(),
@@ -124,10 +126,25 @@ describe("OrcamentosController", () => {
 
       mockOrcamentosService.findAll.mockResolvedValue(orcamentos);
 
-      const result = await controller.findAll(req);
+      const result = await controller.findAll(req, filters);
 
       expect(result).toEqual(orcamentos);
-      expect(service.findAll).toHaveBeenCalledWith(req.user.id);
+      expect(service.findAll).toHaveBeenCalledWith(req.user.id, filters);
+    });
+
+    it("should pass filters to service", async () => {
+      const req = buildRequest();
+      const filters: OrcamentoFindDto = {
+        nome: faker.string.alpha(8),
+        encerrado: true,
+        inativo: false,
+      };
+
+      mockOrcamentosService.findAll.mockResolvedValue([]);
+
+      await controller.findAll(req, filters);
+
+      expect(service.findAll).toHaveBeenCalledWith(req.user.id, filters);
     });
   });
 
@@ -184,9 +201,7 @@ describe("OrcamentosController", () => {
     it("should perform a soft delete of an orcamento", async () => {
       const req = buildRequest();
       const orcamento_id = faker.number.int();
-      const deleted = buildOrcamentoResponseDto({
-        id: orcamento_id,
-      });
+      const deleted = buildOrcamentoResponseDto({ id: orcamento_id });
 
       mockOrcamentosService.softDelete.mockResolvedValue(deleted);
 
