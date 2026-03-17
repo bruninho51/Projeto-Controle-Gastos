@@ -1,3 +1,10 @@
+# [1.30.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.29.0...v1.30.0) (2026-03-17)
+
+
+### Features
+
+* adiciona filtros no findAll de orçamentos ([b95cc60](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/b95cc60e5a1361b3b8c21f46e8b732f07426d546))
+
 # [1.29.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.28.0...v1.29.0) (2026-03-17)
 
 
