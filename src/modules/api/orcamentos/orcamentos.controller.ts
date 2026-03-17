@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
   ParseIntPipe,
+  Query,
 } from "@nestjs/common";
 import { OrcamentosService } from "./orcamentos.service";
 import {
@@ -24,6 +25,7 @@ import { OrcamentoCreateDto } from "./dtos/OrcamentoCreate.dto";
 import { OrcamentoUpdateDto } from "./dtos/OrcamentoUpdate.dto";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { OrcamentoResponseDto } from "./dtos/OrcamentoResponse.dto";
+import { OrcamentoFindDto } from "./dtos/OrcamentoFind.dto";
 
 @ApiTags("Orçamentos")
 @ApiBearerAuth("access-token")
@@ -59,8 +61,11 @@ export class OrcamentosController {
     type: OrcamentoResponseDto,
     isArray: true,
   })
-  findAll(@Req() { user }): Promise<OrcamentoResponseDto[]> {
-    return this.orcamentoService.findAll(user.id);
+  findAll(
+    @Req() { user },
+    @Query() query: OrcamentoFindDto,
+  ): Promise<OrcamentoResponseDto[]> {
+    return this.orcamentoService.findAll(user.id, query);
   }
 
   @Get(":id")
