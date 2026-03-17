@@ -5,6 +5,7 @@ import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
 import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
 import { CategoriaGasto } from "@prisma/client";
 import { faker } from "@faker-js/faker";
+import { CategoriaGastoFindDto } from "./dtos/CategoriaGastoFind.dto";
 
 describe("CategoriasGastosController", () => {
   let controller: CategoriasGastosController;
@@ -38,11 +39,12 @@ describe("CategoriasGastosController", () => {
       jest.spyOn(service, "findAll").mockResolvedValue(result);
 
       const usuarioId = faker.number.int();
+      const filters: CategoriaGastoFindDto = {};
 
-      expect(await controller.findAll({ user: { id: usuarioId } })).toBe(
-        result,
-      );
-      expect(service.findAll).toHaveBeenCalledWith(usuarioId);
+      expect(
+        await controller.findAll({ user: { id: usuarioId } }, filters),
+      ).toBe(result);
+      expect(service.findAll).toHaveBeenCalledWith(usuarioId, filters);
     });
   });
 

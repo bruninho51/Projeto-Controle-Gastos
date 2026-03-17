@@ -6,6 +6,7 @@ import { faker } from "@faker-js/faker";
 import { CategoriaGastoResponseDto } from "./dtos/CategoriaGastoResponse.dto";
 import { CategoriaGastoCreateDto } from "./dtos/CategoriaGastoCreate.dto";
 import { CategoriaGastoUpdateDto } from "./dtos/CategoriaGastoUpdate.dto";
+import { CategoriaGastoFindDto } from "./dtos/CategoriaGastoFind.dto";
 
 describe("CategoriasGastosService", () => {
   let service: CategoriasGastosService;
@@ -36,6 +37,22 @@ describe("CategoriasGastosService", () => {
   });
 
   describe("findAll", () => {
+    const BASE_WHERE = Object.freeze({
+      usuario_id: 1,
+      soft_delete: null,
+    });
+
+    function getLastFindManyWhere() {
+      const calls = prismaServiceMock.categoriaGasto.findMany.mock.calls;
+      if (!calls.length) throw new Error("findMany não foi chamado");
+      return calls[calls.length - 1][0].where;
+    }
+
+    async function findAllWhere(filters: CategoriaGastoFindDto) {
+      await service.findAll(1, filters);
+      return getLastFindManyWhere();
+    }
+
     it("should return an array of categorias de gastos", async () => {
       const now = new Date();
       const usuarioId = faker.number.int();
@@ -54,7 +71,7 @@ describe("CategoriasGastosService", () => {
 
       prismaServiceMock.categoriaGasto.findMany.mockResolvedValue(prismaResult);
 
-      const categories = await service.findAll(usuarioId);
+      const categories = await service.findAll(usuarioId, {});
 
       const expected: CategoriaGastoResponseDto[] = [
         {
@@ -70,6 +87,14 @@ describe("CategoriasGastosService", () => {
 
       expect(prismaServiceMock.categoriaGasto.findMany).toHaveBeenCalledWith({
         where: { usuario_id: usuarioId, soft_delete: null },
+      });
+    });
+
+    it("should filter by nome", async () => {
+      const searchedValue = faker.string.alpha();
+      expect(await findAllWhere({ nome: searchedValue })).toStrictEqual({
+        ...BASE_WHERE,
+        nome: { contains: searchedValue },
       });
     });
   });
