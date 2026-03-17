@@ -1,3 +1,10 @@
+# [1.28.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.27.0...v1.28.0) (2026-03-17)
+
+
+### Features
+
+* faz melhorias nos dtos e controllers e melhora a documentação ([88af36b](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/88af36bfaadf7fcca8ca663deb2cd0c7cd69bd1c))
+
 # [1.27.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.26.0...v1.27.0) (2026-03-16)
 
 
