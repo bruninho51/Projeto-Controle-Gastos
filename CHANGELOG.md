@@ -1,3 +1,10 @@
+# [1.29.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.28.0...v1.29.0) (2026-03-17)
+
+
+### Features
+
+* adiciona filtro de nome na categoria ([783d198](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/783d19871c74b80124322de360d8df0b035a3dd0))
+
 # [1.28.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.27.0...v1.28.0) (2026-03-17)
 
 
