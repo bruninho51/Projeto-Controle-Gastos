@@ -1,3 +1,10 @@
+# [1.31.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.30.0...v1.31.0) (2026-04-16)
+
+
+### Features
+
+* adiciona módulo de tokens de dispostivos ([9f05b3c](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/9f05b3cd649e8ed31c6a30c32a30a7d87b15afe4))
+
 # [1.30.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.29.0...v1.30.0) (2026-03-17)
 
 
