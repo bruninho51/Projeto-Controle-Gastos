@@ -6,6 +6,7 @@ import { GastosFixosModule } from "./api/gastos-fixos/gastos-fixos.module";
 import { GastosVariadosModule } from "./api/gastos-variados/gastos-variados.module";
 import { InvestimentosModule } from "./api/investimentos/investimentos.module";
 import { LinhaDoTempoInvestimentosModule } from "./api/linha-do-tempo-investimentos/linha-do-tempo-investimentos.module";
+import { TokensDispositivosModule } from "./api/tokens-dispositivos/tokens-dispositivos.module"
 import { AuthModule } from "./api/auth/auth.module";
 import { MonitoringModule } from "./monitoring/monitoring.module";
 import { join } from "path";
@@ -19,6 +20,7 @@ import { join } from "path";
     GastosVariadosModule,
     InvestimentosModule,
     LinhaDoTempoInvestimentosModule,
+    TokensDispositivosModule,
     AuthModule,
     MonitoringModule,
   ],

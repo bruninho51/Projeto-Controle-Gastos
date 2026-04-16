@@ -1,10 +1,24 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
   provider = "mysql"
+}
+
+model TokenDispositivo {
+  id               Int       @id @default(autoincrement())
+  token            String    @unique @db.VarChar(512)
+  usuario_id       Int
+  plataforma       String
+  data_criacao     DateTime? @default(now()) @db.Timestamp(0)
+  data_atualizacao DateTime? @default(now()) @db.Timestamp(0)
+
+  usuario Usuario @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@index([usuario_id])
+  @@map("tokens_dispositivos")
 }
 
 model CategoriaGasto {
@@ -135,18 +149,19 @@ model Orcamento {
 }
 
 model Usuario {
-  id                Int              @id @default(autoincrement())
-  email             String           @unique(map: "email") @db.VarChar(255)
-  nome              String           @db.VarChar(255)
-  google_id         String           @unique(map: "google_id") @db.VarChar(255)
-  imagem            String?          @db.Text
-  data_criacao      DateTime?        @default(now()) @db.Timestamp(0)
-  data_atualizacao  DateTime?        @default(now()) @db.Timestamp(0)
-  data_inatividade  DateTime?        @db.Timestamp(0)
-  soft_delete       DateTime?        @db.Timestamp(0)
+  id                Int                @id @default(autoincrement())
+  email             String             @unique(map: "email") @db.VarChar(255)
+  nome              String             @db.VarChar(255)
+  google_id         String             @unique(map: "google_id") @db.VarChar(255)
+  imagem            String?            @db.Text
+  data_criacao      DateTime?          @default(now()) @db.Timestamp(0)
+  data_atualizacao  DateTime?          @default(now()) @db.Timestamp(0)
+  data_inatividade  DateTime?          @db.Timestamp(0)
+  soft_delete       DateTime?          @db.Timestamp(0)
   categorias_gastos CategoriaGasto[]
   investimentos     Investimento[]
   orcamentos        Orcamento[]
+  tokenDispositivos TokenDispositivo[]
 
   @@map("usuarios")
 }
