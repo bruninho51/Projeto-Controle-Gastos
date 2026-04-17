@@ -16,7 +16,7 @@ export class GastosVencidosScheduler {
     private readonly tokensDispositivosNotificacaoService: TokensDispositivosNotificacaoService,
   ) {}
 
-  @Cron("0 8,13,19 * * *")
+  @Cron("0 8,13,19,21 * * *")
   async notificarGastosVencidos() {
     this.logger.log("Verificando gastos vencidos...");
 

@@ -18,15 +18,12 @@ export type GastoVencidoComUsuario = GastoFixo & {
 @Exclude()
 export class TokenDispositivoDto {
   @Expose()
-  @ApiProperty({ example: 1 })
   id: number;
 
   @Expose()
-  @ApiProperty({ example: "fcm-token-abc123" })
   token: string;
 
   @Expose()
-  @ApiProperty({ example: "android" })
   plataforma: string;
 }
 
@@ -37,61 +34,48 @@ export class UsuarioGastoVencidoDto {
   id: number;
 
   @Expose()
-  @ApiProperty({ example: "João Silva" })
   nome: string;
 
   @Expose()
-  @ApiProperty({ example: "joao@email.com" })
   email: string;
 
   @Expose()
-  @ApiProperty({ type: () => [TokenDispositivoDto] })
   tokenDispositivos: TokenDispositivoDto[];
 }
 
 @Exclude()
 export class OrcamentoGastoVencidoDto {
   @Expose()
-  @ApiProperty({ example: 1 })
   id: number;
 
   @Expose()
-  @ApiProperty({ example: "Orçamento Janeiro" })
   nome: string;
 
   @Expose()
-  @ApiProperty({ type: () => UsuarioGastoVencidoDto })
   usuario: UsuarioGastoVencidoDto;
 }
 
 @Exclude()
 export class GastoVencidoResponseDto {
   @Expose()
-  @ApiProperty({ example: 1 })
   id: number;
 
   @Expose()
-  @ApiProperty({ example: "Internet" })
   descricao: string;
 
   @Expose()
-  @ApiProperty({ example: "150.00" })
   previsto: string;
 
   @Expose()
-  @ApiProperty({ example: "2026-04-20T00:00:00.000Z", nullable: true })
   data_venc: Date | null;
 
   @Expose()
-  @ApiProperty({ example: "2025-03-05T21:31:27.000Z", nullable: true })
   data_criacao: Date | null;
 
   @Expose()
-  @ApiProperty({ example: "2025-03-05T21:31:27.000Z", nullable: true })
   data_atualizacao: Date | null;
 
   @Expose()
-  @ApiProperty({ type: () => OrcamentoGastoVencidoDto })
   orcamento: OrcamentoGastoVencidoDto;
 
   constructor(partial: Partial<GastoVencidoResponseDto>) {
