@@ -1,3 +1,10 @@
+# [1.32.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.31.0...v1.32.0) (2026-04-17)
+
+
+### Features
+
+* realiza o envio de notificações de vencimento ([b701874](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/b701874a7658d957885c6888294ca5425271039a))
+
 # [1.31.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.30.0...v1.31.0) (2026-04-16)
 
 
