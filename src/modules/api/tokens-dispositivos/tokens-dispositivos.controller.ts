@@ -55,28 +55,36 @@ export class TokensDispositivosController {
   }
 
   @Get()
-  @ApiOperation({ summary: "Listar todos os tokens de dispositivos do usuário" })
+  @ApiOperation({
+    summary: "Listar todos os tokens de dispositivos do usuário",
+  })
   @ApiResponse({
     status: 200,
     description: "Lista de tokens de dispositivos.",
     type: TokenDispositivoResponseDto,
     isArray: true,
   })
-  async findAll(
-    @Req() { user },
-  ): Promise<TokenDispositivoResponseDto[]> {
+  async findAll(@Req() { user }): Promise<TokenDispositivoResponseDto[]> {
     return this.tokensDispositivosService.findAll(user.id);
   }
 
   @Get(":id")
   @ApiOperation({ summary: "Buscar um token de dispositivo pelo ID" })
-  @ApiParam({ name: "id", type: Number, description: "ID do token", required: true })
+  @ApiParam({
+    name: "id",
+    type: Number,
+    description: "ID do token",
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: "Token de dispositivo encontrado.",
     type: TokenDispositivoResponseDto,
   })
-  @ApiResponse({ status: 404, description: "Token de dispositivo não encontrado." })
+  @ApiResponse({
+    status: 404,
+    description: "Token de dispositivo não encontrado.",
+  })
   async findOne(
     @Req() { user },
     @Param("id", ParseIntPipe) id: number,
@@ -84,7 +92,9 @@ export class TokensDispositivosController {
     const token = await this.tokensDispositivosService.findOne(user.id, id);
 
     if (!token) {
-      throw new NotFoundException("O token de dispositivo informado não foi encontrado.");
+      throw new NotFoundException(
+        "O token de dispositivo informado não foi encontrado.",
+      );
     }
 
     return token;
@@ -92,13 +102,21 @@ export class TokensDispositivosController {
 
   @Delete(":id")
   @ApiOperation({ summary: "Remover um token de dispositivo" })
-  @ApiParam({ name: "id", type: Number, description: "ID do token", required: true })
+  @ApiParam({
+    name: "id",
+    type: Number,
+    description: "ID do token",
+    required: true,
+  })
   @ApiResponse({
     status: 200,
     description: "Token de dispositivo removido com sucesso.",
     type: TokenDispositivoResponseDto,
   })
-  @ApiResponse({ status: 404, description: "Token de dispositivo não encontrado." })
+  @ApiResponse({
+    status: 404,
+    description: "Token de dispositivo não encontrado.",
+  })
   async remove(
     @Req() { user },
     @Param("id", ParseIntPipe) id: number,
@@ -106,7 +124,9 @@ export class TokensDispositivosController {
     const token = await this.tokensDispositivosService.findOne(user.id, id);
 
     if (!token) {
-      throw new NotFoundException("O token de dispositivo informado não foi encontrado.");
+      throw new NotFoundException(
+        "O token de dispositivo informado não foi encontrado.",
+      );
     }
 
     return this.tokensDispositivosService.remove(user.id, id);

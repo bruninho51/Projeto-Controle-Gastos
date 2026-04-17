@@ -219,7 +219,9 @@ describe("TokensDispositivosService", () => {
       const result = await service.findOne(usuario_id, id);
 
       expect(result).toStrictEqual(toResponseDto(token));
-      expect(mockPrismaService.tokenDispositivo.findUnique).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.tokenDispositivo.findUnique,
+      ).toHaveBeenCalledWith({
         where: { id, usuario_id },
       });
     });
@@ -227,7 +229,10 @@ describe("TokensDispositivosService", () => {
     it("should return null if token de dispositivo not found", async () => {
       mockPrismaService.tokenDispositivo.findUnique.mockResolvedValue(null);
 
-      const result = await service.findOne(faker.number.int(), faker.number.int());
+      const result = await service.findOne(
+        faker.number.int(),
+        faker.number.int(),
+      );
 
       expect(result).toBeNull();
     });
@@ -240,7 +245,9 @@ describe("TokensDispositivosService", () => {
 
       await service.findOne(usuario_id, id);
 
-      expect(mockPrismaService.tokenDispositivo.findUnique).toHaveBeenCalledWith({
+      expect(
+        mockPrismaService.tokenDispositivo.findUnique,
+      ).toHaveBeenCalledWith({
         where: { id, usuario_id },
       });
     });

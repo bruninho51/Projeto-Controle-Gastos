@@ -249,7 +249,9 @@ describe("TokensDispositivosController", () => {
 
       mockTokensDispositivosService.findOne.mockResolvedValue(null);
 
-      await expect(controller.remove(req, id)).rejects.toThrow(NotFoundException);
+      await expect(controller.remove(req, id)).rejects.toThrow(
+        NotFoundException,
+      );
 
       expect(service.remove).not.toHaveBeenCalled();
     });
