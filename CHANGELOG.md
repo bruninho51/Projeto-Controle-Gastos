@@ -1,3 +1,10 @@
+# [1.33.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.32.0...v1.33.0) (2026-04-17)
+
+
+### Features
+
+* faz o envio de notificação às 21h ([14e0cde](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/14e0cde7ca27f54b7beebd454f7dd9c198d61f2c))
+
 # [1.32.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.31.0...v1.32.0) (2026-04-17)
 
 
