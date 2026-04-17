@@ -9,11 +9,13 @@ import { LinhaDoTempoInvestimentosModule } from "./api/linha-do-tempo-investimen
 import { TokensDispositivosModule } from "./api/tokens-dispositivos/tokens-dispositivos.module";
 import { AuthModule } from "./api/auth/auth.module";
 import { MonitoringModule } from "./monitoring/monitoring.module";
-import { join } from "path";
+import { ScheduleModule } from "@nestjs/schedule";
+import { GastosVencidosModule } from "./api/gastos-vencidos/gastos-vencidos.module";
 
 @Module({
   imports: [
     PrismaModule,
+    ScheduleModule.forRoot(),
     CategoriasGastosModule,
     OrcamentosModule,
     GastosFixosModule,
@@ -23,6 +25,7 @@ import { join } from "path";
     TokensDispositivosModule,
     AuthModule,
     MonitoringModule,
+    GastosVencidosModule,
   ],
 })
 export class AppModule {}
