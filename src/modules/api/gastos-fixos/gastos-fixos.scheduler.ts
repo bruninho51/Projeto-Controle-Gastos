@@ -1,26 +1,31 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { TokensDispositivosNotificacaoService } from "../tokens-dispositivos/tokens-dispositivos-notificacao.service";
 import { TokenDispositivoNotificacaoDto } from "../tokens-dispositivos/dtos/TokenDispositivoNotificacao.dto";
-import { GastosVencidosService } from "./gastos-vencidos.service";
 import { GastoVencidoResponseDto } from "./dtos/GastoVencidoResponse.dto";
+import { GastosFixosService } from "./gastos-fixos.service";
 
 const MS_POR_DIA = 1000 * 60 * 60 * 24;
 
 @Injectable()
-export class GastosVencidosScheduler {
-  private readonly logger = new Logger(GastosVencidosScheduler.name);
+export class GastosFixosScheduler implements OnApplicationBootstrap {
+  private readonly logger = new Logger(GastosFixosScheduler.name);
 
   constructor(
-    private readonly gastosVencidosService: GastosVencidosService,
+    private readonly gastosFixosService: GastosFixosService,
     private readonly tokensDispositivosNotificacaoService: TokensDispositivosNotificacaoService,
   ) {}
+
+  async onApplicationBootstrap() {
+    this.logger.log("Executando verificação inicial de gastos vencidos...");
+    await this.notificarGastosVencidos();
+  }
 
   @Cron("0 8,13,19,21 * * *")
   async notificarGastosVencidos() {
     this.logger.log("Verificando gastos vencidos...");
 
-    const gastos = await this.gastosVencidosService.findGastosAVencer();
+    const gastos = await this.gastosFixosService.findGastosAVencer();
 
     if (!gastos.length) {
       this.logger.log("Nenhum gasto vencido encontrado.");

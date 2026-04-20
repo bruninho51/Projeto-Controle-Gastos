@@ -10,7 +10,6 @@ import { TokensDispositivosModule } from "./api/tokens-dispositivos/tokens-dispo
 import { AuthModule } from "./api/auth/auth.module";
 import { MonitoringModule } from "./monitoring/monitoring.module";
 import { ScheduleModule } from "@nestjs/schedule";
-import { GastosVencidosModule } from "./api/gastos-vencidos/gastos-vencidos.module";
 
 @Module({
   imports: [
@@ -25,7 +24,6 @@ import { GastosVencidosModule } from "./api/gastos-vencidos/gastos-vencidos.modu
     TokensDispositivosModule,
     AuthModule,
     MonitoringModule,
-    GastosVencidosModule,
   ],
 })
 export class AppModule {}
