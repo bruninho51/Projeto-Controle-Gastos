@@ -8,7 +8,12 @@ import { TokensDispositivosModule } from "../tokens-dispositivos/tokens-disposit
 import { GastosFixosScheduler } from "./gastos-fixos.scheduler";
 
 @Module({
-  imports: [PrismaModule, OrcamentosModule, CategoriasGastosModule, TokensDispositivosModule],
+  imports: [
+    PrismaModule,
+    OrcamentosModule,
+    CategoriasGastosModule,
+    TokensDispositivosModule,
+  ],
   providers: [GastosFixosService, GastosFixosScheduler],
   controllers: [GastosFixosController],
 })

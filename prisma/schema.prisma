@@ -7,6 +7,20 @@ datasource db {
   provider = "mysql"
 }
 
+model PadraoNotificacaoBancaria {
+  id                     Int       @id @default(autoincrement())
+  instituicao_financeira String    @db.VarChar(255)
+  titulo_notificacao     String    @db.VarChar(255)
+  regex                  String    @db.Text
+  data_criacao           DateTime? @default(now()) @db.Timestamp(0)
+  data_atualizacao       DateTime? @default(now()) @db.Timestamp(0)
+  data_expiracao         DateTime  @db.Timestamp(0)
+  soft_delete            DateTime? @db.Timestamp(0)
+
+  @@unique([instituicao_financeira, titulo_notificacao], name: "instituicao_titulo_unique", map: "unique_instituicao_titulo")
+  @@map("padroes_notificacoes_bancarias")
+}
+
 model TokenDispositivo {
   id               Int       @id @default(autoincrement())
   token            String    @unique @db.VarChar(512)

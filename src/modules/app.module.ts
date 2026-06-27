@@ -7,6 +7,7 @@ import { GastosVariadosModule } from "./api/gastos-variados/gastos-variados.modu
 import { InvestimentosModule } from "./api/investimentos/investimentos.module";
 import { LinhaDoTempoInvestimentosModule } from "./api/linha-do-tempo-investimentos/linha-do-tempo-investimentos.module";
 import { TokensDispositivosModule } from "./api/tokens-dispositivos/tokens-dispositivos.module";
+import { PadroesNotificacoesBancariasModule } from "./api/padroes-notificacoes-bancarias/padroes-notificacoes-bancarias.module";
 import { AuthModule } from "./api/auth/auth.module";
 import { MonitoringModule } from "./monitoring/monitoring.module";
 import { ScheduleModule } from "@nestjs/schedule";
@@ -22,6 +23,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     InvestimentosModule,
     LinhaDoTempoInvestimentosModule,
     TokensDispositivosModule,
+    PadroesNotificacoesBancariasModule,
     AuthModule,
     MonitoringModule,
   ],

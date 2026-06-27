@@ -228,5 +228,4 @@ export class GastosFixosService {
 
     return gastos.map((g) => GastoVencidoResponseDto.fromEntity(g));
   }
-
 }
