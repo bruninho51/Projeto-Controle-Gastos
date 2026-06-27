@@ -1,8 +1,12 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { BadGatewayException } from "@nestjs/common";
 import { PadroesNotificacoesBancariasService } from "./padroes-notificacoes-bancarias.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { GeminiService } from "../../gemini/gemini.service";
-import { PadraoNotificacaoBancaria } from "@prisma/client";
+import {
+  InstituicaoFinanceira,
+  PadraoNotificacaoBancaria,
+} from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { PadraoNotificacaoBancariaCreateDto } from "./dtos/PadraoNotificacaoBancariaCreate.dto";
 import { PadraoNotificacaoBancariaFindDto } from "./dtos/PadraoNotificacaoBancariaFind.dto";
@@ -44,7 +48,7 @@ describe("PadraoNotificacoesBancariasService", () => {
     const now = new Date();
     return {
       id: faker.number.int(),
-      instituicao_financeira: "Itaú",
+      instituicao_financeira: InstituicaoFinanceira.ITAU,
       titulo_notificacao: "Compra aprovada",
       regex: "(?<valor>[\\d,.]+).*(?<estabelecimento>.+)",
       data_criacao: now,
@@ -57,7 +61,7 @@ describe("PadraoNotificacoesBancariasService", () => {
 
   describe("obterOuGerar", () => {
     const createDto: PadraoNotificacaoBancariaCreateDto = {
-      instituicao_financeira: "Itaú",
+      instituicao_financeira: InstituicaoFinanceira.ITAU,
       titulo_notificacao: "Compra aprovada",
       corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
     };
@@ -193,6 +197,70 @@ describe("PadraoNotificacoesBancariasService", () => {
         prismaServiceMock.padraoNotificacaoBancaria.upsert,
       ).toHaveBeenCalledTimes(1);
     });
+
+    describe("retentativas de geração de regex", () => {
+      beforeEach(() => {
+        prismaServiceMock.padraoNotificacaoBancaria.findUnique.mockResolvedValue(
+          null,
+        );
+      });
+
+      it("should generate a valid regex on the first attempt", async () => {
+        const regexValida = "(?<valor>[\\d,.]+).*(?<estabelecimento>.+)";
+        geminiServiceMock.gerarRegexNotificacao.mockResolvedValue(regexValida);
+        prismaServiceMock.padraoNotificacaoBancaria.upsert.mockResolvedValue(
+          buildRegistro({ regex: regexValida }),
+        );
+
+        const resultado = await service.obterOuGerar(createDto);
+
+        expect(resultado.regex).toBe(regexValida);
+        expect(geminiServiceMock.gerarRegexNotificacao).toHaveBeenCalledTimes(
+          1,
+        );
+      });
+
+      it("should retry and persist the regex when the first attempt fails and the second succeeds", async () => {
+        const regexValida = "(?<valor>[\\d,.]+).*(?<estabelecimento>.+)";
+        geminiServiceMock.gerarRegexNotificacao
+          .mockRejectedValueOnce(new BadGatewayException("regex inválida"))
+          .mockResolvedValueOnce(regexValida);
+        prismaServiceMock.padraoNotificacaoBancaria.upsert.mockResolvedValue(
+          buildRegistro({ regex: regexValida }),
+        );
+
+        const resultado = await service.obterOuGerar(createDto);
+
+        expect(resultado.regex).toBe(regexValida);
+        expect(geminiServiceMock.gerarRegexNotificacao).toHaveBeenCalledTimes(
+          2,
+        );
+        expect(
+          prismaServiceMock.padraoNotificacaoBancaria.upsert,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          prismaServiceMock.padraoNotificacaoBancaria.upsert.mock.calls[0][0]
+            .create.regex,
+        ).toBe(regexValida);
+      });
+
+      it("should throw an exception after 3 failed attempts and not persist anything", async () => {
+        geminiServiceMock.gerarRegexNotificacao.mockRejectedValue(
+          new BadGatewayException("regex inválida"),
+        );
+
+        await expect(service.obterOuGerar(createDto)).rejects.toThrow(
+          BadGatewayException,
+        );
+
+        expect(geminiServiceMock.gerarRegexNotificacao).toHaveBeenCalledTimes(
+          3,
+        );
+        expect(
+          prismaServiceMock.padraoNotificacaoBancaria.upsert,
+        ).not.toHaveBeenCalled();
+      });
+    });
   });
 
   describe("findAll", () => {
@@ -212,12 +280,12 @@ describe("PadraoNotificacoesBancariasService", () => {
 
     it("should query with both filters when both are provided", async () => {
       const filters: PadraoNotificacaoBancariaFindDto = {
-        instituicao_financeira: "Itaú",
+        instituicao_financeira: InstituicaoFinanceira.ITAU,
         titulo_notificacao: "Compra aprovada",
       };
 
       expect(await findAllWhere(filters)).toEqual({
-        instituicao_financeira: "Itaú",
+        instituicao_financeira: InstituicaoFinanceira.ITAU,
         titulo_notificacao: "Compra aprovada",
       });
     });
@@ -227,8 +295,12 @@ describe("PadraoNotificacoesBancariasService", () => {
     });
 
     it("should query only by instituicao_financeira", async () => {
-      expect(await findAllWhere({ instituicao_financeira: "Itaú" })).toEqual({
-        instituicao_financeira: "Itaú",
+      expect(
+        await findAllWhere({
+          instituicao_financeira: InstituicaoFinanceira.ITAU,
+        }),
+      ).toEqual({
+        instituicao_financeira: InstituicaoFinanceira.ITAU,
       });
     });
 

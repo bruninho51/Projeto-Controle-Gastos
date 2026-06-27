@@ -1,14 +1,16 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsOptional, IsString, IsEnum } from "class-validator";
 import { ApiPropertyOptional } from "@nestjs/swagger";
+import { InstituicaoFinanceira } from "@prisma/client";
 
 export class PadraoNotificacaoBancariaFindDto {
   @ApiPropertyOptional({
     description: "Filtra pela instituição financeira",
-    example: "Itaú",
+    enum: InstituicaoFinanceira,
+    example: InstituicaoFinanceira.ITAU,
   })
   @IsOptional()
-  @IsString()
-  instituicao_financeira?: string;
+  @IsEnum(InstituicaoFinanceira)
+  instituicao_financeira?: InstituicaoFinanceira;
 
   @ApiPropertyOptional({
     description: "Filtra pelo título da notificação",

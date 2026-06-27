@@ -10,13 +10,17 @@ import { globalFilters } from "../../src/filters/global-filters";
 import { globalInterceptors } from "../../src/interceptors/globalInterceptors";
 import { runPrismaMigrations } from "../utils/run-prisma-migrations";
 import { faker } from "@faker-js/faker";
-import { Usuario } from "@prisma/client";
+import { InstituicaoFinanceira, Usuario } from "@prisma/client";
 import { AuthService } from "../../src/modules/api/auth/auth.service";
 import { AuthModule } from "../../src/modules/api/auth/auth.module";
 
 jest.setTimeout(10000); // 10 segundos
 
 const apiGlobalPrefix = "/api/v1";
+
+function instituicaoAleatoria(): InstituicaoFinanceira {
+  return faker.helpers.arrayElement(Object.values(InstituicaoFinanceira));
+}
 
 describe("PadroesNotificacoesBancariasController (e2e)", () => {
   let app: INestApplication;
@@ -86,8 +90,8 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
       geminiServiceMock.gerarRegexNotificacao.mockResolvedValue(regexGerada);
 
       const createDto: PadraoNotificacaoBancariaCreateDto = {
-        instituicao_financeira: faker.company.name(),
-        titulo_notificacao: "Compra aprovada",
+        instituicao_financeira: instituicaoAleatoria(),
+        titulo_notificacao: faker.lorem.words(3),
         corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
       };
 
@@ -106,8 +110,8 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
     });
 
     it("should return the existing regex without calling Gemini when it is still valid", async () => {
-      const instituicao_financeira = faker.company.name();
-      const titulo_notificacao = "Compra aprovada";
+      const instituicao_financeira = instituicaoAleatoria();
+      const titulo_notificacao = faker.lorem.words(3);
 
       const registro = await prisma.padraoNotificacaoBancaria.create({
         data: {
@@ -136,8 +140,8 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
     });
 
     it("should regenerate and update the record (without duplicating it) when it is expired", async () => {
-      const instituicao_financeira = faker.company.name();
-      const titulo_notificacao = "Compra aprovada";
+      const instituicao_financeira = instituicaoAleatoria();
+      const titulo_notificacao = faker.lorem.words(3);
 
       const registroExpirado = await prisma.padraoNotificacaoBancaria.create({
         data: {
@@ -186,6 +190,26 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
       expect(Array.isArray(response.body.message)).toBe(true);
     });
 
+    it("should return 400 when instituicao_financeira is not a valid enum value", async () => {
+      const createDto = {
+        instituicao_financeira: "BANCO_INEXISTENTE",
+        titulo_notificacao: faker.lorem.words(3),
+        corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/padroes-notificacoes-bancarias`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(createDto)
+        .expect(400);
+
+      expect(response.body.statusCode).toBe(400);
+      expect(response.body.message).toEqual([
+        "instituicao_financeira must be one of the following values: INTER, ITAU, NUBANK, ALELO, IFOOD_BENEFICIOS",
+      ]);
+      expect(geminiServiceMock.gerarRegexNotificacao).not.toHaveBeenCalled();
+    });
+
     it("should return 502 when Gemini fails to generate a valid regex", async () => {
       geminiServiceMock.gerarRegexNotificacao.mockRejectedValue(
         new BadGatewayException(
@@ -194,8 +218,8 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
       );
 
       const createDto: PadraoNotificacaoBancariaCreateDto = {
-        instituicao_financeira: faker.company.name(),
-        titulo_notificacao: "Compra aprovada",
+        instituicao_financeira: instituicaoAleatoria(),
+        titulo_notificacao: faker.lorem.words(3),
         corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
       };
 
@@ -211,7 +235,7 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
 
   describe(`GET ${apiGlobalPrefix}/padroes-notificacoes-bancarias`, () => {
     it("should return all records when no filter is provided, including expired ones", async () => {
-      const instituicao_financeira = faker.company.name();
+      const instituicao_financeira = instituicaoAleatoria();
       const titulo_notificacao = faker.lorem.words(2);
 
       const registro = await prisma.padraoNotificacaoBancaria.create({
@@ -234,7 +258,7 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
     });
 
     it("should filter only by instituicao_financeira", async () => {
-      const instituicao_financeira = faker.company.name();
+      const instituicao_financeira = instituicaoAleatoria();
 
       const registro = await prisma.padraoNotificacaoBancaria.create({
         data: {
@@ -251,8 +275,13 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
         .set("Authorization", `Bearer ${userJwt}`)
         .expect(200);
 
-      expect(response.body).toHaveLength(1);
-      expect(response.body[0].id).toBe(registro.id);
+      const encontrado = response.body.find((r) => r.id === registro.id);
+      expect(encontrado).toBeDefined();
+      expect(
+        response.body.every(
+          (r) => r.instituicao_financeira === instituicao_financeira,
+        ),
+      ).toBe(true);
     });
 
     it("should filter only by titulo_notificacao", async () => {
@@ -260,7 +289,7 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
 
       const registro = await prisma.padraoNotificacaoBancaria.create({
         data: {
-          instituicao_financeira: faker.company.name(),
+          instituicao_financeira: instituicaoAleatoria(),
           titulo_notificacao,
           regex: "(?<valor>.+).*(?<estabelecimento>.+)",
           data_expiracao: new Date(Date.now() + 1000 * 60 * 60 * 24),
@@ -278,7 +307,7 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
     });
 
     it("should filter by both instituicao_financeira and titulo_notificacao together", async () => {
-      const instituicao_financeira = faker.company.name();
+      const instituicao_financeira = instituicaoAleatoria();
       const titulo_notificacao = faker.lorem.words(3);
 
       const registro = await prisma.padraoNotificacaoBancaria.create({
@@ -307,6 +336,19 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
 
       expect(response.body).toHaveLength(1);
       expect(response.body[0].id).toBe(registro.id);
+    });
+
+    it("should return 400 when instituicao_financeira filter is not a valid enum value", async () => {
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/padroes-notificacoes-bancarias`)
+        .query({ instituicao_financeira: "BANCO_INEXISTENTE" })
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(400);
+
+      expect(response.body.statusCode).toBe(400);
+      expect(response.body.message).toEqual([
+        "instituicao_financeira must be one of the following values: INTER, ITAU, NUBANK, ALELO, IFOOD_BENEFICIOS",
+      ]);
     });
   });
 });

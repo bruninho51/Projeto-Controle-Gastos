@@ -3,7 +3,10 @@ import { PadroesNotificacoesBancariasController } from "./padroes-notificacoes-b
 import { PadroesNotificacoesBancariasService } from "./padroes-notificacoes-bancarias.service";
 import { PadraoNotificacaoBancariaCreateDto } from "./dtos/PadraoNotificacaoBancariaCreate.dto";
 import { PadraoNotificacaoBancariaFindDto } from "./dtos/PadraoNotificacaoBancariaFind.dto";
-import { PadraoNotificacaoBancaria } from "@prisma/client";
+import {
+  InstituicaoFinanceira,
+  PadraoNotificacaoBancaria,
+} from "@prisma/client";
 
 describe("PadroesNotificacoesBancariasController", () => {
   let controller: PadroesNotificacoesBancariasController;
@@ -34,7 +37,7 @@ describe("PadroesNotificacoesBancariasController", () => {
   describe("obterOuGerar", () => {
     it("should delegate to the service and return its result", async () => {
       const createDto: PadraoNotificacaoBancariaCreateDto = {
-        instituicao_financeira: "Itaú",
+        instituicao_financeira: InstituicaoFinanceira.ITAU,
         titulo_notificacao: "Compra aprovada",
         corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
       };
@@ -53,7 +56,7 @@ describe("PadroesNotificacoesBancariasController", () => {
   describe("findAll", () => {
     it("should delegate to the service and return its result", async () => {
       const filters: PadraoNotificacaoBancariaFindDto = {
-        instituicao_financeira: "Itaú",
+        instituicao_financeira: InstituicaoFinanceira.ITAU,
       };
 
       const result = [{ id: 1 }] as PadraoNotificacaoBancaria[];

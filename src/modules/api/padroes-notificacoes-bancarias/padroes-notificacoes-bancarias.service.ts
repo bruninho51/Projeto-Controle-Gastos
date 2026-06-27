@@ -1,4 +1,9 @@
-import { Inject, Injectable } from "@nestjs/common";
+import {
+  BadGatewayException,
+  Inject,
+  Injectable,
+  Logger,
+} from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "../../prisma/prisma.service";
 import { GeminiService } from "../../gemini/gemini.service";
@@ -7,9 +12,14 @@ import { PadraoNotificacaoBancariaFindDto } from "./dtos/PadraoNotificacaoBancar
 import { PadraoNotificacaoBancariaResponseDto } from "./dtos/PadraoNotificacaoBancariaResponse.dto";
 
 const VALIDADE_PADRAO_DIAS = 30;
+const MAX_TENTATIVAS_GERACAO_REGEX = 3;
 
 @Injectable()
 export class PadroesNotificacoesBancariasService {
+  private readonly logger = new Logger(
+    PadroesNotificacoesBancariasService.name,
+  );
+
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     private readonly geminiService: GeminiService,
@@ -34,7 +44,7 @@ export class PadroesNotificacoesBancariasService {
       return PadraoNotificacaoBancariaResponseDto.fromEntity(existente);
     }
 
-    const regex = await this.geminiService.gerarRegexNotificacao(
+    const regex = await this.gerarRegexComRetentativas(
       titulo_notificacao,
       corpo_notificacao,
     );
@@ -71,6 +81,38 @@ export class PadroesNotificacoesBancariasService {
 
     return registros.map((r) =>
       PadraoNotificacaoBancariaResponseDto.fromEntity(r),
+    );
+  }
+
+  /**
+   * Solicita ao Gemini uma regex válida, tentando novamente em caso de falha
+   * (regex sintaticamente inválida, sem os grupos nomeados obrigatórios, etc.).
+   * Nenhuma regex é persistida até que uma tentativa seja bem-sucedida.
+   */
+  private async gerarRegexComRetentativas(
+    titulo: string,
+    corpo: string,
+  ): Promise<string> {
+    let ultimaMensagemErro = "erro desconhecido";
+
+    for (
+      let tentativa = 1;
+      tentativa <= MAX_TENTATIVAS_GERACAO_REGEX;
+      tentativa++
+    ) {
+      try {
+        return await this.geminiService.gerarRegexNotificacao(titulo, corpo);
+      } catch (error) {
+        ultimaMensagemErro =
+          error instanceof Error ? error.message : String(error);
+        this.logger.warn(
+          `Tentativa ${tentativa}/${MAX_TENTATIVAS_GERACAO_REGEX} de geração de regex falhou: ${ultimaMensagemErro}`,
+        );
+      }
+    }
+
+    throw new BadGatewayException(
+      `Não foi possível gerar uma regex válida após ${MAX_TENTATIVAS_GERACAO_REGEX} tentativas: ${ultimaMensagemErro}`,
     );
   }
 
