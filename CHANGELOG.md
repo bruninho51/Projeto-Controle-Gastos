@@ -1,3 +1,12 @@
+# [1.34.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.33.0...v1.34.0) (2026-06-28)
+
+
+### Features
+
+* adiciona enum de bancos ([776a986](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/776a9868e83399d84467a651eb559f8822027034))
+* adiciona o recurso de padrões de notificações bancárias ([c944c03](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/c944c03a1bb91312dde88d45c71c605d91ed31d1))
+* junta gastos vencidos com gastos fixos ([efb34fc](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/efb34fc4c3bc921e6d63fa30d2dec6a037a84cce))
+
 # [1.33.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.32.0...v1.33.0) (2026-04-17)
 
 
