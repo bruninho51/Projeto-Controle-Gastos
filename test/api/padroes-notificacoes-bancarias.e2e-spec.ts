@@ -10,7 +10,7 @@ import { globalFilters } from "../../src/filters/global-filters";
 import { globalInterceptors } from "../../src/interceptors/globalInterceptors";
 import { runPrismaMigrations } from "../utils/run-prisma-migrations";
 import { faker } from "@faker-js/faker";
-import { InstituicaoFinanceira, Usuario } from "@prisma/client";
+import { Usuario } from "@prisma/client";
 import { AuthService } from "../../src/modules/api/auth/auth.service";
 import { AuthModule } from "../../src/modules/api/auth/auth.module";
 
@@ -18,8 +18,15 @@ jest.setTimeout(10000); // 10 segundos
 
 const apiGlobalPrefix = "/api/v1";
 
-function instituicaoAleatoria(): InstituicaoFinanceira {
-  return faker.helpers.arrayElement(Object.values(InstituicaoFinanceira));
+function instituicaoAleatoria(): string {
+  return faker.helpers.arrayElement([
+    "INTER",
+    "ITAU",
+    "NUBANK",
+    "ALELO",
+    "IFOOD_BENEFICIOS",
+    faker.company.name(),
+  ]);
 }
 
 describe("PadroesNotificacoesBancariasController (e2e)", () => {
@@ -190,9 +197,30 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
       expect(Array.isArray(response.body.message)).toBe(true);
     });
 
-    it("should return 400 when instituicao_financeira is not a valid enum value", async () => {
+    it("should accept any free-text instituicao_financeira value", async () => {
+      const regexGerada = "(?<valor>[\\d,.]+).*(?<estabelecimento>.+)";
+      geminiServiceMock.gerarRegexNotificacao.mockResolvedValue(regexGerada);
+
+      const createDto: PadraoNotificacaoBancariaCreateDto = {
+        instituicao_financeira: "BANCO_NAO_CATALOGADO",
+        titulo_notificacao: faker.lorem.words(3),
+        corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
+      };
+
+      const response = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/padroes-notificacoes-bancarias`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send(createDto)
+        .expect(201);
+
+      expect(response.body.instituicao_financeira).toBe(
+        createDto.instituicao_financeira,
+      );
+    });
+
+    it("should return 400 when instituicao_financeira is empty", async () => {
       const createDto = {
-        instituicao_financeira: "BANCO_INEXISTENTE",
+        instituicao_financeira: "",
         titulo_notificacao: faker.lorem.words(3),
         corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
       };
@@ -204,9 +232,6 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
         .expect(400);
 
       expect(response.body.statusCode).toBe(400);
-      expect(response.body.message).toEqual([
-        "instituicao_financeira must be one of the following values: INTER, ITAU, NUBANK, ALELO, IFOOD_BENEFICIOS",
-      ]);
       expect(geminiServiceMock.gerarRegexNotificacao).not.toHaveBeenCalled();
     });
 
@@ -338,17 +363,26 @@ describe("PadroesNotificacoesBancariasController (e2e)", () => {
       expect(response.body[0].id).toBe(registro.id);
     });
 
-    it("should return 400 when instituicao_financeira filter is not a valid enum value", async () => {
+    it("should filter by any free-text instituicao_financeira value", async () => {
+      const instituicao_financeira = "BANCO_NAO_CATALOGADO";
+
+      const registro = await prisma.padraoNotificacaoBancaria.create({
+        data: {
+          instituicao_financeira,
+          titulo_notificacao: faker.lorem.words(2),
+          regex: "(?<valor>.+).*(?<estabelecimento>.+)",
+          data_expiracao: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        },
+      });
+
       const response = await request(app.getHttpServer())
         .get(`${apiGlobalPrefix}/padroes-notificacoes-bancarias`)
-        .query({ instituicao_financeira: "BANCO_INEXISTENTE" })
+        .query({ instituicao_financeira })
         .set("Authorization", `Bearer ${userJwt}`)
-        .expect(400);
+        .expect(200);
 
-      expect(response.body.statusCode).toBe(400);
-      expect(response.body.message).toEqual([
-        "instituicao_financeira must be one of the following values: INTER, ITAU, NUBANK, ALELO, IFOOD_BENEFICIOS",
-      ]);
+      const encontrado = response.body.find((r) => r.id === registro.id);
+      expect(encontrado).toBeDefined();
     });
   });
 });

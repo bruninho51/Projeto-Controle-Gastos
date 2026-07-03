@@ -1,8 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import {
-  InstituicaoFinanceira,
-  PadraoNotificacaoBancaria,
-} from "@prisma/client";
+import { PadraoNotificacaoBancaria } from "@prisma/client";
 import { Exclude, Expose, plainToInstance } from "class-transformer";
 
 @Exclude()
@@ -16,11 +13,10 @@ export class PadraoNotificacaoBancariaResponseDto {
 
   @Expose()
   @ApiProperty({
-    enum: InstituicaoFinanceira,
-    example: InstituicaoFinanceira.ITAU,
+    example: "ITAU",
     description: "Instituição financeira que enviou a notificação",
   })
-  instituicao_financeira: InstituicaoFinanceira;
+  instituicao_financeira: string;
 
   @Expose()
   @ApiProperty({

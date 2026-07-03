@@ -1,15 +1,14 @@
-import { IsString, IsNotEmpty, IsEnum } from "class-validator";
+import { IsString, IsNotEmpty } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
-import { InstituicaoFinanceira } from "@prisma/client";
 
 export class PadraoNotificacaoBancariaCreateDto {
-  @IsEnum(InstituicaoFinanceira)
+  @IsString()
+  @IsNotEmpty()
   @ApiProperty({
     description: "Instituição financeira que enviou a notificação",
-    enum: InstituicaoFinanceira,
-    example: InstituicaoFinanceira.ITAU,
+    example: "ITAU",
   })
-  instituicao_financeira: InstituicaoFinanceira;
+  instituicao_financeira: string;
 
   @IsString()
   @IsNotEmpty()

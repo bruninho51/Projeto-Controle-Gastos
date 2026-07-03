@@ -3,10 +3,7 @@ import { BadGatewayException } from "@nestjs/common";
 import { PadroesNotificacoesBancariasService } from "./padroes-notificacoes-bancarias.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { GeminiService } from "../../gemini/gemini.service";
-import {
-  InstituicaoFinanceira,
-  PadraoNotificacaoBancaria,
-} from "@prisma/client";
+import { PadraoNotificacaoBancaria } from "@prisma/client";
 import { faker } from "@faker-js/faker";
 import { PadraoNotificacaoBancariaCreateDto } from "./dtos/PadraoNotificacaoBancariaCreate.dto";
 import { PadraoNotificacaoBancariaFindDto } from "./dtos/PadraoNotificacaoBancariaFind.dto";
@@ -48,7 +45,7 @@ describe("PadraoNotificacoesBancariasService", () => {
     const now = new Date();
     return {
       id: faker.number.int(),
-      instituicao_financeira: InstituicaoFinanceira.ITAU,
+      instituicao_financeira: "ITAU",
       titulo_notificacao: "Compra aprovada",
       regex: "(?<valor>[\\d,.]+).*(?<estabelecimento>.+)",
       data_criacao: now,
@@ -61,7 +58,7 @@ describe("PadraoNotificacoesBancariasService", () => {
 
   describe("obterOuGerar", () => {
     const createDto: PadraoNotificacaoBancariaCreateDto = {
-      instituicao_financeira: InstituicaoFinanceira.ITAU,
+      instituicao_financeira: "ITAU",
       titulo_notificacao: "Compra aprovada",
       corpo_notificacao: "Compra de R$ 59,90 em MERCADO SAO JOAO aprovada.",
     };
@@ -280,12 +277,12 @@ describe("PadraoNotificacoesBancariasService", () => {
 
     it("should query with both filters when both are provided", async () => {
       const filters: PadraoNotificacaoBancariaFindDto = {
-        instituicao_financeira: InstituicaoFinanceira.ITAU,
+        instituicao_financeira: "ITAU",
         titulo_notificacao: "Compra aprovada",
       };
 
       expect(await findAllWhere(filters)).toEqual({
-        instituicao_financeira: InstituicaoFinanceira.ITAU,
+        instituicao_financeira: "ITAU",
         titulo_notificacao: "Compra aprovada",
       });
     });
@@ -297,10 +294,10 @@ describe("PadraoNotificacoesBancariasService", () => {
     it("should query only by instituicao_financeira", async () => {
       expect(
         await findAllWhere({
-          instituicao_financeira: InstituicaoFinanceira.ITAU,
+          instituicao_financeira: "ITAU",
         }),
       ).toEqual({
-        instituicao_financeira: InstituicaoFinanceira.ITAU,
+        instituicao_financeira: "ITAU",
       });
     });
 
