@@ -1,3 +1,10 @@
+# [1.35.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.34.0...v1.35.0) (2026-07-03)
+
+
+### Features
+
+* remove enum de instituição financeira ([71d54b7](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/71d54b7c0fe670549175254738fb4f8591e151cf))
+
 # [1.34.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.33.0...v1.34.0) (2026-06-28)
 
 
