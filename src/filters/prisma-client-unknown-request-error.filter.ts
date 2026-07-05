@@ -3,12 +3,18 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { Response } from "express";
+import { logEvent } from "../logging/log-event";
 
 @Catch(Prisma.PrismaClientUnknownRequestError)
 export class PrismaClientUnknownRequestErrorFilter implements ExceptionFilter {
+  private readonly logger = new Logger(
+    PrismaClientUnknownRequestErrorFilter.name,
+  );
+
   catch(
     exception: Prisma.PrismaClientUnknownRequestError,
     host: ArgumentsHost,
@@ -31,13 +37,12 @@ export class PrismaClientUnknownRequestErrorFilter implements ExceptionFilter {
         });
       }
 
-      console.error(
-        "Erro MySQL - Code:",
-        code,
-        "Message:",
-        message,
-        "State:",
-        state,
+      this.logger.error(
+        logEvent("error", "mysql.unknown_request_error", {
+          code,
+          message,
+          state,
+        }),
       );
     }
 

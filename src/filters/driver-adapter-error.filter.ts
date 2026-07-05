@@ -3,12 +3,16 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import { Response } from "express";
 import { DriverAdapterError } from "../modules/prisma/prisma.service";
+import { logEvent } from "../logging/log-event";
 
 @Catch(DriverAdapterError)
 export class DriverAdapterErrorFilter implements ExceptionFilter {
+  private readonly logger = new Logger(DriverAdapterErrorFilter.name);
+
   catch(exception: DriverAdapterError, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
@@ -25,13 +29,8 @@ export class DriverAdapterErrorFilter implements ExceptionFilter {
       });
     }
 
-    console.error(
-      "Erro MySQL - Code:",
-      code,
-      "Message:",
-      message,
-      "State:",
-      state,
+    this.logger.error(
+      logEvent("error", "mysql.driver_adapter_error", { code, message, state }),
     );
 
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send();

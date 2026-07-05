@@ -7,11 +7,17 @@ import { globalInterceptors } from "./interceptors/globalInterceptors";
 import { Registry } from "prom-client";
 import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
+import { JsonLogger } from "./logging/json-logger.service";
+import { correlationIdMiddleware } from "./logging/correlation-id.middleware";
 
 async function bootstrap() {
   const apiGlobalPrefix = "/api/v1";
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+
+  app.useLogger(new JsonLogger());
+
+  app.use(correlationIdMiddleware);
 
   app.use((req: Request, res: Response, next: NextFunction) => {
     res.setHeader("X-Powered-By", "Orcamentos API");

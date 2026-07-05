@@ -3,12 +3,18 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
+  Logger,
 } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { Response } from "express";
+import { logEvent } from "../logging/log-event";
 
 @Catch(Prisma.PrismaClientKnownRequestError)
 export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
+  private readonly logger = new Logger(
+    PrismaClientKnownRequestErrorFilter.name,
+  );
+
   catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const response = context.getResponse<Response>();
@@ -73,7 +79,13 @@ export class PrismaClientKnownRequestErrorFilter implements ExceptionFilter {
     exception: Prisma.PrismaClientKnownRequestError,
     response: Response,
   ) {
-    console.error("Erro desconhecido do Prisma:", exception);
+    this.logger.error(
+      logEvent("error", "prisma.known_request_error.unmapped", {
+        code: exception.code,
+        message: exception.message,
+      }),
+      exception.stack,
+    );
     return response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       message:
         "Erro interno no servidor. Por favor, tente novamente mais tarde.",
