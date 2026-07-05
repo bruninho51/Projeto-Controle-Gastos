@@ -1,3 +1,10 @@
+# [1.36.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.35.0...v1.36.0) (2026-07-05)
+
+
+### Features
+
+* adiciona logs em json ([0de9fd3](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/0de9fd3a8625c953fa223793675837db012ab508))
+
 # [1.35.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.34.0...v1.35.0) (2026-07-03)
 
 
