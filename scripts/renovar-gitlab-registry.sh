@@ -1,4 +1,41 @@
 #!/usr/bin/env bash
+# ==================================================
+# renovar-gitlab-registry.sh
+#
+# Para que serve:
+#   O cluster K3s puxa a imagem da aplicação do GitLab Container Registry
+#   (registry.gitlab.com) usando um imagePullSecret. Esse secret é gerado a
+#   partir de um token do GitLab, que expira. Quando expira, os pods passam a
+#   falhar com ErrImagePull / ImagePullBackOff. Este script renova o secret.
+#
+# O que faz:
+#   1. Pede usuário e IP/hostname do servidor (SSH).
+#   2. Copia um script auxiliar ao servidor e o executa lá, onde pede o
+#      usuário e o token do GitLab Registry e faz `docker login` em um
+#      diretório temporário (o login do seu usuário não é alterado).
+#   3. Gera o Secret (tipo kubernetes.io/dockerconfigjson) com
+#      `kubectl --dry-run=client`, sem aplicá-lo ao cluster.
+#   4. Criptografa o Secret com `kubeseal`, usando o controller
+#      sealed-secrets do cluster, produzindo um SealedSecret. Só o cluster
+#      consegue descriptografá-lo, por isso é seguro versioná-lo no git.
+#   5. Baixa o SealedSecret e grava em k8s/app/gitlab-registry.yml, somente se
+#      o conteúdo for válido (não vazio e com `kind: SealedSecret`).
+#   6. Remove os arquivos temporários local e remoto e fecha a conexão SSH.
+#
+# Como usar:
+#   ./scripts/renovar-gitlab-registry.sh
+#   Depois, revise o diff, faça commit e deixe o pipeline/ArgoCD aplicar o
+#   k8s/app/gitlab-registry.yml.
+#
+# Pré-requisitos:
+#   - Local: ssh e scp.
+#   - Servidor: docker, kubectl e kubeseal, e sudo para o usuário SSH.
+#   - Token do GitLab com permissão de leitura no registry (read_registry).
+#
+# Segurança:
+#   O token é lido sem eco, passado ao docker por stdin e nunca gravado em
+#   disco fora do diretório temporário (modo 700), apagado ao final.
+# ==================================================
 set -Eeuo pipefail
 
 # ==================================================
