@@ -1,3 +1,10 @@
+## [1.36.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.36.0...v1.36.1) (2026-10-18)
+
+
+### Bug Fixes
+
+* renova gitlab registry secret ([2394642](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/2394642a47b5aceca3d6a2c9149cc824763d91de))
+
 # [1.36.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.35.0...v1.36.0) (2026-07-05)
 
 
