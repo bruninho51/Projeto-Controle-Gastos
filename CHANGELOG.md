@@ -1,3 +1,10 @@
+# [1.37.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.36.1...v1.37.0) (2026-11-02)
+
+
+### Features
+
+* adiciona tipo DESPESA/PATRIMONIO às categorias de gastos ([b5b8e70](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/b5b8e70b8f81e3427786dafc0876714ed1c85f39))
+
 ## [1.36.1](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.36.0...v1.36.1) (2026-10-18)
 
 
