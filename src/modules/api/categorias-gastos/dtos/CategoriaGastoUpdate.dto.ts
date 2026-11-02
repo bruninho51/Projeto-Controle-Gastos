@@ -4,8 +4,10 @@ import {
   IsDate,
   IsNotEmpty,
   ValidateIf,
+  IsEnum,
 } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { TipoCategoriaGasto } from "@prisma/client";
 import { Transform } from "class-transformer";
 
 export class CategoriaGastoUpdateDto {
@@ -19,6 +21,16 @@ export class CategoriaGastoUpdateDto {
     nullable: true,
   })
   nome?: string | null;
+
+  @IsOptional()
+  @IsEnum(TipoCategoriaGasto)
+  @ApiPropertyOptional({
+    description:
+      "Tipo da categoria. Só pode ser alterado enquanto a categoria não tiver gastos lançados.",
+    enum: TipoCategoriaGasto,
+    example: TipoCategoriaGasto.PATRIMONIO,
+  })
+  tipo?: TipoCategoriaGasto;
 
   @IsOptional()
   @IsDate()

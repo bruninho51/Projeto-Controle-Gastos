@@ -29,7 +29,9 @@ CREATE OR REPLACE VIEW vw_gastos_ativos AS
         gf.observacoes AS gasto_observacoes,
         gf.data_criacao AS gasto_data_criacao,
         gf.data_atualizacao AS gasto_data_atualizacao,
-        gf.data_venc AS gasto_data_venc
+        gf.data_venc AS gasto_data_venc,
+        -- Categoria
+        cg.tipo AS categoria_tipo
     FROM gastos_fixos gf
     INNER JOIN orcamentos o ON o.id = gf.orcamento_id
     INNER JOIN usuarios u ON u.id = o.usuario_id
@@ -64,7 +66,9 @@ CREATE OR REPLACE VIEW vw_gastos_ativos AS
         gv.observacoes AS gasto_observacoes,
         gv.data_criacao AS gasto_data_criacao,
         gv.data_atualizacao AS gasto_data_atualizacao,
-        NULL AS gasto_data_venc
+        NULL AS gasto_data_venc,
+        -- Categoria
+        cg.tipo AS categoria_tipo
     FROM gastos_variados gv
     INNER JOIN orcamentos o ON o.id = gv.orcamento_id
     INNER JOIN usuarios u ON u.id = o.usuario_id

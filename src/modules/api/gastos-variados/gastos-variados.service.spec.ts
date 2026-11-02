@@ -19,6 +19,7 @@ function buildCategoriaGasto(
   return {
     id: faker.number.int(),
     nome: "Categoria Teste",
+    tipo: "DESPESA",
     data_criacao: new Date(),
     data_atualizacao: new Date(),
     data_inatividade: null,
@@ -72,6 +73,7 @@ function toResponseDto(
   const categoriaDto = new CategoriaGastoResponseDto({});
   categoriaDto.id = categoriaGasto.id;
   categoriaDto.nome = categoriaGasto.nome;
+  categoriaDto.tipo = categoriaGasto.tipo;
   categoriaDto.data_criacao = categoriaGasto.data_criacao;
   categoriaDto.data_atualizacao = categoriaGasto.data_atualizacao;
   categoriaDto.data_inatividade = categoriaGasto.data_inatividade;

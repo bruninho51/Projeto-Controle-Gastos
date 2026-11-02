@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { CategoriaGasto } from "@prisma/client";
+import { CategoriaGasto, TipoCategoriaGasto } from "@prisma/client";
 import { Exclude, Expose, plainToInstance } from "class-transformer";
 
 @Exclude()
@@ -17,6 +17,14 @@ export class CategoriaGastoResponseDto {
     description: "Nome da categoria de gasto",
   })
   nome: string;
+
+  @Expose()
+  @ApiProperty({
+    enum: TipoCategoriaGasto,
+    example: TipoCategoriaGasto.DESPESA,
+    description: "Tipo da categoria (DESPESA ou PATRIMONIO)",
+  })
+  tipo: TipoCategoriaGasto;
 
   @Expose()
   @ApiProperty({
@@ -51,6 +59,7 @@ export class CategoriaGastoResponseDto {
       {
         id: entity.id,
         nome: entity.nome,
+        tipo: entity.tipo,
         data_criacao: entity.data_criacao,
         data_atualizacao: entity.data_atualizacao,
         data_inatividade: entity.data_inatividade,

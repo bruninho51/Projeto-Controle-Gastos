@@ -10,7 +10,7 @@ import { globalInterceptors } from "../../src/interceptors/globalInterceptors";
 import { runPrismaMigrations } from "../utils/run-prisma-migrations";
 import { faker } from "@faker-js/faker";
 import { CategoriaGastoUpdateDto } from "../../src/modules/api/categorias-gastos/dtos/CategoriaGastoUpdate.dto";
-import { Usuario } from "@prisma/client";
+import { TipoCategoriaGasto, Usuario } from "@prisma/client";
 import { AuthService } from "../../src/modules/api/auth/auth.service";
 import { AuthModule } from "../../src/modules/api/auth/auth.module";
 
@@ -107,6 +107,28 @@ describe("CategoriasGastosController (e2e)", () => {
     });
   });
 
+  describe(`GET ${apiGlobalPrefix}/categorias-gastos?tipo`, () => {
+    it("should filter categorias by tipo", async () => {
+      const patrimonio = await prisma.categoriaGasto.create({
+        data: {
+          nome: faker.string.alphanumeric(8),
+          tipo: TipoCategoriaGasto.PATRIMONIO,
+          usuario_id: user.id,
+        },
+      });
+
+      const response = await request(app.getHttpServer())
+        .get(`${apiGlobalPrefix}/categorias-gastos?tipo=PATRIMONIO`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .expect(200);
+
+      expect(response.body.map((c) => c.id)).toContain(patrimonio.id);
+      expect(
+        response.body.every((c) => c.tipo === TipoCategoriaGasto.PATRIMONIO),
+      ).toBe(true);
+    });
+  });
+
   describe(`POST ${apiGlobalPrefix}/categorias-gastos`, () => {
     it("should create a new categoria de gasto", async () => {
       const newCategoria: CategoriaGastoCreateDto = {
@@ -123,9 +145,37 @@ describe("CategoriasGastosController (e2e)", () => {
       expect(response.body.nome).toBe(newCategoria.nome);
     });
 
+    it("should default tipo to DESPESA and accept PATRIMONIO", async () => {
+      const padrao = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({ nome: faker.string.alphanumeric(8) })
+        .expect(201);
+      expect(padrao.body.tipo).toBe(TipoCategoriaGasto.DESPESA);
+
+      const patrimonio = await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({
+          nome: faker.string.alphanumeric(8),
+          tipo: TipoCategoriaGasto.PATRIMONIO,
+        })
+        .expect(201);
+      expect(patrimonio.body.tipo).toBe(TipoCategoriaGasto.PATRIMONIO);
+    });
+
+    it("should return 400 when tipo is invalid", async () => {
+      await request(app.getHttpServer())
+        .post(`${apiGlobalPrefix}/categorias-gastos`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({ nome: faker.string.alphanumeric(8), tipo: "INVALIDO" })
+        .expect(400);
+    });
+
     it("should return 400 with correct messages when create a new categoria gasto when all fields as null", async () => {
       const newCategoria: Required<CategoriaGastoCreateDto> = {
         nome: null,
+        tipo: undefined,
       };
 
       const response = await request(app.getHttpServer())
@@ -147,6 +197,7 @@ describe("CategoriasGastosController (e2e)", () => {
     it("should return 400 with correct messages when create a new categoria gasto when all fields as wrong", async () => {
       const newCategoria: Required<CategoriaGastoCreateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        tipo: undefined,
       };
 
       const response = await request(app.getHttpServer())
@@ -329,6 +380,52 @@ describe("CategoriasGastosController (e2e)", () => {
       expect(response.body.data_inatividade).toBeNull();
     });
 
+    it("should change tipo of a categoria without gastos", async () => {
+      const categoria = await prisma.categoriaGasto.create({
+        data: { nome: faker.string.alphanumeric(8), usuario_id: user.id },
+      });
+
+      const response = await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({ tipo: TipoCategoriaGasto.PATRIMONIO })
+        .expect(200);
+
+      expect(response.body.tipo).toBe(TipoCategoriaGasto.PATRIMONIO);
+    });
+
+    it("should return 409 when changing tipo of a categoria that has gastos", async () => {
+      const categoria = await prisma.categoriaGasto.create({
+        data: { nome: faker.string.alphanumeric(8), usuario_id: user.id },
+      });
+      const orcamento = await prisma.orcamento.create({
+        data: {
+          nome: faker.string.alphanumeric(5),
+          valor_inicial: "1000",
+          usuario_id: user.id,
+        },
+      });
+      await prisma.gastoVariado.create({
+        data: {
+          descricao: "Gasto",
+          valor: "10",
+          data_pgto: new Date(),
+          categoria_id: categoria.id,
+          orcamento_id: orcamento.id,
+        },
+      });
+
+      await request(app.getHttpServer())
+        .patch(`${apiGlobalPrefix}/categorias-gastos/${categoria.id}`)
+        .set("Authorization", `Bearer ${userJwt}`)
+        .send({ tipo: TipoCategoriaGasto.PATRIMONIO })
+        .expect(409);
+
+      const view = await prisma.$queryRaw<{ categoria_tipo: string }[]>`
+        SELECT categoria_tipo FROM vw_gastos_ativos WHERE gasto_categoria_id = ${categoria.id}`;
+      expect(view).toEqual([{ categoria_tipo: TipoCategoriaGasto.DESPESA }]);
+    });
+
     it("should return 400 with correct messages when update a categoria gasto when all fields as null", async () => {
       const nome = faker.string.alphanumeric(6).toUpperCase();
       const categoria = await prisma.categoriaGasto.create({
@@ -362,6 +459,7 @@ describe("CategoriasGastosController (e2e)", () => {
 
       const updatedCategoria: Required<CategoriaGastoUpdateDto> = {
         nome: faker.number.int({ min: 100, max: 999 }) as unknown as string,
+        tipo: undefined,
         data_inatividade: faker.string.alpha(5) as unknown as Date,
       };
 
