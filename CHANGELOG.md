@@ -1,3 +1,10 @@
+# [1.38.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.37.0...v1.38.0) (2026-11-03)
+
+
+### Features
+
+* atualiza credenciais gitlab registry ([3e69194](https://gitlab.com/bruninho51/projeto-controle-gastos/commit/3e691943f2eaa999307cce53eea81ca1e9b79e29))
+
 # [1.37.0](https://gitlab.com/bruninho51/projeto-controle-gastos/compare/v1.36.1...v1.37.0) (2026-11-02)
 
 
